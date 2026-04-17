@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "nbu-nurse-assistant/package.json",
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
+    },
+    {
+      "src": "nbu-backend/src/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "nbu-backend/src/server.js"
+    },
+    {
+      "src": "/assets/(.*)",
+      "dest": "nbu-nurse-assistant/dist/assets/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "nbu-nurse-assistant/dist/index.html"
+    }
+  ]
+}
