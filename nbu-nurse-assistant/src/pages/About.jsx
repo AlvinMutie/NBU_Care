@@ -42,7 +42,7 @@ export default function About({ onBack }) {
               <Activity className="w-4 h-4" /> Better care for babies
            </div>
            <h1 className="text-4xl font-bold text-slate-900 tracking-tight mb-6">
-             Helping you provide the best care
+             Your Clinical Assistant
            </h1>
            <p className="text-lg text-slate-600">
              NeoDesk is a friendly clinical tool built to help nursing teams work more accurately, confidently, and safely every single shift.

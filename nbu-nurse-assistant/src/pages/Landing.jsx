@@ -70,7 +70,7 @@ export default function Landing({ onEnter }) {
           
           <div className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-10 hover:bg-white hover:border-primary/30 hover:text-primary transition-all cursor-default">
             <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 
-            <span className="opacity-60 group-hover:opacity-100 transition-opacity">Helping you provide the best care</span>
+            <span className="opacity-60 group-hover:opacity-100 transition-opacity">NeoDesk</span>
           </div>
 
           <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 leading-[0.9] mb-10 max-w-5xl">
