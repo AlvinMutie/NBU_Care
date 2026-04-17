@@ -1,0 +1,88 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@theme {
+  --color-primary: #0d9488; /* Care Teal */
+  --color-primary-dark: #0f766e;
+  --color-primary-light: #ccfbf1;
+  
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+  --color-surface-hover: #f1f5f9;
+  
+  --color-outline: #e2e8f0;
+  --color-outline-dark: #334155;
+  
+  --color-dark-bg: #0f172a; /* Slate 900 */
+  --color-dark-surface: #1e293b; /* Slate 800 */
+
+  --font-sans: "Inter", "system-ui", sans-serif;
+  --font-heading: "Inter", "system-ui", sans-serif; /* Unify typography for cleaner look */
+}
+
+/* Base Refinement */
+@layer base {
+  html {
+    @apply antialiased scroll-smooth;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+
+  body {
+    @apply font-sans bg-surface text-slate-900 transition-colors duration-500 overflow-x-hidden;
+  }
+
+  h1, h2, h3, h4, .font-heading {
+    @apply font-heading tracking-tight font-black;
+  }
+
+  .dark {
+    @apply bg-dark-bg text-slate-100;
+  }
+}
+
+/* Premium Clinical Utilities */
+@layer utilities {
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+  .dark .bg-surface {
+    background-color: var(--color-dark-bg);
+  }
+
+  .border-outline {
+    border-color: var(--color-outline);
+  }
+  .dark .border-outline {
+    border-color: var(--color-dark-outline);
+  }
+
+  .glass-emerald {
+    @apply backdrop-blur-md bg-white/90 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 shadow-sm;
+  }
+
+  .medical-shadow {
+    @apply shadow-sm hover:shadow-md transition-shadow duration-300;
+  }
+
+  /* Bento Specifics */
+  .bento-card {
+    @apply rounded-2xl p-8 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-all duration-300 hover:shadow-lg;
+  }
+
+  .dashboard-card {
+    @apply rounded-xl p-6 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  .btn-prestigious {
+    @apply flex items-center justify-center gap-2 bg-primary text-white px-6 py-3 rounded-lg font-medium text-sm shadow-sm hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 transition-all;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-marquee-slow {
+    animation: marquee 30s linear infinite;
+  }
+}
