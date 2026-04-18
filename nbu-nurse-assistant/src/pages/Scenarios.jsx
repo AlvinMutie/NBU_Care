@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 
-const ScenarioCard = ({ id, title, problem, solution, formulas, warning }) => {
+const ScenarioCard = ({ _id, title, problem, solution, formulas, warning }) => {
   const [expanded, setExpanded] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -20,7 +20,7 @@ const ScenarioCard = ({ id, title, problem, solution, formulas, warning }) => {
   const handleComplete = async () => {
     setLoading(true);
     try {
-      const res = await api.completeScenario(id || title);
+      const res = await api.completeScenario(_id || title);
       if (res.success) {
         setIsCompleted(true);
       }
@@ -139,6 +139,7 @@ const ScenarioCard = ({ id, title, problem, solution, formulas, warning }) => {
 export default function Scenarios() {
   const scenarios = [
     {
+      _id: 'hypoglycemia_01',
       title: 'Low Blood Sugar in a Newborn',
       problem: 'A 2.5kg newborn is 3 hours old and has a blood glucose of 2.1 mmol/L. The baby seems fine but has a risk factor — the mother has gestational diabetes.',
       solution: [
@@ -152,6 +153,7 @@ export default function Scenarios() {
       warning: 'Low blood sugar that is not treated can cause permanent brain damage or seizures. Act quickly and accurately.'
     },
     {
+      _id: 'resuscitation_01',
       title: 'Baby Not Breathing After Birth',
       problem: 'A baby is born by emergency C-section and is gasping with a heart rate of 80 bpm. The team has already dried and warmed the baby.',
       solution: [

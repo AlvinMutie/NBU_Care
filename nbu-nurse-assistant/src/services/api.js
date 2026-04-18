@@ -184,5 +184,26 @@ export const api = {
       body: JSON.stringify({ score })
     });
     return res.json();
+  },
+
+  getFlashcards: async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/flashcards`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  createFlashcard: async (cardData) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/flashcards`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(cardData)
+    });
+    return res.json();
   }
 };

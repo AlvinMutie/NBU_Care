@@ -12,7 +12,9 @@ import {
   ShieldCheck,
   BookOpen,
   ArrowRight,
-  Activity
+  Activity,
+  X,
+  FileText
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -165,15 +167,121 @@ const Flashcard = ({ _id, title, category, when, steps, warning, tips }) => {
   );
 };
 
+const AddCardModal = ({ isOpen, onClose, onAdd }) => {
+  const [formData, setFormData] = useState({ title: '', category: 'Clinical', steps: '', warning: '', tips: '' });
+  const [loading, setLoading] = useState(false);
+
+  if (!isOpen) return null;
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const stepsArray = formData.steps.split('\n').filter(s => s.trim());
+      const res = await api.createFlashcard({ ...formData, steps: stepsArray });
+      if (res.success) {
+        onAdd(res.data);
+        onClose();
+        setFormData({ title: '', category: 'Clinical', steps: '', warning: '', tips: '' });
+      }
+    } catch (err) {
+      console.error("Failed to create card");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl relative z-10 overflow-hidden">
+        <div className="p-8 border-b border-slate-100 flex justify-between items-center">
+          <div>
+            <h3 className="text-2xl font-bold text-slate-900 tracking-tight">New Procedure Card</h3>
+            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1">Add to the unit library</p>
+          </div>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-slate-50 text-slate-400">
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-6 max-h-[70vh] overflow-y-auto">
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Title</label>
+              <input 
+                required
+                value={formData.title}
+                onChange={e => setFormData({...formData, title: e.target.value})}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                placeholder="e.g. IV Cannulation"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Category</label>
+              <select 
+                value={formData.category}
+                onChange={e => setFormData({...formData, category: e.target.value})}
+                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              >
+                <option>Clinical</option>
+                <option>Critical</option>
+                <option>Daily Routine</option>
+              </select>
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Steps (one per line)</label>
+            <textarea 
+              required
+              rows="5"
+              value={formData.steps}
+              onChange={e => setFormData({...formData, steps: e.target.value})}
+              className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none"
+              placeholder="1. Wash hands&#10;2. Prepare equipment..."
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Warning (if any)</label>
+            <input 
+              value={formData.warning}
+              onChange={e => setFormData({...formData, warning: e.target.value})}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              placeholder="e.g. Do not use if expired"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Clinical Tips</label>
+            <input 
+              value={formData.tips}
+              onChange={e => setFormData({...formData, tips: e.target.value})}
+              className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+              placeholder="e.g. Always use a 24G needle"
+            />
+          </div>
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full py-3 bg-primary text-white rounded-xl font-bold text-sm shadow-sm hover:bg-primary-dark transition-all flex items-center justify-center gap-2"
+          >
+            {loading ? <Activity className="w-5 h-5 animate-pulse" /> : <><ShieldCheck className="w-5 h-5" /> Publish to Unit</>}
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default function Flashcards({ user }) {
   const [cards, setCards] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchCards = async () => {
       try {
-        const res = await api.get('/flashcards');
+        const res = await api.getFlashcards();
         if (res.success) {
           setCards(res.data);
         } else {
@@ -182,17 +290,27 @@ export default function Flashcards({ user }) {
       } catch (err) {
         setError('Hospital network secure synchronization failure.');
       } finally {
-        setIsLoading(false);
+        setLoading(false);
       }
     };
     fetchCards();
   }, []);
 
+  const handleAddCard = (newCard) => {
+    setCards([newCard, ...cards]);
+  };
+
+  const filteredCards = cards.filter(card => 
+    card.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    card.category.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const canAddCard = user?.role === 'Nursing In-Charge' || 
                     user?.role === 'Consultant Pediatrician';
 
   return (
-    <div className="max-w-[1600px] mx-auto w-full p-8">
+    <div className="max-w-[1600px] mx-auto w-full p-8 pb-32">
+      <AddCardModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} onAdd={handleAddCard} />
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 border-b border-slate-200 pb-8">
         <div>
           <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-2">Procedure Library</h2>
@@ -200,23 +318,28 @@ export default function Flashcards({ user }) {
           <p className="text-sm text-slate-500">Quick reference cards for common and critical neonatal procedures.</p>
         </div>
         <div className="flex gap-4">
-          <div className="relative">
-             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+          <div className="relative group">
+             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors" />
              <input 
               type="text" 
               placeholder="Search guides..." 
-              className="pl-12 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 w-64 outline-none" 
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="pl-12 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 w-64 outline-none shadow-sm" 
              />
           </div>
           {canAddCard && (
-            <button className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-bold transition-all shadow-sm">
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="flex items-center gap-2 px-6 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-bold transition-all shadow-sm active:scale-95"
+            >
               <Plus className="w-4 h-4" /> New Card
             </button>
           )}
         </div>
       </div>
 
-      {isLoading ? (
+      {loading ? (
         <div className="flex flex-col items-center justify-center py-32">
           <Activity className="w-8 h-8 text-primary animate-pulse mb-4" />
           <p className="text-sm font-bold text-slate-400">Loading guides...</p>
@@ -229,16 +352,16 @@ export default function Flashcards({ user }) {
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {cards.map((card, i) => (
+          {filteredCards.map((card, i) => (
             <Flashcard key={card._id || i} {...card} />
           ))}
-          {cards.length === 0 && (
+          {filteredCards.length === 0 && (
             <div className="col-span-full p-20 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center bg-slate-50 text-center">
                <div className="w-16 h-16 bg-white border border-slate-200 rounded-xl flex items-center justify-center mb-6 shadow-sm">
-                  <BookOpen className="w-8 h-8 text-slate-400" />
+                  <FileText className="w-8 h-8 text-slate-400" />
                </div>
-               <h4 className="text-lg font-bold text-slate-900 mb-2">No guides yet</h4>
-               <p className="text-sm font-medium text-slate-500 max-w-sm">Procedure guides will appear here once they've been added by the In-Charge.</p>
+               <h4 className="text-lg font-bold text-slate-900 mb-2">No guides found</h4>
+               <p className="text-sm font-medium text-slate-500 max-w-sm">Try searching for something else or add a new card.</p>
             </div>
           )}
         </div>

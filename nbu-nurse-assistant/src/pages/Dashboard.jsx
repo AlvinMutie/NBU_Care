@@ -35,7 +35,7 @@ const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) =>
 
 // --- ROLE-SPECIFIC VIEWS ---
 
-const AdminDashboard = ({ stats, loading }) => {
+const AdminDashboard = ({ stats, loading, onNavigate }) => {
   const [logs, setLogs] = useState([]);
   const [logsLoading, setLogsLoading] = useState(true);
 
@@ -85,7 +85,12 @@ const AdminDashboard = ({ stats, loading }) => {
                <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
                   <ActivityIcon className="w-4 h-4 text-primary" /> Recent Calculations
                </h3>
-               <button className="text-xs font-bold text-primary hover:underline transition-all">View All</button>
+               <button 
+                 onClick={() => onNavigate('audit-logs')}
+                 className="text-xs font-bold text-primary hover:underline transition-all"
+               >
+                 View All
+               </button>
             </div>
             <div className="flex-1 overflow-x-auto">
               {logsLoading ? (
@@ -592,7 +597,7 @@ export default function Dashboard({ user, onNavigate }) {
       )}
 
       {isAdminView ? (
-        <AdminDashboard stats={stats} loading={loading} />
+        <AdminDashboard stats={stats} loading={loading} onNavigate={onNavigate} />
       ) : isStudentView ? (
         <StudentDashboard onNavigate={onNavigate} user={user} />
       ) : (

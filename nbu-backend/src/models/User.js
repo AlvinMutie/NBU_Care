@@ -21,8 +21,8 @@ const UserSchema = new mongoose.Schema({
   },
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flashcard' }],
   learningStats: {
-    completedScenarios: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Scenario' }],
-    completedFlashcards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flashcard' }],
+    completedScenarios: [{ type: String }],
+    completedFlashcards: [{ type: String }],
     quizScore: { type: Number, default: 0 },
     badges: [{ type: String }],
     lastDailyQuiz: { type: Date }
