@@ -95,6 +95,7 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
             <div className="px-4 pt-6 py-2">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Learning Tools</p>
             </div>
+            <SidebarLink icon={Calculator} label="Practice Calculators" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
             <SidebarLink icon={BookOpen} label="Study Cards" active={currentPath === 'flashcards'} onClick={() => onNavigate('flashcards')} />
             <SidebarLink icon={HelpCircle} label="Patient Scenarios" active={currentPath === 'scenarios'} onClick={() => onNavigate('scenarios')} />
           </>

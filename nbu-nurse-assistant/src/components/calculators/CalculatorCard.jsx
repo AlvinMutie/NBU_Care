@@ -5,15 +5,18 @@ import {
   ShieldCheck
 } from 'lucide-react';
 
-const CalculatorCard = ({ title, icon: Icon, formula, result, resultLabel, error, warning, onLog, children }) => (
+const CalculatorCard = ({ title, icon: Icon, formula, result, resultLabel, error, warning, onLog, isPractice, children }) => (
   <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden flex flex-col group hover:shadow-md transition-shadow">
-    <div className="p-6 border-b border-slate-100 bg-slate-50">
+    <div className={`p-6 border-b border-slate-100 ${isPractice ? 'bg-amber-50/50' : 'bg-slate-50'}`}>
       <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-white border border-slate-200 rounded-xl flex items-center justify-center text-primary shadow-sm">
+        <div className={`w-10 h-10 ${isPractice ? 'bg-amber-100 text-amber-600' : 'bg-white border border-slate-200 text-primary'} rounded-xl flex items-center justify-center shadow-sm`}>
           <Icon className="w-5 h-5" />
         </div>
         <div>
-          <h3 className="text-lg font-bold text-slate-900 tracking-tight">{title}</h3>
+          <h3 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
+            {title}
+            {isPractice && <span className="text-[10px] font-bold text-amber-600 uppercase tracking-widest bg-amber-100 px-2 py-0.5 rounded">Practice</span>}
+          </h3>
           <p className="text-xs font-mono text-slate-500 mt-1">{formula}</p>
         </div>
       </div>
@@ -27,7 +30,7 @@ const CalculatorCard = ({ title, icon: Icon, formula, result, resultLabel, error
       <div className={`mt-auto p-4 rounded-xl border transition-all ${
         error ? 'bg-rose-50 border-rose-100 text-rose-600' : 
         warning && result ? 'bg-amber-50 border-amber-100 text-amber-700' :
-        result ? 'bg-emerald-50 border-emerald-100 text-emerald-700' : 
+        result ? (isPractice ? 'bg-amber-50 border-amber-100 text-amber-700' : 'bg-emerald-50 border-emerald-100 text-emerald-700') : 
         'bg-slate-50 border-slate-100 text-slate-500'
       }`}>
         <div className="flex items-center justify-between gap-4">
@@ -35,7 +38,7 @@ const CalculatorCard = ({ title, icon: Icon, formula, result, resultLabel, error
             <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
               error ? 'bg-rose-100 text-rose-600' : 
               warning && result ? 'bg-amber-100 text-amber-600' :
-              result ? 'bg-emerald-100 text-emerald-600' : 
+              result ? (isPractice ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600') : 
               'bg-slate-200 text-slate-400'
             }`}>
                {error ? <AlertTriangle className="w-5 h-5" /> : 
@@ -44,7 +47,7 @@ const CalculatorCard = ({ title, icon: Icon, formula, result, resultLabel, error
             </div>
             <div>
               <p className="text-[10px] font-bold uppercase tracking-wider opacity-70 mb-0.5">
-                Here is the result
+                {isPractice ? 'Practice Result' : 'Official Result'}
               </p>
               <div className="flex items-baseline gap-1.5">
                 <span className="text-2xl font-black tracking-tight">{error || result || '—'}</span>
@@ -56,9 +59,9 @@ const CalculatorCard = ({ title, icon: Icon, formula, result, resultLabel, error
           {result && !error && onLog && (
             <button 
               onClick={onLog}
-              className="px-3 py-1.5 bg-white/50 hover:bg-white text-[10px] font-bold uppercase tracking-widest text-slate-700 rounded-lg border border-slate-200/50 shadow-sm transition-all active:scale-95"
+              className={`px-3 py-1.5 ${isPractice ? 'bg-amber-600 text-white' : 'bg-white/50 hover:bg-white text-slate-700'} text-[10px] font-bold uppercase tracking-widest rounded-lg border border-slate-200/50 shadow-sm transition-all active:scale-95`}
             >
-              Record Result
+              {isPractice ? 'Check Calculation' : 'Record Result'}
             </button>
           )}
         </div>

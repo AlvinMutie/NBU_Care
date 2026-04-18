@@ -137,5 +137,52 @@ export const api = {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     return res.json();
+  },
+
+  getLearningStats: async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/learning/stats`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  completeScenario: async (scenarioId) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/learning/complete-scenario`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ scenarioId })
+    });
+    return res.json();
+  },
+
+  completeFlashcard: async (flashcardId) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/learning/complete-flashcard`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ flashcardId })
+    });
+    return res.json();
+  },
+
+  updateQuizScore: async (score) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/learning/quiz-score`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ score })
+    });
+    return res.json();
   }
 };

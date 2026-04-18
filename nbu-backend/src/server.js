@@ -20,6 +20,7 @@ app.use('/api/flashcards', require('./routes/flashcards'));
 app.use('/api/scenarios', require('./routes/scenarios'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/logs', require('./routes/logs'));
+app.use('/api/learning', require('./routes/learning'));
 
 // Basic Route
 app.get('/api/health', (req, res) => res.json({ status: 'NeoDesk Assistant Backend Online' }));

@@ -16,20 +16,39 @@ import {
 } from 'lucide-react';
 import { api } from '../services/api';
 
-const Flashcard = ({ title, category, when, steps, warning, tips }) => {
+const Flashcard = ({ _id, title, category, when, steps, warning, tips }) => {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isRead, setIsRead] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const toggleExpand = () => setIsExpanded(!isExpanded);
+
+  const handleMarkAsRead = async (e) => {
+    e.stopPropagation();
+    setLoading(true);
+    try {
+      const res = await api.completeFlashcard(_id || title);
+      if (res.success) {
+        setIsRead(true);
+      }
+    } catch (err) {
+      console.error("Failed to mark flashcard as read");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className={`bg-white rounded-2xl border transition-all duration-300 ${isExpanded ? 'border-primary/50 shadow-md ring-4 ring-primary/5' : 'border-slate-200 hover:border-slate-300 hover:shadow-sm'}`}>
       <div className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex gap-4 items-center">
-            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border ${
+            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 border transition-all ${
+              isRead ? 'bg-emerald-500 text-white border-emerald-500' :
               category === 'Critical' ? 'bg-rose-50 text-rose-600 border-rose-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'
             }`}>
-               {category === 'Critical' ? <AlertTriangle className="w-6 h-6" /> : <Baby className="w-6 h-6" />}
+               {isRead ? <CheckCircle2 className="w-6 h-6" /> : 
+                category === 'Critical' ? <AlertTriangle className="w-6 h-6" /> : <Baby className="w-6 h-6" />}
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
@@ -40,21 +59,35 @@ const Flashcard = ({ title, category, when, steps, warning, tips }) => {
                  }`}>
                    {category}
                  </span>
-                 <div className="flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    <ShieldCheck className="w-3 h-3" /> Validated
-                 </div>
+                 {isRead && (
+                   <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-600 uppercase tracking-wider">
+                      <ShieldCheck className="w-3 h-3" /> Reviewed
+                   </div>
+                 )}
               </div>
               <h3 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h3>
             </div>
           </div>
-          <button 
-            onClick={toggleExpand}
-            className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
-              isExpanded ? 'bg-primary text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 border border-slate-200'
-            }`}
-          >
-            {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-          </button>
+          <div className="flex gap-2">
+            {!isRead && (
+              <button 
+                onClick={handleMarkAsRead}
+                disabled={loading}
+                className="w-10 h-10 rounded-lg bg-slate-50 text-slate-400 hover:bg-emerald-50 hover:text-emerald-600 border border-slate-200 flex items-center justify-center transition-all"
+                title="Mark as Read"
+              >
+                <CheckCircle2 className="w-5 h-5" />
+              </button>
+            )}
+            <button 
+              onClick={toggleExpand}
+              className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors shrink-0 ${
+                isExpanded ? 'bg-primary text-white' : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600 border border-slate-200'
+              }`}
+            >
+              {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
 
         <div className={`transition-all duration-500 overflow-hidden ${isExpanded ? 'max-h-[2000px] opacity-100 mt-8' : 'max-h-0 opacity-0 mt-0'}`}>

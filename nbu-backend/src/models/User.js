@@ -20,6 +20,13 @@ const UserSchema = new mongoose.Schema({
     default: 'Student'
   },
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flashcard' }],
+  learningStats: {
+    completedScenarios: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Scenario' }],
+    completedFlashcards: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flashcard' }],
+    quizScore: { type: Number, default: 0 },
+    badges: [{ type: String }],
+    lastDailyQuiz: { type: Date }
+  },
   status: { 
     type: String, 
     enum: ['Active', 'Restricted'], 

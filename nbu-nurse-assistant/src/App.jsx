@@ -47,7 +47,7 @@ function App() {
   let safePage = currentPage;
   if (user) {
     if (!isAdmin && !isITSupport && (currentPage === 'audit-logs' || currentPage === 'manage-staff')) safePage = 'dashboard';
-    if (isStudent && (currentPage === 'calculators' || currentPage === 'favorites')) safePage = 'dashboard';
+    if (isStudent && (currentPage === 'favorites')) safePage = 'dashboard';
   }
 
   return (
