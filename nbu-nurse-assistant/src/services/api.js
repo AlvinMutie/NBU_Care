@@ -103,5 +103,39 @@ export const api = {
       body: JSON.stringify(settingsData)
     });
     return res.json();
+  },
+
+  updateProfile: async (profileData) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/auth/profile`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(profileData)
+    });
+    return res.json();
+  },
+
+  createLog: async (logData) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/logs`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(logData)
+    });
+    return res.json();
+  },
+
+  getRecentLogs: async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/logs/recent`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
   }
 };

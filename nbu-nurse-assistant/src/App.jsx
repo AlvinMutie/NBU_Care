@@ -86,13 +86,13 @@ function App() {
           user={user}
           onLogout={handleLogout}
         >
-          {safePage === 'dashboard' && <Dashboard user={user} />}
+          {safePage === 'dashboard' && <Dashboard user={user} onNavigate={setCurrentPage} />}
           {safePage === 'calculators' && <Calculators />}
           {safePage === 'flashcards' && <Flashcards user={user} />}
           {safePage === 'scenarios' && <Scenarios />}
           {safePage === 'audit-logs' && <AuditLogs />}
           {safePage === 'manage-staff' && <ManageStaff />}
-          {safePage === 'settings' && <Settings user={user} />}
+          {safePage === 'settings' && <Settings user={user} onUpdateUser={handleLogin} />}
         </MainLayout>
       )}
     </div>

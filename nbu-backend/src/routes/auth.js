@@ -28,4 +28,27 @@ router.post('/login', async (req, res) => {
   }
 });
 
+const auth = require('../middleware/auth');
+
+router.put('/profile', auth.protect, async (req, res) => {
+  try {
+    const { name, currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.user.id).select('+password');
+    
+    if (name) user.name = name;
+    
+    if (newPassword && currentPassword) {
+      if (!(await user.comparePassword(currentPassword))) {
+        return res.status(401).json({ success: false, message: 'Invalid current password' });
+      }
+      user.password = newPassword;
+    }
+    
+    await user.save();
+    res.json({ success: true, user: { id: user._id, name: user.name, email: user.email, role: user.role } });
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 module.exports = router;

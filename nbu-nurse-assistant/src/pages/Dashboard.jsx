@@ -35,124 +35,221 @@ const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) =>
 
 // --- ROLE-SPECIFIC VIEWS ---
 
-const AdminDashboard = ({ stats, loading }) => (
-  <div className="space-y-6">
-    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
-       <div>
-          <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Unit Overview</h2>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">How our unit is doing</h1>
-          <p className="text-sm text-slate-500 mt-1">A live look at our nursing tools and team progress.</p>
-       </div>
-       <div className="flex items-center gap-2">
-          <div className="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600 flex items-center gap-2">
-             <Clock className="w-3.5 h-3.5" /> Shift 2A
-          </div>
-          <button className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow-sm hover:bg-primary-dark transition-colors">
-             Export Records
-          </button>
-       </div>
-    </div>
+const AdminDashboard = ({ stats, loading }) => {
+  const [logs, setLogs] = useState([]);
+  const [logsLoading, setLogsLoading] = useState(true);
 
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      <StatCard title="Team Members" value={loading ? '...' : stats.users} icon={Users} colorClass="bg-indigo-50 text-indigo-600" trend="2.4" />
-      <StatCard title="Procedure Cards" value={loading ? '...' : stats.flashcards} icon={FileText} colorClass="bg-teal-50 text-teal-600" />
-      <StatCard title="Learning Cases" value={loading ? '...' : stats.scenarios} icon={GraduationCap} colorClass="bg-amber-50 text-amber-600" />
-      <StatCard title="Tools Online" value="14" icon={ShieldCheck} colorClass="bg-primary/10 text-primary" highlight />
-    </div>
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const res = await api.getRecentLogs();
+        if (res.success) setLogs(res.data);
+      } catch (err) {
+        console.error('Logs fetch failed', err);
+      } finally {
+        setLogsLoading(false);
+      }
+    };
+    fetchLogs();
+  }, []);
 
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2 space-y-4">
-        <div className="bg-white rounded-xl border border-slate-200 shadow-tiny overflow-hidden flex flex-col h-full">
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
-             <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <ActivityIcon className="w-4 h-4 text-primary" /> Recent Calculations
-             </h3>
-             <button className="text-xs font-bold text-primary hover:underline transition-all">View All</button>
-          </div>
-          <div className="flex-1 overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
-                  <th className="px-5 py-3 font-bold">What was done</th>
-                  <th className="px-5 py-3 font-bold">Done By</th>
-                  <th className="px-5 py-3 font-bold">Status</th>
-                  <th className="px-5 py-3 font-bold text-right">Time</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-50">
-                {[
-                  { action: 'IV Fluids: 1.4kg baby', by: 'Nurse Joy', time: '2m ago', status: 'Checked', type: 'Fluids' },
-                  { action: 'Gentamicin: 2.1kg baby', by: 'Nurse Amina', time: '18m ago', status: 'Checked', type: 'Meds' },
-                  { action: 'Daily TPN: 3.2kg baby', by: 'Dr. Sarah', time: '45m ago', status: 'Checked', type: 'Nutrition' },
-                  { action: 'Emergency Bolus: 3.5kg', by: 'Nurse Joy', time: '1h ago', status: 'Review', type: 'Urgent' },
-                ].map((log, i) => (
-                  <tr key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
-                    <td className="px-5 py-4">
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-slate-800 tracking-tight">{log.action}</span>
-                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{log.type} Tool</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4 text-sm font-semibold text-slate-600">{log.by}</td>
-                    <td className="px-5 py-4">
-                      {log.status === 'Checked' ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-md border border-emerald-100">Checked</span> : 
-                       log.status === 'Review' ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-bold rounded-md border border-rose-100">Needs Review</span> :
-                       <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 text-[10px] font-bold rounded-md border border-amber-100">Waiting</span>}
-                    </td>
-                    <td className="px-5 py-4 text-xs font-bold text-slate-400 text-right">{log.time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
+         <div>
+            <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Unit Overview</h2>
+            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">How our unit is doing</h1>
+            <p className="text-sm text-slate-500 mt-1">A live look at our nursing tools and team progress.</p>
+         </div>
+         <div className="flex items-center gap-2">
+            <div className="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600 flex items-center gap-2">
+               <Clock className="w-3.5 h-3.5" /> Shift 2A
+            </div>
+            <button className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow-sm hover:bg-primary-dark transition-colors">
+               Export Records
+            </button>
+         </div>
       </div>
 
-      <div className="space-y-4">
-         <div className="bg-slate-900 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
-            <div className="relative z-10">
-               <div className="flex items-center justify-between mb-4">
-                  <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-primary border border-white/5">
-                    <Database className="w-4 h-4" />
-                  </div>
-                  <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">System Status</span>
-               </div>
-               <h4 className="text-white font-bold text-sm mb-1 tracking-tight">App Health</h4>
-               <p className="text-xs text-slate-400 mb-6 leading-relaxed">Guidelines are up to date and verified.</p>
-               <div className="space-y-2">
-                 <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                   <span>Stability</span>
-                   <span className="text-primary font-black">99.9%</span>
-                 </div>
-                 <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                   <div className="w-[99.9%] h-full bg-primary shadow-[0_0_10px_rgba(13,148,136,0.5)]" />
-                 </div>
-               </div>
-            </div>
-         </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard title="Team Members" value={loading ? '...' : stats.users} icon={Users} colorClass="bg-indigo-50 text-indigo-600" trend="2.4" />
+        <StatCard title="Procedure Cards" value={loading ? '...' : stats.flashcards} icon={FileText} colorClass="bg-teal-50 text-teal-600" />
+        <StatCard title="Learning Cases" value={loading ? '...' : stats.scenarios} icon={GraduationCap} colorClass="bg-amber-50 text-amber-600" />
+        <StatCard title="Tools Online" value="14" icon={ShieldCheck} colorClass="bg-primary/10 text-primary" highlight />
+      </div>
 
-         <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-tiny">
-            <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Things to do</h4>
-            <div className="space-y-3">
-               {[
-                 { t: 'Check Nurse Schedule', s: 'Done', c: 'emerald' },
-                 { t: 'Audit Bedside Tools', s: 'In Progress', c: 'primary' },
-                 { t: 'Review Emergency Doses', s: '1 Flagged', c: 'rose' },
-               ].map((task, i) => (
-                 <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-50 hover:border-slate-100 transition-all cursor-pointer group">
-                   <span className="text-xs font-bold text-slate-700 tracking-tight">{task.t}</span>
-                   <ChevronRight className={`w-3.5 h-3.5 text-${task.c}-500 opacity-0 group-hover:opacity-100 transition-all`} />
-                 </div>
-               ))}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-4">
+          <div className="bg-white rounded-xl border border-slate-200 shadow-tiny overflow-hidden flex flex-col h-full">
+            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
+               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                  <ActivityIcon className="w-4 h-4 text-primary" /> Recent Calculations
+               </h3>
+               <button className="text-xs font-bold text-primary hover:underline transition-all">View All</button>
             </div>
-         </div>
+            <div className="flex-1 overflow-x-auto">
+              {logsLoading ? (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <ActivityIcon className="w-6 h-6 text-primary animate-pulse mb-3" />
+                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fetching live records...</p>
+                </div>
+              ) : logs.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
+                    <Database className="w-6 h-6" />
+                  </div>
+                  <h4 className="text-sm font-bold text-slate-900 mb-1">No calculations recorded yet</h4>
+                  <p className="text-xs text-slate-500 max-w-[240px]">Recent calculations from the unit will appear here automatically.</p>
+                </div>
+              ) : (
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
+                      <th className="px-5 py-3 font-bold">What was done</th>
+                      <th className="px-5 py-3 font-bold">Done By</th>
+                      <th className="px-5 py-3 font-bold">Status</th>
+                      <th className="px-5 py-3 font-bold text-right">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-50">
+                    {logs.map((log, i) => (
+                      <tr key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
+                        <td className="px-5 py-4">
+                          <div className="flex flex-col">
+                            <span className="text-sm font-bold text-slate-800 tracking-tight">{log.action}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{log.type} Tool</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-4 text-sm font-semibold text-slate-600">{log.user?.name || 'Unknown'}</td>
+                        <td className="px-5 py-4">
+                          {log.status === 'Checked' ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-md border border-emerald-100">Checked</span> : 
+                           log.status === 'Review' ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-bold rounded-md border border-rose-100">Needs Review</span> :
+                           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 text-[10px] font-bold rounded-md border border-amber-100">Waiting</span>}
+                        </td>
+                        <td className="px-5 py-4 text-xs font-bold text-slate-400 text-right">
+                          {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+           <div className="bg-slate-900 rounded-xl p-5 shadow-lg relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
+              <div className="relative z-10">
+                 <div className="flex items-center justify-between mb-4">
+                    <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-primary border border-white/5">
+                      <Database className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">System Status</span>
+                 </div>
+                 <h4 className="text-white font-bold text-sm mb-1 tracking-tight">App Health</h4>
+                 <p className="text-xs text-slate-400 mb-6 leading-relaxed">Guidelines are up to date and verified.</p>
+                 <div className="space-y-2">
+                   <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                     <span>Stability</span>
+                     <span className="text-primary font-black">99.9%</span>
+                   </div>
+                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                     <div className="w-[99.9%] h-full bg-primary shadow-[0_0_10px_rgba(13,148,136,0.5)]" />
+                   </div>
+                 </div>
+              </div>
+           </div>
+
+           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-tiny">
+              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Things to do</h4>
+              <div className="space-y-3">
+                 {[
+                   { t: 'Check Nurse Schedule', s: 'Done', c: 'emerald' },
+                   { t: 'Audit Bedside Tools', s: 'In Progress', c: 'primary' },
+                   { t: 'Review Emergency Doses', s: '1 Flagged', c: 'rose' },
+                 ].map((task, i) => (
+                   <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-50 hover:border-slate-100 transition-all cursor-pointer group">
+                     <span className="text-xs font-bold text-slate-700 tracking-tight">{task.t}</span>
+                     <ChevronRight className={`w-3.5 h-3.5 text-${task.c}-500 opacity-0 group-hover:opacity-100 transition-all`} />
+                   </div>
+                 ))}
+              </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const StudentDashboard = ({ onNavigate }) => (
+  <div className="space-y-8">
+    <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
+       <div>
+          <h2 className="text-xs font-bold text-indigo-600 uppercase tracking-widest mb-1">Learning Portal</h2>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Welcome to NeoDesk Student</h1>
+          <p className="text-sm text-slate-500 mt-1">Focus on learning the guidelines and practicing with clinical scenarios.</p>
+       </div>
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {[
+        { t: "Our Guidelines", d: "Master the neonatal care pathways and protocols used in our unit.", icon: Activity, c: "teal", h: "bg-teal-50", tCol: "text-teal-600", path: 'flashcards' },
+        { t: "Clinical Scenarios", d: "Test your knowledge with realistic case studies and practice scenarios.", icon: GraduationCap, c: "indigo", h: "bg-indigo-50", tCol: "text-indigo-600", path: 'scenarios' }
+      ].map((module, i) => (
+        <div 
+          key={i} 
+          onClick={() => onNavigate(module.path)}
+          className="bg-white p-8 rounded-2xl border border-slate-200 hover:border-primary/50 hover:shadow-lg transition-all cursor-pointer group flex flex-col items-start min-h-[200px]"
+        >
+           <div className={`w-14 h-14 ${module.h} ${module.tCol} rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
+              <module.icon className="w-7 h-7" />
+           </div>
+           <h3 className="text-lg font-bold text-slate-900 mb-2">{module.t}</h3>
+           <p className="text-sm text-slate-500 font-medium leading-relaxed mb-6">{module.d}</p>
+           <div className={`mt-auto flex items-center gap-1.5 ${module.tCol} text-xs font-bold uppercase tracking-widest group-hover:gap-2.5 transition-all`}>
+              Enter Learning Module <ArrowRight className="w-4 h-4" />
+           </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden group">
+      <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
+      <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
+        <div>
+          <h3 className="text-xl font-bold mb-4">Safe Learning Environment</h3>
+          <p className="text-slate-400 text-sm leading-relaxed mb-6">
+            You are currently in Student Mode. This dashboard is designed to help you build confidence without the pressure of live clinical calculations.
+          </p>
+          <div className="flex items-center gap-4">
+            <div className="flex -space-x-2">
+              {[1,2,3].map(i => (
+                <div key={i} className="w-8 h-8 rounded-full border-2 border-slate-900 bg-slate-800 flex items-center justify-center">
+                  <Users className="w-4 h-4 text-slate-400" />
+                </div>
+              ))}
+            </div>
+            <span className="text-xs font-bold text-slate-400 tracking-tight">Join 12 other students learning today</span>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <h4 className="text-2xl font-black text-indigo-400">85%</h4>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Case Mastery</p>
+          </div>
+          <div className="bg-white/5 rounded-xl p-4 border border-white/10">
+            <h4 className="text-2xl font-black text-teal-400">12</h4>
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Cards Reviewed</p>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 );
 
-const ClinicalDashboard = () => (
+const ClinicalDashboard = ({ onNavigate }) => (
   <div className="space-y-8">
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
        <div>
@@ -164,12 +261,16 @@ const ClinicalDashboard = () => (
 
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {[
-        { t: "Fluid Help", d: "Calculate IV fluid rates.", icon: Droplets, c: "primary", h: "bg-primary/10", tCol: "text-primary" },
-        { t: "Quick Doses", d: "For urgent medications.", icon: Zap, c: "rose", h: "bg-rose-50", tCol: "text-rose-500" },
-        { t: "Our Guidelines", d: "Neonatal care pathways.", icon: Activity, c: "teal", h: "bg-teal-50", tCol: "text-teal-600" },
-        { t: "Nutrition Tool", d: "Help with TPN math.", icon: Calculator, c: "indigo", h: "bg-indigo-50", tCol: "text-indigo-600" }
+        { t: "Fluid Help", d: "Calculate IV fluid rates.", icon: Droplets, c: "primary", h: "bg-primary/10", tCol: "text-primary", path: 'calculators' },
+        { t: "Quick Doses", d: "For urgent medications.", icon: Zap, c: "rose", h: "bg-rose-50", tCol: "text-rose-500", path: 'calculators' },
+        { t: "Our Guidelines", d: "Neonatal care pathways.", icon: Activity, c: "teal", h: "bg-teal-50", tCol: "text-teal-600", path: 'flashcards' },
+        { t: "Learning Mode", d: "Practice with scenarios.", icon: GraduationCap, c: "indigo", h: "bg-indigo-50", tCol: "text-indigo-600", path: 'scenarios' }
       ].map((module, i) => (
-        <div key={i} className="bg-white p-5 rounded-xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer group flex flex-col items-start min-h-[160px]">
+        <div 
+          key={i} 
+          onClick={() => onNavigate(module.path)}
+          className="bg-white p-5 rounded-xl border border-slate-200 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer group flex flex-col items-start min-h-[160px]"
+        >
            <div className={`w-10 h-10 ${module.h} ${module.tCol} rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
               <module.icon className="w-5 h-5" />
            </div>
@@ -241,11 +342,12 @@ const ClinicalDashboard = () => (
 
 // --- MAIN WRAPPER ---
 
-export default function Dashboard({ user }) {
+export default function Dashboard({ user, onNavigate }) {
   const [stats, setStats] = useState({ users: 0, flashcards: 0, scenarios: 0 });
   const [loading, setLoading] = useState(true);
 
   const isAdminView = user?.role === 'Nursing In-Charge' || user?.role === 'Consultant Pediatrician';
+  const isStudentView = user?.role === 'Student';
 
   useEffect(() => {
     if (isAdminView) {
@@ -284,7 +386,13 @@ export default function Dashboard({ user }) {
         </div>
       )}
 
-      {isAdminView ? <AdminDashboard stats={stats} loading={loading} /> : <ClinicalDashboard />}
+      {isAdminView ? (
+        <AdminDashboard stats={stats} loading={loading} />
+      ) : isStudentView ? (
+        <StudentDashboard onNavigate={onNavigate} />
+      ) : (
+        <ClinicalDashboard onNavigate={onNavigate} />
+      )}
     </div>
   );
 }

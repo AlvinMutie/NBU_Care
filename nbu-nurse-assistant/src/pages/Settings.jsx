@@ -36,12 +36,13 @@ const InputWrapper = ({ label, children }) => (
   </div>
 );
 
-export default function Settings({ user }) {
+export default function Settings({ user, onUpdateUser }) {
   const [profile, setProfile] = useState({ name: user?.name || '', email: user?.email || '', currentPassword: '', newPassword: '' });
   const [sysSettings, setSysSettings] = useState({ wardName: '', hospitalName: '', broadcastMessage: '' });
   const [loading, setLoading] = useState(false);
   const [sysLoading, setSysLoading] = useState(true);
   const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
   const isAdmin = user?.role === 'Nursing In-Charge' || user?.role === 'Consultant Pediatrician';
 
@@ -60,19 +61,39 @@ export default function Settings({ user }) {
     e.preventDefault();
     setLoading(true);
     setSuccess('');
-    setTimeout(() => {
+    setError('');
+    
+    try {
+      const res = await api.updateProfile({
+        name: profile.name,
+        currentPassword: profile.currentPassword,
+        newPassword: profile.newPassword
+      });
+
+      if (res.success) {
         setSuccess('Your profile has been updated!');
-        setLoading(false);
-    }, 800);
+        if (onUpdateUser) onUpdateUser(res.user);
+        setProfile({ ...profile, currentPassword: '', newPassword: '' });
+      } else {
+        setError(res.message || 'Update failed');
+      }
+    } catch (err) {
+      setError('A connection error occurred');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSysSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccess('');
+    setError('');
     const res = await api.updateSettings(sysSettings);
     if (res.success) {
       setSuccess('Ward settings saved successfully!');
+    } else {
+      setError(res.message || 'System update failed');
     }
     setLoading(false);
   };
@@ -85,11 +106,18 @@ export default function Settings({ user }) {
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Settings</h1>
           <p className="text-sm text-slate-500">Update your profile and manage your personal preferences.</p>
         </div>
-        {success && (
-          <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4" /> {success}
-          </div>
-        )}
+        <div className="flex flex-col items-end gap-2">
+          {success && (
+            <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+              <CheckCircle2 className="w-4 h-4" /> {success}
+            </div>
+          )}
+          {error && (
+            <div className="px-4 py-2 bg-rose-50 border border-rose-100 text-rose-700 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+              <Activity className="w-4 h-4" /> {error}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Profile Section */}
@@ -117,34 +145,42 @@ export default function Settings({ user }) {
               />
             </InputWrapper>
           </div>
-          <button className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-bold transition-colors shadow-sm">
-            {loading ? <Activity className="w-4 h-4 animate-pulse" /> : <Save className="w-4 h-4" />} Save Changes
+
+          <div className="pt-4 border-t border-slate-50">
+            <div className="flex items-center gap-2 mb-4">
+              <Lock className="w-4 h-4 text-slate-400" />
+              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest">Change Password</h4>
+            </div>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <InputWrapper label="Current Password">
+                <input 
+                  type="password" 
+                  value={profile.currentPassword}
+                  onChange={e => setProfile({...profile, currentPassword: e.target.value})}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
+                />
+              </InputWrapper>
+              <InputWrapper label="New Password">
+                <input 
+                  type="password" 
+                  value={profile.newPassword}
+                  onChange={e => setProfile({...profile, newPassword: e.target.value})}
+                  placeholder="••••••••"
+                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
+                />
+              </InputWrapper>
+            </div>
+          </div>
+
+          <button 
+            type="submit"
+            disabled={loading}
+            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-bold transition-all shadow-sm active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? <Activity className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Changes
           </button>
         </form>
-      </SettingSection>
-
-      {/* Password Section */}
-      <SettingSection 
-        title="Change Password" 
-        description="Update your password regularly to keep your account safe."
-        icon={Lock}
-      >
-        <div className="grid sm:grid-cols-2 gap-6">
-          <InputWrapper label="Current Password">
-            <input 
-              type="password" 
-              placeholder="••••••••"
-              className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
-            />
-          </InputWrapper>
-          <InputWrapper label="New Password">
-            <input 
-              type="password" 
-              placeholder="••••••••"
-              className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
-            />
-          </InputWrapper>
-        </div>
       </SettingSection>
 
       {/* Admin Section: Ward Settings */}

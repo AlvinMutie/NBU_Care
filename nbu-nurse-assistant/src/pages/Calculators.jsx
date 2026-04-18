@@ -8,9 +8,11 @@ import {
   Scale,
   ShieldCheck,
   Info,
-  ArrowUpRight
+  ArrowUpRight,
+  CheckCircle2
 } from 'lucide-react';
 import CalculatorCard from '../components/calculators/CalculatorCard';
+import { api } from '../services/api';
 
 const InputField = ({ label, value, onChange, suffix, help }) => (
   <div className="space-y-2">
@@ -54,6 +56,8 @@ export default function Calculators() {
   const [dilV2, setDilV2] = useState('');
   const [dilResult, setDilResult] = useState(null);
 
+  const [logSuccess, setLogSuccess] = useState(null);
+
   useEffect(() => {
     if (doseWeight && doseMgKg) setDoseResult((parseFloat(doseWeight) * parseFloat(doseMgKg)).toFixed(2));
     else setDoseResult(null);
@@ -71,17 +75,36 @@ export default function Calculators() {
     else setDilResult(null);
   }, [doseWeight, doseMgKg, volReqMg, volStockMg, volStockMl, ivWeight, ivMlKgDay, bolWeight, bolAmount, dilC1, dilC2, dilV2]);
 
+  const handleLog = async (action, type) => {
+    try {
+      const res = await api.createLog({ action, type, status: 'Checked' });
+      if (res.success) {
+        setLogSuccess(action);
+        setTimeout(() => setLogSuccess(null), 3000);
+      }
+    } catch (err) {
+      console.error('Logging failed', err);
+    }
+  };
+
   return (
     <div className="max-w-[1600px] mx-auto w-full p-8">
-      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 border-b border-slate-200 pb-8">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-10 border-b border-slate-200 pb-8 relative">
         <div>
           <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-2">Nursing Tools</h2>
           <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Treatment Calculators</h1>
           <p className="text-sm text-slate-500">Quick, verified calculations to help you care for your patients safely.</p>
         </div>
-        <div className="bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-lg flex items-center gap-3">
-          <ShieldCheck className="w-5 h-5 text-emerald-600" />
-          <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Verified & Up to Date</span>
+        <div className="flex items-center gap-4">
+          {logSuccess && (
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg shadow-lg animate-in fade-in slide-in-from-right-4">
+              <CheckCircle2 className="w-3.5 h-3.5" /> Logged: {logSuccess}
+            </div>
+          )}
+          <div className="bg-emerald-50 border border-emerald-100 px-4 py-2 rounded-lg flex items-center gap-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-600" />
+            <span className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Verified & Up to Date</span>
+          </div>
         </div>
       </div>
 
@@ -93,6 +116,7 @@ export default function Calculators() {
           result={doseResult}
           resultLabel="mg"
           warning="Always double-check this result with a colleague before giving the drug."
+          onLog={() => handleLog(`Drug Dose: ${doseResult}mg for ${doseWeight}kg baby`, 'Meds')}
         >
           <InputField label="Baby's Weight" value={doseWeight} onChange={setDoseWeight} suffix="kg" />
           <InputField label="Prescribed Dose" value={doseMgKg} onChange={setDoseMgKg} suffix="mg/kg" />
@@ -104,6 +128,7 @@ export default function Calculators() {
           formula="ml = (required_mg / stock_mg) × stock_ml"
           result={volResult}
           resultLabel="mL"
+          onLog={() => handleLog(`Draw Up: ${volResult}mL (${volReqMg}mg required)`, 'Meds')}
         >
           <InputField label="Dose Needed" value={volReqMg} onChange={setVolReqMg} suffix="mg" />
           <InputField label="Stock Strength" value={volStockMg} onChange={setVolStockMg} suffix="mg" />
@@ -116,6 +141,7 @@ export default function Calculators() {
           formula="ml/hr = (fluid_ml/kg/day × kg) / 24"
           result={ivResult}
           resultLabel="mL/hr"
+          onLog={() => handleLog(`IV Fluids: ${ivResult}mL/hr for ${ivWeight}kg baby`, 'Fluids')}
         >
           <InputField label="Baby's Weight" value={ivWeight} onChange={setIvWeight} suffix="kg" />
           <InputField label="Prescribed Fluid" value={ivMlKgDay} onChange={setIvMlKgDay} suffix="ml/kg/day" />
@@ -128,6 +154,7 @@ export default function Calculators() {
           result={bolResult}
           resultLabel="mL total"
           warning="Normal range is 10–20 ml/kg. Always confirm with the doctor before giving."
+          onLog={() => handleLog(`Emergency Bolus: ${bolResult}mL for ${bolWeight}kg baby`, 'Urgent')}
         >
           <InputField label="Baby's Weight" value={bolWeight} onChange={setBolWeight} suffix="kg" />
           <InputField label="Bolus Amount" value={bolAmount} onChange={setBolAmount} suffix="ml/kg" help="Standard starting dose: 10 ml/kg" />
@@ -139,6 +166,7 @@ export default function Calculators() {
           formula="V1 = (C2 × V2) / C1"
           result={dilResult}
           resultLabel="Amount to use"
+          onLog={() => handleLog(`Dilution: Target ${dilC2} from ${dilC1} (Total ${dilV2}mL)`, 'Meds')}
         >
           <InputField label="Stock Concentration (C1)" value={dilC1} onChange={setDilC1} />
           <InputField label="Target Concentration (C2)" value={dilC2} onChange={setDilC2} />
