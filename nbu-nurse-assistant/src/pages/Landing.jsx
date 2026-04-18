@@ -1,9 +1,10 @@
 import React from 'react';
 import { 
   Stethoscope, Activity, Calculator, 
-  Database, UserCheck, ArrowRight, CheckCircle2,
-  Lock, Globe, BriefcaseMedical, Zap, Droplets
+  ArrowRight, Globe, Zap, ShieldCheck,
+  Lock, Database, UserCheck, CheckCircle2, BriefcaseMedical
 } from 'lucide-react';
+import heroNewborn from '../assets/hero_newborn.jpg';
 
 export default function Landing({ onEnter }) {
   const handleLogin = () => {
@@ -11,173 +12,82 @@ export default function Landing({ onEnter }) {
   };
 
   return (
-    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-primary/20 selection:text-primary-dark overflow-x-hidden">
+    <div className="min-h-screen bg-white font-sans text-slate-900 selection:bg-primary/20 selection:text-primary-dark overflow-x-hidden medical-mesh-gradient">
       
-      {/* System Status Banner */}
-      <div className="bg-slate-900 text-white py-2 px-6 overflow-hidden relative border-b border-white/5">
-        <div className="max-w-7xl mx-auto flex items-center justify-end text-[10px] font-bold uppercase tracking-[0.2em]">
-           <div className="flex items-center gap-4 opacity-60">
-              <Globe className="w-3 h-3" />
-           </div>
-        </div>
-      </div>
-
       {/* Navigation */}
-      <nav className="sticky top-0 w-full bg-white/80 backdrop-blur-xl border-b border-slate-100 z-50 transition-all duration-300">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex flex-row items-center justify-between">
+      <nav className="absolute top-0 w-full bg-transparent z-50 transition-all duration-300">
+        <div className="max-w-7xl mx-auto px-6 h-24 flex flex-row items-center justify-between">
           
           {/* Logo */}
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => window.scrollTo({top: 0, behavior: 'smooth'})}>
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-105 transition-transform shadow-tiny shadow-primary/20">
+            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-primary group-hover:scale-105 transition-transform backdrop-blur-md border border-white/10">
               <Stethoscope className="w-6 h-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold tracking-tighter text-slate-900 leading-none">Neo<span className="text-primary">Desk</span></h1>
+              <h1 className="text-xl font-bold tracking-tighter text-white leading-none">Neo<span className="text-primary">Desk</span></h1>
               <div className="flex items-center gap-1 mt-1">
-                 <div className="w-2 h-0.5 bg-primary/30 rounded-full" />
-                 <span className="text-[9px] uppercase tracking-[0.3em] font-black text-slate-400">Better Care Together</span>
+                 <div className="w-2 h-0.5 bg-primary rounded-full" />
+                 <span className="text-[9px] uppercase tracking-[0.3em] font-black text-slate-400">Clinical Intelligence</span>
               </div>
             </div>
           </div>
 
           {/* Nav Links */}
           <div className="hidden lg:flex items-center gap-10">
-            <a href="#features" className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors">Our Tools</a>
-            <a href="#compliance" className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors">How We Work</a>
-            <a href="#trust" className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-primary transition-colors">Trust</a>
+            <a href="#features" className="text-xs font-bold uppercase tracking-widest text-slate-300 hover:text-white transition-colors">Capabilities</a>
+            <a href="#compliance" className="text-xs font-bold uppercase tracking-widest text-slate-300 hover:text-white transition-colors">Standards</a>
+            <a href="#trust" className="text-xs font-bold uppercase tracking-widest text-slate-300 hover:text-white transition-colors">Impact</a>
           </div>
 
           {/* Actions */}
           <div className="flex items-center gap-4">
             <button 
               onClick={handleLogin}
-              className="group relative flex items-center gap-2 bg-slate-900 overflow-hidden text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-slate-900/10 hover:shadow-primary/20 hover:scale-[1.02] active:scale-[0.98]"
+              className="group relative flex items-center gap-2 bg-primary overflow-hidden text-white px-8 py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all shadow-lg shadow-primary/20 hover:scale-[1.05] active:scale-[0.98]"
             >
-              <div className="absolute inset-0 bg-primary translate-y-12 group-hover:translate-y-0 transition-transform duration-500" />
-              <span className="relative z-10">Enter Clinical Hub</span>
+              <span className="relative z-10">Sign In</span>
             </button>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <main className="pt-24 pb-32 px-6 relative overflow-visible">
-        {/* Modern decorative background elements */}
-        <div className="absolute top-1/4 right-[5%] w-[600px] h-[600px] bg-primary/5 rounded-full blur-[120px] -z-10" />
-        <div className="absolute bottom-1/4 left-[5%] w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] -z-10" />
+      <main className="relative min-h-[90vh] flex items-center px-6 overflow-hidden">
+        {/* Full-bleed Background Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={heroNewborn} 
+            alt="Newborn clinical care" 
+            className="w-full h-full object-cover grayscale brightness-50"
+          />
+          {/* Professional Gradient Overlay (similar to template) */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/40 to-transparent" />
+        </div>
 
-        <div className="max-w-7xl mx-auto flex flex-col items-center text-center">
+        <div className="max-w-7xl mx-auto w-full relative z-10 grid lg:grid-cols-2 gap-20 items-center">
           
-          <div className="group inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-50 border border-slate-200 text-slate-500 text-[10px] font-bold uppercase tracking-widest mb-10 hover:bg-white hover:border-primary/30 hover:text-primary transition-all cursor-default">
-            <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 
-            <span className="opacity-60 group-hover:opacity-100 transition-opacity">NeoDesk</span>
-          </div>
+          {/* Left Column: Content (Overlaid on Image) */}
+          <div className="flex flex-col items-start text-left pt-10">
+            <h2 className="animate-fade-in-up [animation-delay:200ms] text-5xl md:text-6xl lg:text-7xl font-black tracking-tighter text-white leading-[1.1] mb-8 max-w-2xl">
+              Empowering clinical teams to transition from <br />
+              <span className="text-primary italic">vulnerability</span> to <span className="text-white italic">excellence.</span>
+            </h2>
 
-          <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 leading-[0.9] mb-10 max-w-5xl">
-            Smarter Care for <br />
-            <span className="text-slate-200 relative inline-block">
-               Every Newborn
-               <div className="absolute -bottom-2 sm:-bottom-4 left-0 w-full h-1 sm:h-2 bg-primary rounded-full opacity-60" />
-            </span>
-          </h2>
+            <p className="animate-fade-in-up [animation-delay:400ms] text-lg md:text-xl text-slate-300 mb-12 leading-relaxed max-w-xl font-medium">
+              Standardized care pathways, intelligent dosing, and fluid management systems designed for neonatal precision.
+            </p>
 
-          <p className="text-lg md:text-xl text-slate-500 mb-12 leading-relaxed max-w-2xl font-medium">
-            A friendly and helpful assistant that makes medication and fluid management simple and safe for everyone on the team.
-          </p>
-
-          <div className="flex flex-col sm:flex-row items-center gap-4 mb-24">
-            <button onClick={handleLogin} className="w-full sm:w-auto flex items-center justify-center gap-3 bg-primary hover:bg-primary-dark text-white px-10 py-5 rounded-2xl text-sm font-bold transition-all shadow-xl shadow-primary/20 hover:translate-y-[-2px]">
-              Go to Dashboard <ArrowRight className="w-5 h-5" />
-            </button>
-            <button className="w-full sm:w-auto flex items-center justify-center gap-3 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 px-10 py-5 rounded-2xl text-sm font-bold transition-all shadow-tiny">
-              Learn More
-            </button>
-          </div>
-
-          {/* Hero UI Preview - High Fidelity Style */}
-          <div className="relative w-full max-w-6xl mx-auto perspective-1000 group">
-             <div className="absolute -inset-10 bg-primary/5 rounded-[4rem] blur-3xl -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-             
-             <div className="bg-white rounded-[2.5rem] border border-slate-200 shadow-[0_32px_80px_-16px_rgba(0,0,0,0.08)] overflow-hidden transform group-hover:translate-y-[-20px] transition-transform duration-700 ease-out-expo border-t-8 border-t-primary/20">
-                {/* Header Mock */}
-                <div className="h-16 border-b border-slate-100 bg-slate-50/50 flex items-center px-8 gap-10">
-                   <div className="flex gap-1.5">
-                      <div className="w-3 h-3 rounded-full bg-slate-200" />
-                      <div className="w-3 h-3 rounded-full bg-slate-200" />
-                      <div className="w-3 h-3 rounded-full bg-slate-200" />
-                   </div>
-                   <div className="flex-1 flex items-center gap-6">
-                      <div className="w-48 h-2 bg-slate-100 rounded-full" />
-                      <div className="w-32 h-2 bg-slate-100 rounded-full" />
-                   </div>
-                   <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-primary/20" />
-                      <div className="w-8 h-8 rounded-lg bg-slate-100" />
-                   </div>
-                </div>
-
-                {/* Dashboard Mock Content */}
-                <div className="p-10 grid grid-cols-12 gap-8 text-left">
-                   <div className="col-span-12 lg:col-span-3 space-y-8">
-                      <div className="space-y-4">
-                         <div className="w-24 h-1.5 bg-slate-200 rounded-full" />
-                         <div className="space-y-2">
-                            <div className="w-full h-10 bg-primary/5 border border-primary/20 rounded-xl" />
-                            <div className="w-full h-10 bg-slate-50 rounded-xl" />
-                            <div className="w-full h-10 bg-slate-50 rounded-xl" />
-                         </div>
-                      </div>
-                      <div className="space-y-4">
-                         <div className="w-20 h-1.5 bg-slate-200 rounded-full" />
-                         <div className="p-4 bg-slate-900 rounded-2xl shadow-lg">
-                            <div className="w-10 h-1 h-white/10 rounded-full mb-4" />
-                            <div className="w-full h-1.5 bg-primary rounded-full mb-1" />
-                            <div className="flex justify-between text-[8px] font-bold text-slate-400">
-                               <span>SYSTEM OK</span>
-                               <span className="text-white">99%</span>
-                            </div>
-                         </div>
-                      </div>
-                   </div>
-
-                   <div className="col-span-12 lg:col-span-9 space-y-8">
-                      <div className="grid grid-cols-3 gap-6">
-                         {[Zap, Droplets, Activity].map((Icon, i) => (
-                           <div key={i} className="p-6 rounded-2xl border border-slate-100 bg-slate-50/50 flex items-start justify-between group/card">
-                              <div>
-                                 <Icon className="w-5 h-5 text-slate-400 mb-4 group-hover/card:text-primary transition-colors" />
-                                 <div className="w-20 h-2 bg-slate-200 rounded-full mb-2" />
-                                 <div className="w-12 h-1.5 bg-slate-100 rounded-full" />
-                              </div>
-                              <ArrowRight className="w-3 h-3 text-slate-300" />
-                           </div>
-                         ))}
-                      </div>
-                      
-                      <div className="bg-slate-50 border border-slate-100 rounded-3xl p-8 min-h-[300px] relative">
-                         <div className="flex items-center justify-between mb-8">
-                            <div className="flex items-center gap-3">
-                               <div className="w-4 h-4 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]" />
-                               <div className="w-40 h-3 bg-slate-200 rounded-full" />
-                            </div>
-                            <div className="w-24 h-8 bg-white border border-slate-200 rounded-lg" />
-                         </div>
-                         <div className="space-y-6">
-                            {[1, 2, 3].map(i => (
-                              <div key={i} className="flex items-center gap-6 border-b border-slate-100 pb-6 last:border-0 last:pb-0">
-                                 <div className="w-12 h-12 rounded-xl bg-white border border-slate-100" />
-                                 <div className="flex-1 space-y-2">
-                                    <div className="w-3/4 h-3 bg-slate-100 rounded-full" />
-                                    <div className="w-1/2 h-2 bg-slate-50 rounded-full" />
-                                 </div>
-                                 <div className="w-10 h-10 rounded-full bg-slate-100/50" />
-                              </div>
-                            ))}
-                         </div>
-                      </div>
-                   </div>
-                </div>
-             </div>
+            <div className="animate-fade-in-up [animation-delay:600ms] flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
+              <button 
+                onClick={handleLogin} 
+                className="w-full sm:w-auto flex items-center justify-center gap-3 bg-primary hover:bg-primary-dark text-white px-10 py-5 rounded-2xl text-sm font-bold transition-all shadow-2xl shadow-primary/20 hover:translate-y-[-4px]"
+              >
+                Access Clinical Hub <ArrowRight className="w-5 h-5" />
+              </button>
+              <button className="w-full sm:w-auto flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/20 text-white px-10 py-5 rounded-2xl text-sm font-bold transition-all hover:translate-y-[-4px]">
+                Technical Overview
+              </button>
+            </div>
           </div>
         </div>
       </main>
