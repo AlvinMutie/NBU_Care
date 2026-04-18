@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck, FileText, Search, Filter, AlertTriangle, Clock, ChevronLeft, ChevronRight, Activity } from 'lucide-react';
 import { api } from '../services/api';
 
-export default function AuditLogs() {
+export default function AuditLogs({ user, onNavigate }) {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');

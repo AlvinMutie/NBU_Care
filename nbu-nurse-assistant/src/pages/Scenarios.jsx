@@ -136,7 +136,7 @@ const ScenarioCard = ({ _id, title, problem, solution, formulas, warning }) => {
   );
 };
 
-export default function Scenarios() {
+export default function Scenarios({ user, onNavigate }) {
   const scenarios = [
     {
       _id: 'hypoglycemia_01',

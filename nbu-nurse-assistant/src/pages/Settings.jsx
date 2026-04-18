@@ -36,7 +36,7 @@ const InputWrapper = ({ label, children }) => (
   </div>
 );
 
-export default function Settings({ user, onUpdateUser }) {
+export default function Settings({ user, onUpdateUser, onNavigate }) {
   const [profile, setProfile] = useState({ name: user?.name || '', email: user?.email || '', currentPassword: '', newPassword: '' });
   const [sysSettings, setSysSettings] = useState({ wardName: '', hospitalName: '', broadcastMessage: '' });
   const [loading, setLoading] = useState(false);

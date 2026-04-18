@@ -138,7 +138,7 @@ const AddStaffModal = ({ isOpen, onClose, onAdd }) => {
   );
 };
 
-export default function ManageStaff() {
+export default function ManageStaff({ user, onNavigate }) {
   const [staff, setStaff] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);

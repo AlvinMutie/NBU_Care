@@ -33,7 +33,7 @@ const InputField = ({ label, value, onChange, suffix, help }) => (
   </div>
 );
 
-export default function Calculators({ user }) {
+export default function Calculators({ user, onNavigate }) {
   const [doseWeight, setDoseWeight] = useState('');
   const [doseMgKg, setDoseMgKg] = useState('');
   const [doseResult, setDoseResult] = useState(null);
@@ -213,7 +213,10 @@ export default function Calculators({ user }) {
               These calculators are helpful tools, but always verify the result with a colleague and follow your unit's official guidelines.
             </p>
           </div>
-          <button className="mt-8 relative w-full py-3 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2">
+          <button 
+            onClick={() => onNavigate('flashcards')}
+            className="mt-8 relative w-full py-3 rounded-lg bg-primary hover:bg-primary-dark text-white text-xs font-bold uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
+          >
              Open Procedure Library
              <ArrowUpRight className="w-4 h-4" />
           </button>
