@@ -12,6 +12,7 @@ import UserGuide from './pages/UserGuide'
 import AuditLogs from './pages/AuditLogs'
 import ManageStaff from './pages/ManageStaff'
 import Settings from './pages/Settings'
+import Handovers from './pages/Handovers'
 import { useTheme } from './context/ThemeContext.jsx'
 
 function App() {
@@ -87,6 +88,7 @@ function App() {
           onLogout={handleLogout}
         >
           {safePage === 'dashboard' && <Dashboard user={user} onNavigate={setCurrentPage} />}
+          {safePage === 'handovers' && <Handovers user={user} onNavigate={setCurrentPage} />}
           {safePage === 'calculators' && <Calculators user={user} onNavigate={setCurrentPage} />}
           {safePage === 'flashcards' && <Flashcards user={user} onNavigate={setCurrentPage} />}
           {safePage === 'scenarios' && <Scenarios user={user} onNavigate={setCurrentPage} />}

@@ -85,6 +85,7 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
             <div className="px-4 pt-6 py-2">
               <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Nursing Tools</p>
             </div>
+            <SidebarLink icon={FileText} label="Shift Handovers" active={currentPath === 'handovers'} onClick={() => onNavigate('handovers')} />
             <SidebarLink icon={Calculator} label="Treatment Calculators" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
             <SidebarLink icon={BookOpen} label="Procedure Library" active={currentPath === 'flashcards'} onClick={() => onNavigate('flashcards')} />
           </>
