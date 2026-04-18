@@ -1,30 +1,63 @@
-# NBU Care Assistant
+# NeoDesk: Neonatal Clinical Intelligence Portal
 
-## Overview
-The NBU Care Assistant is a specialized, high-fidelity clinical toolkit engineered for Neonatal Building Units (NBU). It provides precise computational frameworks for dosing, fluid logic, and critical emergency interventions, ensuring optimal patient safety through structured protocols.
+NeoDesk is a professional-grade clinical operating system designed to standardize neonatal care through precision engineering and editorial design. It transitions neonatal wards from manual, high-risk workflows to a unified, safety-validated digital environment.
 
-## Architecture
-The application is built upon a modern, responsive architecture tailored for clinical environments:
-- Frontend: React and Vite, presenting a role-based glassmorphism aesthetic.
-- State Management: Context API for theme and session integrity.
-- Component Design: Tailored for high-contrast, professional interactions using Tailwind CSS and GSAP.
+## Vision
 
-## Key Features
-- Roles and Governance: Strict role-gated access mapping (Admin, Clinician, Student, IT).
-- Diagnostic Calculators: Dose Metrics, IV Hydration Rates, Dilution Logic, and Emergency Bolus calculations.
-- Audit Ledger: Comprehensive, immutable logs referencing exact metric derivations.
-- Knowledge Base: Validated clinical pathway flashcards and diagnostic scenarios.
+In the high-stakes environment of a Neonatal Building Unit (NBU), variables are the enemy of safety. NeoDesk eliminates these variables by providing a high-fidelity interface that enforces clinical protocols, automates high-precision calculations, and orchestrates team communication with surgical accuracy.
 
-## Development Setup
+## Core Pillars
 
-1. Install Dependencies
-   Ensure Node.js is installed. Run `npm install` to gather necessary packages.
+### Precision Safety Engine
+The heart of NeoDesk is a real-time validation layer that monitors every clinical input. Whether calculating weight-based drug dosages or maintenance fluid rates, the system cross-references data against physiological neonatal boundaries to prevent medication errors before they reach the bedside.
 
-2. Start Development Server
-   Run `npm run dev` to launch the application locally.
+### Editorial Design System
+Designed with a "Warm Emerald & Professional Slate" aesthetic, the interface utilizes Material 3 principles and sophisticated glassmorphism. This high-contrast, low-cognitive-load design ensures that clinicians can access critical data instantly, even in high-pressure emergency scenarios.
 
-3. Testing and Deployment
-   Strict testing must be observed for any calculation logic modifications before entering a production setting. Build using `npm run build`.
+### Clinical Orchestration
+NeoDesk bridges the gap between shifts and roles. Through structured Shift Handovers and a unified Knowledge Hub, the platform ensures that every newborn receives a consistent high standard of care, regardless of the provider or the time of day.
 
-## Clinical Safety Notice
-The calculations and methodologies presented in this software are bedside aids. Standard ward procedures, clinical judgment, and the official WHO Pharmacopoeia always take precedence over software-generated outcomes.
+## Functional Architecture
+
+### Clinical Modules
+- Shift Handover: Structured care transitions with vital trend visualization and task-based validation.
+- Knowledge Hub: An editorial-grade library of standardized clinical procedures and diagnostic pathways.
+- Precision Calculators: Intelligent engines for Drug Dosing, IV Fluid Rates, Dilution Logic, and Emergency Bolus interventions.
+- Patient Scenarios: High-fidelity simulation environments for student training and clinical competency verification.
+
+### Governance and Security
+- Role-Based Access Control (RBAC): Customized hubs for Nurses, Consultants, Students, and Hospital Management.
+- Audit Ledger: Immutable tracking of clinical actions and calculation derivations for forensic shift reviews.
+- Data Integrity: Persistent session management and secure clinical context preservation.
+
+## Technical Specification
+
+### Frontend Stack
+- Framework: React 18+ with Vite for ultra-fast HMR and build performance.
+- Styling: Tailwind CSS v4 for a utility-first, high-performance design system.
+- Animation: GSAP for smooth, non-distracting clinical transitions and workflow visualizations.
+- Icons: Lucide-React for a standardized, medical-grade iconography set.
+
+### Backend and Integration
+- Service Layer: Modular API service for real-time synchronization with the NeoDesk backend.
+- State Management: Context-driven architecture for robust theme and user session integrity.
+
+## Installation and Deployment
+
+### Development Environment
+1. Clone the repository to your local clinical workstation.
+2. Execute `npm install` to synchronize the professional dependency tree.
+3. Launch the development engine using `npm run dev`.
+
+### Production Build
+1. Perform a full clinical validation of all calculation logic.
+2. Execute `npm run build` to generate the optimized production bundle.
+3. Deploy to the hospital's secure internal network or staging environment.
+
+## Clinical Safety Mandate
+
+NeoDesk is a decision-support tool designed to enhance clinical precision. It is not a substitute for professional clinical judgment. All software-generated calculations must be verified by a secondary clinician in accordance with standard neonatal ward protocols and institutional guidelines.
+
+## License and Attribution
+
+Copyright 2026 NeoDesk Clinical Systems. All rights reserved. Developed by the Advanced Agentic Coding team for the modernization of neonatal care units globally.
