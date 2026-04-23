@@ -16,12 +16,17 @@ services:
         generateValue: true
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: nbu-frontend
     plan: free
+    runtime: static
     rootDir: nbu-nurse-assistant
     buildCommand: npm install && npm run build
     staticPublishPath: dist
+    routes:
+      - path: /*
+        destinationPath: /index.html
+        action: rewrite
     envVars:
       - key: VITE_API_BASE_URL
         fromService:
