@@ -18,7 +18,6 @@ services:
   # Frontend Static Site
   - type: web
     name: nbu-frontend
-    plan: free
     runtime: static
     rootDir: nbu-nurse-assistant
     buildCommand: npm install && npm run build
