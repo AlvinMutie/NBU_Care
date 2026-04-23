@@ -24,9 +24,9 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
-      - path: /*
-        destinationPath: /index.html
-        type: rewrite
+      - type: rewrite
+        source: /*
+        destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
         sync: false # Set this to your public backend URL (e.g., https://nbu-backend.onrender.com)
