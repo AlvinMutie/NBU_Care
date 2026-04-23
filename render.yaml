@@ -29,7 +29,4 @@ services:
         type: rewrite
     envVars:
       - key: VITE_API_BASE_URL
-        fromService:
-          type: web
-          name: nbu-backend
-          property: url
+        sync: false # Set this to your public backend URL (e.g., https://nbu-backend.onrender.com)
