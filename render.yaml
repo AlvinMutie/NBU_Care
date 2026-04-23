@@ -1,0 +1,30 @@
+services:
+  # Backend Web Service
+  - type: web
+    name: nbu-backend
+    env: node
+    plan: free
+    rootDir: nbu-backend
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+
+  # Frontend Static Site
+  - type: static
+    name: nbu-frontend
+    plan: free
+    rootDir: nbu-nurse-assistant
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        fromService:
+          type: web
+          name: nbu-backend
+          property: url

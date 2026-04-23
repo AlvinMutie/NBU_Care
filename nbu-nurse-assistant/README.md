@@ -54,6 +54,43 @@ NeoDesk bridges the gap between shifts and roles. Through structured Shift Hando
 2. Execute `npm run build` to generate the optimized production bundle.
 3. Deploy to the hospital's secure internal network or staging environment.
 
+## Project Structure
+
+```text
+hospital/
+├── render.yaml             # Render Blueprint configuration
+├── vercel.json             # Vercel deployment configuration
+├── nbu-backend/            # Node.js Express API
+│   ├── src/
+│   │   ├── server.js       # Entry point
+│   │   ├── routes/         # API endpoints
+│   │   ├── models/         # Database schemas
+│   │   └── middleware/     # Auth and security
+│   └── package.json
+└── nbu-nurse-assistant/    # React + Vite Frontend
+    ├── src/
+    │   ├── components/     # UI elements
+    │   ├── pages/          # Main views
+    │   ├── services/       # API communication layer
+    │   └── context/        # State management
+    ├── public/             # Static assets
+    └── package.json
+```
+
+## Deployment
+
+### Deploying to Render
+
+This project is configured for one-click deployment using Render Blueprints.
+
+1.  **Database**: Create a free MongoDB cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
+2.  **Connect Repo**: Push this project to GitHub and connect the repository to your Render account.
+3.  **Blueprints**: Render will automatically detect the `render.yaml` file. Click **Apply** to create the services.
+4.  **Environment Variables**:
+    -   In the `nbu-backend` service, add `MONGODB_URI` with your Atlas connection string.
+    -   The `JWT_SECRET` will be automatically generated, but you can override it if needed.
+    -   The `VITE_API_BASE_URL` for the frontend is automatically linked to the backend service.
+
 ## Clinical Safety Mandate
 
 NeoDesk is a decision-support tool designed to enhance clinical precision. It is not a substitute for professional clinical judgment. All software-generated calculations must be verified by a secondary clinician in accordance with standard neonatal ward protocols and institutional guidelines.

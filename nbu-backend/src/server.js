@@ -29,17 +29,17 @@ app.get('/api/health', (req, res) => res.json({ status: 'NeoDesk Assistant Backe
 const PORT = process.env.PORT || 5000;
 const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/nbu_nurse_assistant';
 
-if (process.env.NODE_ENV !== 'production') {
-  mongoose.connect(MONGODB_URI)
-    .then(() => {
-      console.log('Connected to MongoDB');
+// Connect to MongoDB and Start Server
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    console.log('Connected to MongoDB');
+    // Listen for requests if not running in a serverless environment that handles listening
+    if (process.env.NODE_ENV !== 'production' || !process.env.VERCEL) {
       app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-    })
-    .catch(err => {
-      console.error('Database connection error:', err);
-    });
-} else {
-  mongoose.connect(MONGODB_URI);
-}
+    }
+  })
+  .catch(err => {
+    console.error('Database connection error:', err);
+  });
 
 module.exports = app;
