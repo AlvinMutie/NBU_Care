@@ -5,9 +5,9 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  phone: { type: String, required: true },
-  idNumber: { type: String, required: true },
-  profileImage: { type: String, required: true }, // Path to uploaded image
+  phone: { type: String },
+  idNumber: { type: String },
+  profileImage: { type: String }, // Path to uploaded image
   role: { 
     type: String, 
     required: true, 

@@ -77,9 +77,9 @@ router.post('/login', async (req, res) => {
     // Force approve demo accounts if they are not yet approved
     const demoEmails = ['incharge@nbu.hospital.ke', 'nurse@nbu.hospital.ke'];
     if (demoEmails.includes(user.email) && user.status !== 'Approved') {
+      await User.updateOne({ _id: user._id }, { status: 'Approved', isVerified: true });
       user.status = 'Approved';
       user.isVerified = true;
-      await user.save();
     }
 
     if (user.status !== 'Approved') {
