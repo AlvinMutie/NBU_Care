@@ -12,10 +12,12 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { NEOBOT_KNOWLEDGE } from '../../services/neoBotKnowledge';
+
 export default function NeoBot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'bot', text: 'Hello! I am NeoBot, your NBU Clinical Assistant. How can I help you today?' }
+    { role: 'bot', text: 'Hello! I am NeoBot, your NBU Clinical Assistant. I am trained on your unit\'s protocols and can help you navigate the system. How can I help you today?' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -42,19 +44,48 @@ export default function NeoBot() {
     setInput('');
     setIsTyping(true);
 
-    // Simulate AI Response based on unit protocols
+    // Simulate AI Response based on the Training Manual (NEOBOT_KNOWLEDGE)
     setTimeout(() => {
-      let response = "I'm analyzing your query based on current NBU protocols...";
-      
       const lower = userMsg.toLowerCase();
-      if (lower.includes('cpap')) response = "For CPAP, standard pressure is 5-8 cm H2O. Ensure FiO2 is adjusted to maintain saturations between 90-95%. Would you like to see the full protocol?";
-      if (lower.includes('oxygen')) response = "Oxygen targets for preterm neonates are 90-94%. For term neonates, target 94-98%. Avoid hyperoxia to prevent ROP.";
-      if (lower.includes('emergency') || lower.includes('help')) response = "If this is a clinical emergency, please alert the on-call team immediately. Helplines: Unit In-Charge (+254 700 000 000).";
-      if (lower.includes('weight')) response = "Dosing depends on current weight. Ensure you have updated the weight in the Neonate Registry before using calculators.";
+      let response = "I'm not quite sure about that protocol. Please consult the Unit In-Charge. You can also ask me about CPAP, Fluids, Sepsis, or how to navigate the system!";
+      
+      // Clinical Knowledge Retrieval
+      if (lower.includes('cpap')) {
+        const cpap = NEOBOT_KNOWLEDGE.clinical.respiratory.cpap;
+        response = `CPAP Protocol: ${cpap.indication} Settings: ${cpap.settings} Targets: ${cpap.monitoring}`;
+      } else if (lower.includes('oxygen')) {
+        const oxy = NEOBOT_KNOWLEDGE.clinical.respiratory.oxygen;
+        response = `Oxygen Targets: For preterms: ${oxy.preterm}. For term neonates: ${oxy.term}.`;
+      } else if (lower.includes('gentamicin') || lower.includes('sepsis')) {
+        const gent = NEOBOT_KNOWLEDGE.clinical.medications.gentamicin;
+        response = `Sepsis/Gentamicin: ${gent.dose} ${gent.dilution} ${gent.safety}`;
+      } else if (lower.includes('fluid')) {
+        const f = NEOBOT_KNOWLEDGE.clinical.fluids.dailyRates;
+        response = `Fluid Requirements: Day 1: ${f.day1}, Day 2: ${f.day2}, Day 3: ${f.day3}. Type: ${NEOBOT_KNOWLEDGE.clinical.fluids.fluidType}`;
+      } else if (lower.includes('heart rate') || lower.includes('vital') || lower.includes('normal')) {
+        const v = NEOBOT_KNOWLEDGE.clinical.vitals;
+        response = `Normal Vitals: HR: ${v.heartRate}, RR: ${v.respRate}, Temp: ${v.temperature}.`;
+      }
+      
+      // System Navigation Retrieval
+      else if (lower.includes('add') || lower.includes('register')) {
+        response = NEOBOT_KNOWLEDGE.system.navigation.add_neonate;
+      } else if (lower.includes('verify') || lower.includes('admin')) {
+        response = NEOBOT_KNOWLEDGE.system.navigation.verification;
+      } else if (lower.includes('handover')) {
+        response = NEOBOT_KNOWLEDGE.system.navigation.handover;
+      } else if (lower.includes('calc')) {
+        response = NEOBOT_KNOWLEDGE.system.navigation.drug_calculator;
+      }
+
+      // Add Disclaimer for clinical queries
+      if (lower.includes('cpap') || lower.includes('gentamicin') || lower.includes('fluid') || lower.includes('sepsis')) {
+        response += `\n\n${NEOBOT_KNOWLEDGE.personality.disclaimer}`;
+      }
 
       setMessages(prev => [...prev, { role: 'bot', text: response }]);
       setIsTyping(false);
-    }, 1500);
+    }, 1200);
   };
 
   return (
@@ -62,11 +93,15 @@ export default function NeoBot() {
       {/* Toggle Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-8 right-8 z-[200] w-16 h-16 rounded-[24px] shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-95 ${
-          isOpen ? 'bg-slate-900 rotate-90' : 'bg-primary shadow-primary/40'
+        className={`fixed bottom-8 right-8 z-[200] w-20 h-20 rounded-[32px] shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 active:scale-95 overflow-hidden border-2 ${
+          isOpen ? 'bg-slate-900 border-slate-800' : 'bg-white border-primary/20 shadow-primary/40'
         }`}
       >
-        {isOpen ? <X className="w-8 h-8 text-white" /> : <Sparkles className="w-8 h-8 text-white" />}
+        {isOpen ? (
+          <X className="w-10 h-10 text-white" />
+        ) : (
+          <img src="/ai-icon.png" alt="AI Assistant" className="w-full h-full object-cover" />
+        )}
       </button>
 
       {/* Chat Window */}
