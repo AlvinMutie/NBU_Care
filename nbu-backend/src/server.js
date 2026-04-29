@@ -43,10 +43,8 @@ mongoose.connect(MONGODB_URI)
     
     // Auto-seed default users for first-time setup
     try {
-      const adminExists = await User.findOne({ email: 'incharge@nbu.hospital.ke' });
-      if (!adminExists) {
-        console.log('Seeding default admin user...');
-        await User.create({
+      const defaultUsers = [
+        {
           name: 'Nursing In-Charge',
           email: 'incharge@nbu.hospital.ke',
           password: 'Admin@1234',
@@ -56,7 +54,31 @@ mongoose.connect(MONGODB_URI)
           phone: '0711000000',
           idNumber: 'ADMIN-001',
           profileImage: '/uploads/profiles/default.png'
-        });
+        },
+        {
+          name: 'Staff Nurse',
+          email: 'nurse@nbu.hospital.ke',
+          password: 'Nurse@1234',
+          role: 'Nurse',
+          status: 'Approved',
+          isVerified: true,
+          phone: '0722000000',
+          idNumber: 'NURSE-001',
+          profileImage: '/uploads/profiles/default.png'
+        }
+      ];
+
+      for (const u of defaultUsers) {
+        const existing = await User.findOne({ email: u.email });
+        if (!existing) {
+          console.log(`Creating user ${u.email}...`);
+          await User.create(u);
+        } else if (existing.status !== 'Approved') {
+          console.log(`Updating user ${u.email} status to Approved...`);
+          existing.status = 'Approved';
+          existing.isVerified = true;
+          await existing.save();
+        }
       }
     } catch (e) {
       console.error('Seeding error:', e);
