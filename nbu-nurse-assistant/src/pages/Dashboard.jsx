@@ -3,7 +3,7 @@ import {
   Activity, Calculator, Droplets, Zap, ArrowRight,
   Users, ShieldAlert, GraduationCap, Clock, FileText,
   Activity as ActivityIcon, HeartPulse, Stethoscope, ChevronRight,
-  Database, ShieldCheck, AlertCircle, HelpCircle
+  Database, ShieldCheck, AlertCircle, HelpCircle, Loader2
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -655,7 +655,7 @@ export default function Dashboard({ user, onNavigate }) {
       )}
 
       {isAdminView ? (
-        <AdminDashboard stats={stats} loading={loading} onNavigate={onNavigate} />
+        <AdminDashboard stats={stats} loading={loading} onNavigate={onNavigate} user={user} />
       ) : isStudentView ? (
         <StudentDashboard onNavigate={onNavigate} user={user} />
       ) : (
