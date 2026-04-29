@@ -74,6 +74,14 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid credentials' });
     }
 
+    // Force approve demo accounts if they are not yet approved
+    const demoEmails = ['incharge@nbu.hospital.ke', 'nurse@nbu.hospital.ke'];
+    if (demoEmails.includes(user.email) && user.status !== 'Approved') {
+      user.status = 'Approved';
+      user.isVerified = true;
+      await user.save();
+    }
+
     if (user.status !== 'Approved') {
       return res.status(403).json({ 
         success: false, 

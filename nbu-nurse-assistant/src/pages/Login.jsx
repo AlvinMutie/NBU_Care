@@ -71,11 +71,28 @@ export default function Login({ onLogin, onBack, onRegister }) {
                     { role: "Nurse / Doctor", email: "nurse@nbu.hospital.ke", pass: "Nurse@1234" },
                     { role: "In-Charge", email: "incharge@nbu.hospital.ke", pass: "Admin@1234" }
                   ].map((acc, i) => (
-                    <div key={i} className="flex flex-col p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 transition-colors">
-                       <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1">{acc.role}</span>
+                    <button 
+                      key={i} 
+                      type="button"
+                      onClick={() => {
+                        setEmail(acc.email);
+                        setPassword(acc.pass);
+                        // Optional: auto-submit? Let's just fill for now to be safe, or auto-submit.
+                        // I'll auto-submit after a tiny delay.
+                        setTimeout(() => {
+                          const form = document.querySelector('form');
+                          if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+                        }, 100);
+                      }}
+                      className="w-full flex flex-col p-4 bg-white/5 rounded-2xl border border-white/5 hover:bg-white/10 hover:border-primary/50 transition-all text-left group/card"
+                    >
+                       <div className="flex items-center justify-between w-full">
+                         <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-1 group-hover/card:text-primary transition-colors">{acc.role}</span>
+                         <ArrowLeft className="w-3 h-3 text-slate-600 rotate-180 group-hover/card:translate-x-1 transition-all" />
+                       </div>
                        <span className="text-sm text-slate-200 font-bold">{acc.email}</span>
                        <span className="text-[10px] text-slate-500 mt-1">Pass: {acc.pass}</span>
-                    </div>
+                    </button>
                   ))}
                </div>
             </div>
