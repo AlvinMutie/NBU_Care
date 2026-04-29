@@ -19,7 +19,7 @@ const BlueTick = ({ className = "w-4 h-4" }) => (
 
 const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) => (
   <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
-     <div className="absolute -right-4 -top-4 w-20 h-20 bg-slate-50 rounded-full group-hover:scale-150 transition-transform duration-700" />
+     <div className="hidden lg:block absolute -right-4 -top-4 w-20 h-20 bg-slate-50 rounded-full group-hover:scale-150 transition-transform duration-700" />
      <div className="relative z-10">
        <div className="flex items-center justify-between mb-6">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colorClass} transition-transform group-hover:scale-110 shadow-inner`}>
@@ -193,7 +193,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
 
         <div className="space-y-6">
            <div className="bg-slate-900 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
+              <div className="hidden lg:block absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
               <div className="relative z-10">
                  <div className="flex items-center justify-between mb-8">
                     <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary border border-white/5 backdrop-blur-xl">
@@ -414,7 +414,7 @@ const StudentDashboard = ({ onNavigate, user }) => {
 
           {/* Featured Scenario Card */}
           <div className="bg-slate-900 rounded-3xl p-8 text-white relative overflow-hidden group">
-            <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000" />
+            <div className="hidden lg:block absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000" />
             <div className="relative z-10">
                <div className="flex items-center gap-3 mb-6">
                   <div className="px-3 py-1 bg-primary text-white text-[10px] font-bold uppercase tracking-widest rounded-lg">Featured Scenario</div>

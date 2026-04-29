@@ -34,13 +34,24 @@ const SidebarLink = ({ icon: Icon, label, active, onClick }) => (
   </button>
 );
 
-export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
+export default function Sidebar({ currentPath, onNavigate, user, onLogout, isOpen, onClose }) {
   const isAdmin = user?.role === 'Nursing In-Charge' || user?.role === 'Consultant Pediatrician';
   const isStudent = user?.role === 'Student';
   const isITSupport = user?.role === 'ICT / IT Support';
 
   return (
-    <aside className="w-72 h-screen bg-white border-r border-slate-200 flex flex-col sticky top-0 z-50 overflow-hidden">
+    <>
+      {/* Mobile Overlay */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] lg:hidden animate-in fade-in duration-300"
+          onClick={onClose}
+        />
+      )}
+
+      <aside className={`fixed lg:sticky top-0 left-0 w-72 h-screen bg-white border-r border-slate-200 flex flex-col z-[70] transition-transform duration-300 ease-out overflow-hidden ${
+        isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
+      }`}>
       {/* Brand Profile */}
       <div className="p-8 pb-6 flex flex-col gap-6">
         <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onNavigate('dashboard')}>
@@ -95,13 +106,13 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
           icon={LayoutDashboard} 
           label={isStudent ? 'Learning Hub' : 'Unit Dashboard'} 
           active={currentPath === 'dashboard'} 
-          onClick={() => onNavigate('dashboard')} 
+          onClick={() => { onNavigate('dashboard'); onClose(); }} 
         />
         <SidebarLink 
           icon={Baby} 
           label="Neonate Registry" 
           active={currentPath === 'neonates'} 
-          onClick={() => onNavigate('neonates')} 
+          onClick={() => { onNavigate('neonates'); onClose(); }} 
         />
 
         {!isStudent && (
@@ -109,11 +120,11 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
             <div className="px-4 pt-6 py-2">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Nursing Tools</p>
             </div>
-            <SidebarLink icon={CalendarDays} label="Duty Rota" active={currentPath === 'rota'} onClick={() => onNavigate('rota')} />
-            <SidebarLink icon={FileText} label="Shift Handovers" active={currentPath === 'handovers'} onClick={() => onNavigate('handovers')} />
-            <SidebarLink icon={Calculator} label="Drug Pipeline" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
-            <SidebarLink icon={BookOpen} label="Knowledge Hub" active={currentPath === 'knowledge'} onClick={() => onNavigate('knowledge')} />
-            <SidebarLink icon={BookOpen} label="Procedure Library" active={currentPath === 'flashcards'} onClick={() => onNavigate('flashcards')} />
+            <SidebarLink icon={CalendarDays} label="Duty Rota" active={currentPath === 'rota'} onClick={() => { onNavigate('rota'); onClose(); }} />
+            <SidebarLink icon={FileText} label="Shift Handovers" active={currentPath === 'handovers'} onClick={() => { onNavigate('handovers'); onClose(); }} />
+            <SidebarLink icon={Calculator} label="Drug Pipeline" active={currentPath === 'calculators'} onClick={() => { onNavigate('calculators'); onClose(); }} />
+            <SidebarLink icon={BookOpen} label="Knowledge Hub" active={currentPath === 'knowledge'} onClick={() => { onNavigate('knowledge'); onClose(); }} />
+            <SidebarLink icon={BookOpen} label="Procedure Library" active={currentPath === 'flashcards'} onClick={() => { onNavigate('flashcards'); onClose(); }} />
           </>
         )}
 
@@ -122,9 +133,9 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
             <div className="px-4 pt-6 py-2">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Learning Tools</p>
             </div>
-            <SidebarLink icon={Calculator} label="Practice Calculators" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
-            <SidebarLink icon={BookOpen} label="Study Cards" active={currentPath === 'flashcards'} onClick={() => onNavigate('flashcards')} />
-            <SidebarLink icon={HelpCircle} label="Patient Scenarios" active={currentPath === 'scenarios'} onClick={() => onNavigate('scenarios')} />
+            <SidebarLink icon={Calculator} label="Practice Calculators" active={currentPath === 'calculators'} onClick={() => { onNavigate('calculators'); onClose(); }} />
+            <SidebarLink icon={BookOpen} label="Study Cards" active={currentPath === 'flashcards'} onClick={() => { onNavigate('flashcards'); onClose(); }} />
+            <SidebarLink icon={HelpCircle} label="Patient Scenarios" active={currentPath === 'scenarios'} onClick={() => { onNavigate('scenarios'); onClose(); }} />
           </>
         )}
 
@@ -133,16 +144,16 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
              <div className="px-4 pt-6 py-2">
               <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Unit Management</p>
             </div>
-            <SidebarLink icon={ShieldCheck} label="Staff Verification" active={currentPath === 'verification-queue'} onClick={() => onNavigate('verification-queue')} />
-            <SidebarLink icon={Users} label="Team Members" active={currentPath === 'manage-staff'} onClick={() => onNavigate('manage-staff')} />
-            <SidebarLink icon={FileText} label="Shift Records" active={currentPath === 'audit-logs'} onClick={() => onNavigate('audit-logs')} />
+            <SidebarLink icon={ShieldCheck} label="Staff Verification" active={currentPath === 'verification-queue'} onClick={() => { onNavigate('verification-queue'); onClose(); }} />
+            <SidebarLink icon={Users} label="Team Members" active={currentPath === 'manage-staff'} onClick={() => { onNavigate('manage-staff'); onClose(); }} />
+            <SidebarLink icon={FileText} label="Shift Records" active={currentPath === 'audit-logs'} onClick={() => { onNavigate('audit-logs'); onClose(); }} />
           </>
         )}
 
         <div className="px-4 pt-6 py-2">
           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">System</p>
         </div>
-        <SidebarLink icon={Settings} label="My Settings" active={currentPath === 'settings'} onClick={() => onNavigate('settings')} />
+        <SidebarLink icon={Settings} label="My Settings" active={currentPath === 'settings'} onClick={() => { onNavigate('settings'); onClose(); }} />
       </nav>
 
       <div className="p-4 mt-auto">
