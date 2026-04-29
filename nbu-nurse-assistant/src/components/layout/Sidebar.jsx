@@ -172,6 +172,7 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout, isOpe
            <p className="text-[9px] text-slate-400 font-medium italic">Better care together</p>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
   );
 }
