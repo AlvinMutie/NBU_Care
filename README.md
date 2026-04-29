@@ -97,4 +97,4 @@ NeoDesk is a decision-support tool designed to enhance clinical precision. It is
 
 ## License and Attribution
 
-Copyright 2026 NeoDesk Clinical Systems. All rights reserved. Developed by the Advanced Agentic Coding team for the modernization of neonatal care units globally.
+Copyright 2026 NeoDesk Clinical Systems. All rights reserved. designed by AlvinMutie

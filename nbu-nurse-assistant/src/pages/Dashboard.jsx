@@ -9,129 +9,177 @@ import { api } from '../services/api';
 
 // --- SHARED COMPONENTS ---
 
+// --- SHARED COMPONENTS ---
+
+const BlueTick = ({ className = "w-4 h-4" }) => (
+  <div className={`${className} bg-primary text-white rounded-full flex items-center justify-center p-0.5 shadow-sm border border-white/20`} title="Verified Staff">
+    <ShieldCheck className="w-full h-full" />
+  </div>
+);
+
 const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) => (
-  <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-sm hover:shadow-md transition-all group">
-     <div className="flex items-center justify-between mb-4">
-        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colorClass} transition-transform group-hover:scale-110`}>
-           <Icon className="w-5 h-5" />
-        </div>
-        {highlight && (
-          <div className="flex items-center gap-1.5 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-full border border-emerald-100">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Active
+  <div className="bg-white rounded-3xl border border-slate-100 p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden">
+     <div className="absolute -right-4 -top-4 w-20 h-20 bg-slate-50 rounded-full group-hover:scale-150 transition-transform duration-700" />
+     <div className="relative z-10">
+       <div className="flex items-center justify-between mb-6">
+          <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colorClass} transition-transform group-hover:scale-110 shadow-inner`}>
+             <Icon className="w-6 h-6" />
           </div>
-        )}
-     </div>
-     <div className="flex items-end justify-between">
-        <div>
-           <h3 className="text-2xl font-bold text-slate-900 leading-none">{value}</h3>
-           <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mt-2">{title}</p>
-        </div>
-        {trend && (
-           <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded leading-none">+{trend}%</span>
-        )}
+          {highlight && (
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Live
+            </div>
+          )}
+       </div>
+       <div className="flex items-end justify-between">
+          <div>
+             <h3 className="text-3xl font-black text-slate-900 leading-none tracking-tight">{value}</h3>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-3">{title}</p>
+          </div>
+          {trend && (
+             <span className="text-xs font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">+{trend}%</span>
+          )}
+       </div>
      </div>
   </div>
 );
 
 // --- ROLE-SPECIFIC VIEWS ---
 
-const AdminDashboard = ({ stats, loading, onNavigate }) => {
+const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
   const [logs, setLogs] = useState([]);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [neonateCount, setNeonateCount] = useState(0);
   const [logsLoading, setLogsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchDashboardData = async () => {
       try {
-        const res = await api.getRecentLogs();
-        if (res.success) setLogs(res.data);
+        const [logsRes, pendingRes, neonateRes] = await Promise.all([
+          api.getRecentLogs(),
+          api.getPendingUsers(),
+          api.getNeonates()
+        ]);
+        if (logsRes.success) setLogs(logsRes.data);
+        if (pendingRes.success) setPendingCount(pendingRes.users.length);
+        if (neonateRes.success) setNeonateCount(neonateRes.neonates.length);
       } catch (err) {
-        console.error('Logs fetch failed', err);
+        console.error('Dashboard data fetch failed', err);
       } finally {
         setLogsLoading(false);
       }
     };
-    fetchLogs();
+    fetchDashboardData();
   }, []);
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
+    <div className="space-y-8">
+      {/* Verification Alert */}
+      {pendingCount > 0 && (
+        <div 
+          onClick={() => onNavigate('verification-queue')}
+          className="bg-amber-50 border border-amber-200 rounded-[32px] p-6 flex flex-col md:flex-row items-center justify-between gap-6 shadow-lg shadow-amber-200/20 cursor-pointer hover:bg-amber-100 transition-all group animate-in slide-in-from-top-8 duration-700"
+        >
+           <div className="flex items-center gap-5">
+              <div className="w-16 h-16 bg-white rounded-3xl flex items-center justify-center text-amber-500 shadow-xl shadow-amber-200/50 group-hover:scale-110 transition-transform">
+                 <ShieldAlert className="w-8 h-8" />
+              </div>
+              <div>
+                 <h4 className="text-lg font-black text-amber-900 tracking-tight">Access Requests Pending</h4>
+                 <p className="text-sm text-amber-700 font-bold opacity-80">{pendingCount} staff members are waiting for your verification.</p>
+              </div>
+           </div>
+           <button className="px-8 py-3 bg-amber-600 text-white font-black text-xs uppercase tracking-widest rounded-2xl shadow-xl shadow-amber-600/20 group-hover:bg-amber-700 transition-all flex items-center gap-2">
+              Review Queue <ChevronRight className="w-4 h-4" />
+           </button>
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2 px-2">
          <div>
-            <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-1">Unit Overview</h2>
-            <h1 className="text-2xl font-bold text-slate-900 tracking-tight">How our unit is doing</h1>
-            <p className="text-sm text-slate-500 mt-1">A live look at our nursing tools and team progress.</p>
-         </div>
-         <div className="flex items-center gap-2">
-            <div className="px-3 py-1 bg-slate-100 rounded-lg text-xs font-bold text-slate-600 flex items-center gap-2">
-               <Clock className="w-3.5 h-3.5" /> Shift 2A
+            <h2 className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 ml-1">In-Charge Overview</h2>
+            <div className="flex items-center gap-3">
+               <h1 className="text-4xl font-black text-slate-900 tracking-tighter">Unit Dashboard<span className="text-primary text-5xl">.</span></h1>
+               <BlueTick className="w-7 h-7" />
             </div>
-            <button className="px-4 py-1.5 bg-primary text-white text-xs font-bold rounded-lg shadow-sm hover:bg-primary-dark transition-colors">
-               Export Records
+            <p className="text-sm text-slate-500 mt-2 font-medium">Monitoring clinical precision and team workflow.</p>
+         </div>
+         <div className="flex items-center gap-3">
+            <div className="px-5 py-2.5 bg-white border border-slate-100 rounded-2xl text-xs font-black text-slate-600 flex items-center gap-3 shadow-sm">
+               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Shift Morning
+            </div>
+            <button className="p-3 bg-slate-900 text-white rounded-2xl shadow-xl hover:bg-slate-800 transition-all active:scale-95">
+               <Database className="w-5 h-5" />
             </button>
          </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Team Members" value={loading ? '...' : stats.users} icon={Users} colorClass="bg-indigo-50 text-indigo-600" trend="2.4" />
-        <StatCard title="Procedure Cards" value={loading ? '...' : stats.flashcards} icon={FileText} colorClass="bg-teal-50 text-teal-600" />
-        <StatCard title="Learning Cases" value={loading ? '...' : stats.scenarios} icon={GraduationCap} colorClass="bg-amber-50 text-amber-600" />
-        <StatCard title="Tools Online" value="14" icon={ShieldCheck} colorClass="bg-primary/10 text-primary" highlight />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <StatCard title="Total Staff" value={loading ? '...' : stats.users} icon={Users} colorClass="bg-indigo-50 text-indigo-600" trend="12" />
+        <StatCard title="Live Cases" value="24" icon={ActivityIcon} colorClass="bg-teal-50 text-teal-600" highlight />
+        <StatCard title="Doses Given" value="142" icon={Droplets} colorClass="bg-rose-50 text-rose-500" />
+        <StatCard title="Safety Score" value="100%" icon={ShieldCheck} colorClass="bg-primary/10 text-primary" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-4">
-          <div className="bg-white rounded-xl border border-slate-200 shadow-tiny overflow-hidden flex flex-col h-full">
-            <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/30">
-               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                  <ActivityIcon className="w-4 h-4 text-primary" /> Recent Calculations
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="bg-white rounded-[40px] border border-slate-100 shadow-sm overflow-hidden flex flex-col h-full hover:shadow-2xl transition-all duration-500">
+            <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+               <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center gap-3">
+                  <ActivityIcon className="w-5 h-5 text-primary" /> Live Shift Logs
                </h3>
                <button 
                  onClick={() => onNavigate('audit-logs')}
-                 className="text-xs font-bold text-primary hover:underline transition-all"
+                 className="text-xs font-black text-primary hover:underline transition-all uppercase tracking-widest"
                >
-                 View All
+                 History
                </button>
             </div>
             <div className="flex-1 overflow-x-auto">
               {logsLoading ? (
-                <div className="flex flex-col items-center justify-center py-12">
-                  <ActivityIcon className="w-6 h-6 text-primary animate-pulse mb-3" />
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fetching live records...</p>
+                <div className="flex flex-col items-center justify-center py-24">
+                  <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Encrypting live data...</p>
                 </div>
               ) : logs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
-                  <div className="w-12 h-12 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-4">
-                    <Database className="w-6 h-6" />
+                <div className="flex flex-col items-center justify-center py-24 px-10 text-center">
+                  <div className="w-20 h-20 bg-slate-50 rounded-[32px] flex items-center justify-center text-slate-200 mb-6 border border-slate-100">
+                    <Database className="w-10 h-10" />
                   </div>
-                  <h4 className="text-sm font-bold text-slate-900 mb-1">No calculations recorded yet</h4>
-                  <p className="text-xs text-slate-500 max-w-[240px]">Recent calculations from the unit will appear here automatically.</p>
+                  <h4 className="text-xl font-black text-slate-900 mb-2">No activity recorded</h4>
+                  <p className="text-sm text-slate-500 max-w-xs font-medium">Calculations and clinical actions from this shift will appear here in real-time.</p>
                 </div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-slate-50/50">
-                      <th className="px-5 py-3 font-bold">What was done</th>
-                      <th className="px-5 py-3 font-bold">Done By</th>
-                      <th className="px-5 py-3 font-bold">Status</th>
-                      <th className="px-5 py-3 font-bold text-right">Time</th>
+                    <tr className="border-b border-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] bg-slate-50/50">
+                      <th className="px-8 py-5">Action</th>
+                      <th className="px-8 py-5">Verified Clinician</th>
+                      <th className="px-8 py-5">Status</th>
+                      <th className="px-8 py-5 text-right">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-50">
                     {logs.map((log, i) => (
-                      <tr key={i} className="group hover:bg-slate-50 transition-colors cursor-pointer">
-                        <td className="px-5 py-4">
+                      <tr key={i} className="group hover:bg-slate-50 transition-all cursor-pointer">
+                        <td className="px-8 py-6">
                           <div className="flex flex-col">
-                            <span className="text-sm font-bold text-slate-800 tracking-tight">{log.action}</span>
-                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{log.type} Tool</span>
+                            <span className="text-sm font-black text-slate-800 tracking-tight">{log.action}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-tight">{log.type}</span>
                           </div>
                         </td>
-                        <td className="px-5 py-4 text-sm font-semibold text-slate-600">{log.user?.name || 'Unknown'}</td>
-                        <td className="px-5 py-4">
-                          {log.status === 'Checked' ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-600 text-[10px] font-bold rounded-md border border-emerald-100">Checked</span> : 
-                           log.status === 'Review' ? <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-rose-50 text-rose-600 text-[10px] font-bold rounded-md border border-rose-100">Needs Review</span> :
-                           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-50 text-amber-600 text-[10px] font-bold rounded-md border border-amber-100">Waiting</span>}
+                        <td className="px-8 py-6">
+                           <div className="flex items-center gap-2">
+                              <span className="text-sm font-bold text-slate-700">{log.user?.name || 'Unknown'}</span>
+                              <BlueTick className="w-3.5 h-3.5" />
+                           </div>
                         </td>
-                        <td className="px-5 py-4 text-xs font-bold text-slate-400 text-right">
+                        <td className="px-8 py-6">
+                          {log.status === 'Checked' ? <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-emerald-100">Checked</span> : 
+                           log.status === 'Review' ? <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-rose-100">Needs Review</span> :
+                           <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-black uppercase tracking-widest rounded-lg border border-amber-100">Pending</span>}
+                        </td>
+                        <td className="px-8 py-6 text-xs font-black text-slate-400 text-right">
                           {new Date(log.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </td>
                       </tr>
@@ -143,41 +191,50 @@ const AdminDashboard = ({ stats, loading, onNavigate }) => {
           </div>
         </div>
 
-        <div className="space-y-4">
-           <div className="bg-slate-900 rounded-xl p-5 shadow-lg relative overflow-hidden group">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/20 rounded-full blur-[40px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
+        <div className="space-y-6">
+           <div className="bg-slate-900 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
               <div className="relative z-10">
-                 <div className="flex items-center justify-between mb-4">
-                    <div className="w-8 h-8 rounded bg-white/10 flex items-center justify-center text-primary border border-white/5">
-                      <Database className="w-4 h-4" />
+                 <div className="flex items-center justify-between mb-8">
+                    <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary border border-white/5 backdrop-blur-xl">
+                      <ShieldCheck className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">System Status</span>
+                    <span className="text-[10px] font-black text-slate-400 tracking-[0.2em] uppercase">Clinical Gatekeeper</span>
                  </div>
-                 <h4 className="text-white font-bold text-sm mb-1 tracking-tight">App Health</h4>
-                 <p className="text-xs text-slate-400 mb-6 leading-relaxed">Guidelines are up to date and verified.</p>
-                 <div className="space-y-2">
-                   <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                     <span>Stability</span>
-                     <span className="text-primary font-black">99.9%</span>
+                 <h4 className="text-white text-2xl font-black mb-2 tracking-tight">Security Protocol</h4>
+                 <p className="text-sm text-slate-400 mb-8 leading-relaxed font-medium">All clinical staff must be verified by the In-Charge before accessing drug calculators.</p>
+                 <div className="space-y-3">
+                   <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-widest text-slate-500">
+                     <span>Unit Verification</span>
+                     <span className="text-primary font-black">Active</span>
                    </div>
-                   <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                     <div className="w-[99.9%] h-full bg-primary shadow-[0_0_10px_rgba(13,148,136,0.5)]" />
+                   <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                     <div className="w-full h-full bg-primary shadow-[0_0_20px_rgba(13,148,136,0.6)]" />
                    </div>
                  </div>
               </div>
            </div>
 
-           <div className="bg-white rounded-xl border border-slate-200 p-5 shadow-tiny">
-              <h4 className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Things to do</h4>
-              <div className="space-y-3">
+           <div className="bg-white rounded-[40px] border border-slate-100 p-8 shadow-sm">
+              <h4 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6 px-1">Unit Tasks</h4>
+              <div className="space-y-4">
                  {[
-                   { t: 'Check Nurse Schedule', s: 'Done', c: 'emerald' },
-                   { t: 'Audit Bedside Tools', s: 'In Progress', c: 'primary' },
-                   { t: 'Review Emergency Doses', s: '1 Flagged', c: 'rose' },
+                   { t: 'Review Pending Staff', s: 'Priority', c: pendingCount > 0 ? 'amber' : 'emerald', path: 'verification-queue' },
+                   { t: 'Audit Drug Register', s: 'Daily', c: 'primary', path: 'audit-logs' },
+                   { t: 'Update Duty Rota', s: 'Required', c: 'rose', path: 'manage-staff' },
                  ].map((task, i) => (
-                   <div key={i} className="flex items-center justify-between p-3 rounded-lg border border-slate-50 hover:border-slate-100 transition-all cursor-pointer group">
-                     <span className="text-xs font-bold text-slate-700 tracking-tight">{task.t}</span>
-                     <ChevronRight className={`w-3.5 h-3.5 text-${task.c}-500 opacity-0 group-hover:opacity-100 transition-all`} />
+                   <div 
+                     key={i} 
+                     onClick={() => onNavigate(task.path)}
+                     className="flex items-center justify-between p-5 rounded-3xl bg-slate-50 border border-transparent hover:border-slate-100 hover:bg-white hover:shadow-xl transition-all cursor-pointer group"
+                   >
+                     <div className="flex flex-col">
+                        <span className="text-sm font-black text-slate-700 tracking-tight mb-0.5">{task.t}</span>
+                        <span className={`text-[9px] font-black text-${task.c}-500 uppercase tracking-widest`}>{task.s}</span>
+                     </div>
+                     <div className={`w-8 h-8 rounded-xl bg-white flex items-center justify-center text-${task.c}-500 shadow-sm opacity-0 group-hover:opacity-100 transition-all`}>
+                        <ChevronRight className="w-4 h-4" />
+                     </div>
                    </div>
                  ))}
               </div>
@@ -187,6 +244,7 @@ const AdminDashboard = ({ stats, loading, onNavigate }) => {
     </div>
   );
 };
+
 
 const QuizWidget = () => {
   const [step, setStep] = useState('start'); // start, question, result

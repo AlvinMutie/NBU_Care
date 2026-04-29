@@ -11,13 +11,22 @@ export const api = {
   
   post: async (endpoint, data) => {
     const token = localStorage.getItem('token');
+    const isFormData = data instanceof FormData;
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       method: 'POST',
       headers: { 
-        'Content-Type': 'application/json',
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         'Authorization': `Bearer ${token}` 
       },
-      body: JSON.stringify(data)
+      body: isFormData ? data : JSON.stringify(data)
+    });
+    return res.json();
+  },
+
+  register: async (formData) => {
+    const res = await fetch(`${API_BASE_URL}/auth/register`, {
+      method: 'POST',
+      body: formData // Fetch handles Content-Type for FormData
     });
     return res.json();
   },
@@ -31,6 +40,100 @@ export const api = {
     const data = await res.json();
     if (data.token) localStorage.setItem('token', data.token);
     return data;
+  },
+
+  getPendingUsers: async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/auth/pending`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  verifyUser: async (id, status) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/auth/verify/${id}`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify({ status })
+    });
+    return res.json();
+  },
+
+  getRotas: async (month, year) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/rota?month=${month}&year=${year}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  getCurrentRota: async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/rota/current`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  saveRota: async (rotaData) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/rota`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify(rotaData)
+    });
+    return res.json();
+  },
+
+  // Neonate Endpoints
+  getNeonates: async () => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/neonates`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  saveNeonate: async (neonateData) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/neonates`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify(neonateData)
+    });
+    return res.json();
+  },
+
+  // Handover Endpoints
+  getHandovers: async (neonateId) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/handovers/neonate/${neonateId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    return res.json();
+  },
+
+  saveHandover: async (handoverData) => {
+    const token = localStorage.getItem('token');
+    const res = await fetch(`${API_BASE_URL}/handovers`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}` 
+      },
+      body: JSON.stringify(handoverData)
+    });
+    return res.json();
   },
 
   getStats: async () => {

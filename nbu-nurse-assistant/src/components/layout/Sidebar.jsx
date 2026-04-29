@@ -11,7 +11,9 @@ import {
   Activity,
   ChevronRight,
   LogOut,
-  Stethoscope
+  Stethoscope,
+  CalendarDays,
+  Baby
 } from 'lucide-react';
 
 const SidebarLink = ({ icon: Icon, label, active, onClick }) => (
@@ -52,16 +54,32 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
         </div>
 
         {/* User Quick Info */}
-        <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+        <div className="p-4 rounded-3xl bg-slate-50 border border-slate-100/50 shadow-sm">
            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary border border-primary/20 uppercase">
-                {user?.name?.charAt(0) || 'M'}
+              <div className="relative flex-shrink-0">
+                {user?.profileImage ? (
+                  <img 
+                    src={`${import.meta.env.VITE_API_BASE_URL || ''}${user.profileImage}`} 
+                    alt="profile" 
+                    className="w-10 h-10 rounded-xl object-cover border-2 border-white shadow-sm"
+                    onError={(e) => { e.target.src = 'https://via.placeholder.com/150'; }}
+                  />
+                ) : (
+                  <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-xs font-black text-primary border border-primary/20 uppercase">
+                    {user?.name?.charAt(0) || 'M'}
+                  </div>
+                )}
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-50">
+                   <ShieldCheck className="w-2.5 h-2.5 text-primary" />
+                </div>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-bold text-slate-900 truncate">{user?.name || 'Medical Staff'}</p>
+                <div className="flex items-center gap-1.5">
+                   <p className="text-sm font-black text-slate-900 truncate tracking-tight">{user?.name?.split(' ')[0] || 'Medical'}</p>
+                </div>
                 <div className="flex items-center gap-1.5 overflow-hidden">
-                   <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider truncate">{user?.role || 'Clinician'}</p>
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest truncate">{user?.role || 'Clinician'}</p>
                 </div>
               </div>
            </div>
@@ -70,7 +88,7 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
 
       <nav className="flex-1 px-4 space-y-1 overflow-y-auto custom-scrollbar pb-10 mt-2">
         <div className="px-4 py-2">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Main Menu</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Main Menu</p>
         </div>
 
         <SidebarLink 
@@ -79,14 +97,22 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
           active={currentPath === 'dashboard'} 
           onClick={() => onNavigate('dashboard')} 
         />
+        <SidebarLink 
+          icon={Baby} 
+          label="Neonate Registry" 
+          active={currentPath === 'neonates'} 
+          onClick={() => onNavigate('neonates')} 
+        />
 
         {!isStudent && (
           <>
             <div className="px-4 pt-6 py-2">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Nursing Tools</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Nursing Tools</p>
             </div>
+            <SidebarLink icon={CalendarDays} label="Duty Rota" active={currentPath === 'rota'} onClick={() => onNavigate('rota')} />
             <SidebarLink icon={FileText} label="Shift Handovers" active={currentPath === 'handovers'} onClick={() => onNavigate('handovers')} />
-            <SidebarLink icon={Calculator} label="Treatment Calculators" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
+            <SidebarLink icon={Calculator} label="Drug Pipeline" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
+            <SidebarLink icon={BookOpen} label="Knowledge Hub" active={currentPath === 'knowledge'} onClick={() => onNavigate('knowledge')} />
             <SidebarLink icon={BookOpen} label="Procedure Library" active={currentPath === 'flashcards'} onClick={() => onNavigate('flashcards')} />
           </>
         )}
@@ -94,7 +120,7 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
         {isStudent && (
           <>
             <div className="px-4 pt-6 py-2">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Learning Tools</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Learning Tools</p>
             </div>
             <SidebarLink icon={Calculator} label="Practice Calculators" active={currentPath === 'calculators'} onClick={() => onNavigate('calculators')} />
             <SidebarLink icon={BookOpen} label="Study Cards" active={currentPath === 'flashcards'} onClick={() => onNavigate('flashcards')} />
@@ -105,8 +131,9 @@ export default function Sidebar({ currentPath, onNavigate, user, onLogout }) {
         {(isAdmin || isITSupport) && (
           <>
              <div className="px-4 pt-6 py-2">
-              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Unit Management</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] leading-none">Unit Management</p>
             </div>
+            <SidebarLink icon={ShieldCheck} label="Staff Verification" active={currentPath === 'verification-queue'} onClick={() => onNavigate('verification-queue')} />
             <SidebarLink icon={Users} label="Team Members" active={currentPath === 'manage-staff'} onClick={() => onNavigate('manage-staff')} />
             <SidebarLink icon={FileText} label="Shift Records" active={currentPath === 'audit-logs'} onClick={() => onNavigate('audit-logs')} />
           </>

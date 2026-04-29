@@ -16,8 +16,13 @@ app.use('/uploads', express.static('uploads'));
 
 // Routes
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/stats', require('./routes/stats'));
 app.use('/api/flashcards', require('./routes/flashcards'));
 app.use('/api/scenarios', require('./routes/scenarios'));
+app.use('/api/audit', require('./routes/audit'));
+app.use('/api/rota', require('./routes/rota'));
+app.use('/api/neonates', require('./routes/neonates'));
+app.use('/api/handovers', require('./routes/handovers'));
 app.use('/api/admin', require('./routes/admin'));
 app.use('/api/logs', require('./routes/logs'));
 app.use('/api/learning', require('./routes/learning'));

@@ -13,6 +13,11 @@ import AuditLogs from './pages/AuditLogs'
 import ManageStaff from './pages/ManageStaff'
 import Settings from './pages/Settings'
 import Handovers from './pages/Handovers'
+import VerificationQueue from './pages/VerificationQueue'
+import DutyRota from './pages/DutyRota'
+import Neonates from './pages/Neonates'
+import KnowledgeHub from './pages/KnowledgeHub'
+import NeoBot from './components/common/NeoBot'
 import { useTheme } from './context/ThemeContext.jsx'
 
 function App() {
@@ -25,6 +30,12 @@ function App() {
     const savedUser = localStorage.getItem('nbu_user');
     return savedUser ? 'dashboard' : 'landing';
   });
+  const [pageParams, setPageParams] = useState({});
+
+  const handleNavigate = (page, params = {}) => {
+    setCurrentPage(page);
+    setPageParams(params);
+  };
 
   const handleLogin = (userData) => {
     setUser(userData);
@@ -47,7 +58,7 @@ function App() {
   // Force unauthorized pages back to dashboard
   let safePage = currentPage;
   if (user) {
-    if (!isAdmin && !isITSupport && (currentPage === 'audit-logs' || currentPage === 'manage-staff')) safePage = 'dashboard';
+    if (!isAdmin && !isITSupport && (currentPage === 'audit-logs' || currentPage === 'manage-staff' || currentPage === 'verification-queue')) safePage = 'dashboard';
     if (isStudent && (currentPage === 'favorites')) safePage = 'dashboard';
   }
 
@@ -82,19 +93,24 @@ function App() {
         </>
       ) : (
         <MainLayout 
+          user={user} 
           currentPath={safePage} 
-          onNavigate={setCurrentPage} 
-          user={user}
+          onNavigate={handleNavigate}
           onLogout={handleLogout}
         >
-          {safePage === 'dashboard' && <Dashboard user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'handovers' && <Handovers user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'calculators' && <Calculators user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'flashcards' && <Flashcards user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'scenarios' && <Scenarios user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'audit-logs' && <AuditLogs user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'manage-staff' && <ManageStaff user={user} onNavigate={setCurrentPage} />}
-          {safePage === 'settings' && <Settings user={user} onUpdateUser={handleLogin} onNavigate={setCurrentPage} />}
+          {safePage === 'dashboard' && <Dashboard user={user} onNavigate={handleNavigate} />}
+          {safePage === 'handovers' && <Handovers user={user} neonateId={pageParams.neonateId} onNavigate={handleNavigate} />}
+          {safePage === 'neonates' && <Neonates user={user} onNavigate={handleNavigate} />}
+          {safePage === 'calculators' && <Calculators user={user} onNavigate={handleNavigate} />}
+          {safePage === 'knowledge' && <KnowledgeHub user={user} onNavigate={handleNavigate} />}
+          {safePage === 'flashcards' && <Flashcards user={user} onNavigate={handleNavigate} />}
+          {safePage === 'scenarios' && <Scenarios user={user} onNavigate={handleNavigate} />}
+          {safePage === 'audit-logs' && <AuditLogs user={user} onNavigate={handleNavigate} />}
+          {safePage === 'manage-staff' && <ManageStaff user={user} onNavigate={handleNavigate} />}
+          {safePage === 'verification-queue' && <VerificationQueue user={user} onNavigate={handleNavigate} />}
+          {safePage === 'rota' && <DutyRota user={user} onNavigate={handleNavigate} />}
+          {safePage === 'settings' && <Settings user={user} onUpdateUser={handleLogin} onNavigate={handleNavigate} />}
+          <NeoBot />
         </MainLayout>
       )}
     </div>

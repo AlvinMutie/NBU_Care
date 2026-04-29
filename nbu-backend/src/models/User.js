@@ -5,6 +5,9 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  phone: { type: String, required: true },
+  idNumber: { type: String, required: true },
+  profileImage: { type: String, required: true }, // Path to uploaded image
   role: { 
     type: String, 
     required: true, 
@@ -19,6 +22,14 @@ const UserSchema = new mongoose.Schema({
     ],
     default: 'Student'
   },
+  status: { 
+    type: String, 
+    enum: ['Pending', 'Approved', 'Rejected', 'Restricted'], 
+    default: 'Pending' 
+  },
+  isVerified: { type: Boolean, default: false },
+  verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  verificationDate: { type: Date },
   favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Flashcard' }],
   learningStats: {
     completedScenarios: [{ type: String }],
@@ -26,11 +37,6 @@ const UserSchema = new mongoose.Schema({
     quizScore: { type: Number, default: 0 },
     badges: [{ type: String }],
     lastDailyQuiz: { type: Date }
-  },
-  status: { 
-    type: String, 
-    enum: ['Active', 'Restricted'], 
-    default: 'Active' 
   },
   createdAt: { type: Date, default: Date.now }
 });
