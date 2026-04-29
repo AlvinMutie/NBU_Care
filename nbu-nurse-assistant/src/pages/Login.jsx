@@ -7,7 +7,9 @@ import {
   ChevronRight,
   Loader2,
   AlertCircle,
-  Key
+  Key,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import { api } from '../services/api';
 

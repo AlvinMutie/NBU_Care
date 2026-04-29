@@ -5,7 +5,7 @@ import {
   Search, Filter, Plus, FileText, 
   Activity, Thermometer, Droplets,
   Stethoscope, ShieldCheck, X, Check,
-  Loader2, ArrowRightLeft, Heart, Zap
+  Loader2, ArrowRightLeft, Heart, Zap, Calendar
 } from 'lucide-react';
 import { api } from '../services/api';
 

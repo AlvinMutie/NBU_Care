@@ -7,7 +7,7 @@ import {
   TrendingUp, Clock, UserCheck, ChevronRight,
   ChevronLeft, Search, Loader2, Weight,
   FlaskRound as Flask, Pill, ClipboardCheck,
-  X
+  X, Check
 } from 'lucide-react';
 import { api } from '../services/api';
 
