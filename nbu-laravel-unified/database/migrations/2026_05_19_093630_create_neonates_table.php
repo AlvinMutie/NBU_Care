@@ -21,7 +21,7 @@ return new class extends Migration
             $table->decimal('current_weight', 5, 3);
             $table->unsignedTinyInteger('gestational_age');
             $table->text('admission_diagnosis')->nullable();
-            $table->text('clinical_history')->nullable();
+            $table->text('history')->nullable();
             $table->enum('status', ['Stable', 'Critical', 'Serious', 'Discharged'])->default('Stable');
             $table->string('mother_name')->nullable();
             $table->string('mother_phone')->nullable();
