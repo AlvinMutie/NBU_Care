@@ -53,6 +53,58 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        User::updateOrCreate(
+            ['email' => 'angela.omwansa@hospital.go.ke'],
+            [
+                'name' => 'Dr. Angela Omwansa',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'hospital_id' => 'NBU-2026-003',
+                'role' => 'Consultant Pediatrician',
+                'status' => 'Approved',
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'teresa.njoroge@hospital.go.ke'],
+            [
+                'name' => 'Sister Teresa Njoroge',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'hospital_id' => 'NBU-2026-001',
+                'role' => 'Nursing In-Charge',
+                'status' => 'Approved',
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'patrick.kamau@hospital.go.ke'],
+            [
+                'name' => 'Nurse Patrick Kamau',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'hospital_id' => 'NBU-2026-002',
+                'role' => 'Nurse',
+                'status' => 'Approved',
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
+        User::updateOrCreate(
+            ['email' => 'cynthia.wekesa@hospital.go.ke'],
+            [
+                'name' => 'Nurse Cynthia Wekesa',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'hospital_id' => 'NBU-2026-004',
+                'role' => 'CO Pediatrics / MO',
+                'status' => 'Approved',
+                'is_verified' => true,
+                'email_verified_at' => now(),
+            ]
+        );
+
         // 3. Seed Realistic Neonatal Patients for registry
         $neonates = [
             [
@@ -128,5 +180,77 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         }
+
+        // Fetch seeded users and neonates for scheduling
+        $adminUser = User::where('email', 'admin@neodesk.org')->first();
+        $consultant = User::where('email', 'angela.omwansa@hospital.go.ke')->first();
+        $manager = User::where('email', 'teresa.njoroge@hospital.go.ke')->first();
+        $nurse = User::where('email', 'patrick.kamau@hospital.go.ke')->first();
+
+        // Create a Rota for Today
+        $rotaId = \Illuminate\Support\Facades\DB::table('rotas')->insertGetId([
+            'date' => now()->format('Y-m-d'),
+            'shift' => 'Morning',
+            'consultant_id' => $consultant->id,
+            'manager_id' => $manager->id,
+            'created_by' => $adminUser->id,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Assign Nurse to Rota
+        \Illuminate\Support\Facades\DB::table('rota_user')->insert([
+            'rota_id' => $rotaId,
+            'user_id' => $nurse->id,
+        ]);
+
+        // Seed Shift Handovers for baby patients
+        $janeDoe = \Illuminate\Support\Facades\DB::table('neonates')->where('hospital_number', 'NBU-2026-901')->first();
+        $johnMwangi = \Illuminate\Support\Facades\DB::table('neonates')->where('hospital_number', 'NBU-2026-902')->first();
+
+        \Illuminate\Support\Facades\DB::table('handovers')->insert([
+            [
+                'neonate_id' => $janeDoe->id,
+                'date' => now(),
+                'shift' => 'Morning',
+                'clinical_lead_id' => $consultant->id,
+                'nurse_on_duty_id' => $manager->id,
+                'commentary' => 'Infant stable on room air. Minimal retractions noted in the early morning but resolved. Tolerating feeds well. Vital checkups are fully reassuring.',
+                'temperature' => 36.6,
+                'sugar_level' => 4.2,
+                'oxygen_saturation' => 98,
+                'heart_rate' => 142,
+                'respiratory_rate' => 48,
+                'investigations' => json_encode([
+                    'liver' => 'Normal',
+                    'kidney' => 'Normal',
+                    'fbc' => 'Hb 14.2 g/dL, WBC 11.5',
+                ]),
+                'plan' => 'Maintain thermal care. Encourage breast feeds every 3 hours. Monitor diaper output.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'neonate_id' => $johnMwangi->id,
+                'date' => now(),
+                'shift' => 'Morning',
+                'clinical_lead_id' => $consultant->id,
+                'nurse_on_duty_id' => $manager->id,
+                'commentary' => 'Jaundice is visibly present on the trunk. Started phototherapy at 09:00. Ensure eye protection patches are kept secured and phototherapy light is positioned properly.',
+                'temperature' => 36.8,
+                'sugar_level' => 4.5,
+                'oxygen_saturation' => 97,
+                'heart_rate' => 138,
+                'respiratory_rate' => 45,
+                'investigations' => json_encode([
+                    'liver' => 'Serum Bilirubin 210 mmol/L',
+                    'kidney' => 'Normal',
+                    'fbc' => 'Hb 13.8 g/dL',
+                ]),
+                'plan' => 'Continue phototherapy. Monitor bilirubin level in 12 hours. Ensure high fluid intake via express breast milk.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
     }
 }

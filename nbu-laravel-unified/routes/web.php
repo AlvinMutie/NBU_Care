@@ -17,25 +17,7 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     $neonates = \Illuminate\Support\Facades\DB::table('neonates')
         ->orderBy('created_at', 'desc')
-        ->get()
-        ->map(function ($neonate) {
-            // Map db columns to JS keys
-            return [
-                'id' => $neonate->id,
-                'hospitalNumber' => $neonate->hospital_number,
-                'name' => $neonate->name,
-                'dob' => $neonate->dob,
-                'gender' => $neonate->gender,
-                'birthWeight' => $neonate->birth_weight,
-                'currentWeight' => $neonate->current_weight,
-                'gestationalAge' => $neonate->gestational_age,
-                'admissionDiagnosis' => $neonate->admission_diagnosis,
-                'history' => $neonate->history,
-                'motherPhone' => $neonate->mother_phone,
-                'status' => $neonate->status,
-                'createdAt' => $neonate->created_at,
-            ];
-        });
+        ->get();
 
     $auditLogs = \Illuminate\Support\Facades\DB::table('audit_logs')
         ->leftJoin('users', 'audit_logs.user_id', '=', 'users.id')
@@ -44,9 +26,59 @@ Route::get('/dashboard', function () {
         ->take(50)
         ->get();
 
+    $handovers = \Illuminate\Support\Facades\DB::table('handovers')
+        ->leftJoin('neonates', 'handovers.neonate_id', '=', 'neonates.id')
+        ->leftJoin('users as nurse', 'handovers.nurse_on_duty_id', '=', 'nurse.id')
+        ->leftJoin('users as lead', 'handovers.clinical_lead_id', '=', 'lead.id')
+        ->select(
+            'handovers.*', 
+            'neonates.name as neonate_name', 
+            'neonates.hospital_number as neonate_hospital_number',
+            'nurse.name as nurse_name',
+            'lead.name as lead_name'
+        )
+        ->orderBy('handovers.created_at', 'desc')
+        ->get()
+        ->map(function ($h) {
+            $h->investigations = json_decode($h->investigations ?? '{}');
+            $h->medications_given = json_decode($h->medications_given ?? '[]');
+            return $h;
+        });
+
+    $rotasRaw = \Illuminate\Support\Facades\DB::table('rotas')
+        ->leftJoin('users as consultant', 'rotas.consultant_id', '=', 'consultant.id')
+        ->leftJoin('users as manager', 'rotas.manager_id', '=', 'manager.id')
+        ->select(
+            'rotas.*',
+            'consultant.name as consultant_name',
+            'manager.name as manager_name'
+        )
+        ->orderBy('rotas.date', 'desc')
+        ->orderBy('rotas.shift', 'asc')
+        ->get();
+
+    $rotas = $rotasRaw->map(function ($rota) {
+        $nurses = \Illuminate\Support\Facades\DB::table('rota_user')
+            ->join('users', 'rota_user.user_id', '=', 'users.id')
+            ->where('rota_user.rota_id', $rota->id)
+            ->select('users.id', 'users.name', 'users.role')
+            ->get();
+        
+        $rota->nurses = $nurses;
+        return $rota;
+    });
+
+    $allUsers = \Illuminate\Support\Facades\DB::table('users')
+        ->select('id', 'name', 'role', 'email')
+        ->orderBy('name', 'asc')
+        ->get();
+
     return Inertia::render('Dashboard', [
         'initialNeonates' => $neonates,
         'initialAuditLogs' => $auditLogs,
+        'initialHandovers' => $handovers,
+        'initialRotas' => $rotas,
+        'allUsers' => $allUsers,
     ]);
 })->middleware(['auth'])->name('dashboard');
 
@@ -108,6 +140,108 @@ Route::middleware('auth')->group(function () {
         ]);
 
         return redirect()->back()->with('success', 'Action logged successfully.');
+    });
+
+    // Record Shift Handover Report
+    Route::post('/handovers', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'neonateId' => 'required|exists:neonates,id',
+            'shift' => 'required|string|in:Morning,Afternoon,Night',
+            'clinicalLeadId' => 'nullable|exists:users,id',
+            'temperature' => 'nullable|numeric|min:30|max:45',
+            'sugarLevel' => 'nullable|numeric|min:0|max:30',
+            'oxygenSaturation' => 'nullable|integer|min:0|max:100',
+            'heartRate' => 'nullable|integer|min:0|max:300',
+            'respiratoryRate' => 'nullable|integer|min:0|max:150',
+            'fbc' => 'nullable|string|max:255',
+            'kidney' => 'nullable|string|max:255',
+            'liver' => 'nullable|string|max:255',
+            'commentary' => 'nullable|string',
+            'plan' => 'nullable|string',
+        ]);
+
+        $investigations = [
+            'fbc' => $validated['fbc'] ?? null,
+            'kidney' => $validated['kidney'] ?? null,
+            'liver' => $validated['liver'] ?? null,
+        ];
+
+        $neonate = \Illuminate\Support\Facades\DB::table('neonates')->where('id', $validated['neonateId'])->first();
+
+        \Illuminate\Support\Facades\DB::table('handovers')->insert([
+            'neonate_id' => $validated['neonateId'],
+            'date' => now(),
+            'shift' => $validated['shift'],
+            'clinical_lead_id' => $validated['clinicalLeadId'] ?? null,
+            'nurse_on_duty_id' => auth()->id(),
+            'temperature' => $validated['temperature'] ?? null,
+            'sugar_level' => $validated['sugarLevel'] ?? null,
+            'oxygen_saturation' => $validated['oxygenSaturation'] ?? null,
+            'heart_rate' => $validated['heartRate'] ?? null,
+            'respiratory_rate' => $validated['respiratoryRate'] ?? null,
+            'investigations' => json_encode($investigations),
+            'medications_given' => json_encode([]),
+            'commentary' => $validated['commentary'] ?? null,
+            'plan' => $validated['plan'] ?? null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Audit log with user_id! (using MEDICATION CALCULATED or CLINICAL HANDOVER)
+        \Illuminate\Support\Facades\DB::table('audit_logs')->insert([
+            'user_id' => auth()->id(),
+            'action' => "CLINICAL SHIFT HANDOVER: Registered handover for newborn " . ($neonate ? $neonate->name : 'Neonate') . " by nurse " . auth()->user()->name,
+            'type' => 'Medication', // Category matches audit_logs table
+            'status' => 'Checked',
+            'metadata' => json_encode(['neonate_id' => $validated['neonateId'], 'shift' => $validated['shift']]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', 'Shift handover report recorded successfully.');
+    });
+
+    // Schedule Clinician Duty Rota
+    Route::post('/rotas', function (\Illuminate\Http\Request $request) {
+        $validated = $request->validate([
+            'date' => 'required|date',
+            'shift' => 'required|string|in:Morning,Afternoon,Night',
+            'consultantId' => 'nullable|exists:users,id',
+            'managerId' => 'nullable|exists:users,id',
+            'assignedNurses' => 'nullable|array',
+            'assignedNurses.*' => 'exists:users,id',
+        ]);
+
+        // Enforce unique rota constraint by date and shift
+        $existing = \Illuminate\Support\Facades\DB::table('rotas')
+            ->where('date', $validated['date'])
+            ->where('shift', $validated['shift'])
+            ->first();
+
+        if ($existing) {
+            return redirect()->back()->withErrors(['date' => 'A duty roster already exists for this date and shift.']);
+        }
+
+        $rotaId = \Illuminate\Support\Facades\DB::table('rotas')->insertGetId([
+            'date' => $validated['date'],
+            'shift' => $validated['shift'],
+            'consultant_id' => $validated['consultantId'] ?? null,
+            'manager_id' => $validated['managerId'] ?? null,
+            'created_by' => auth()->id(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        if (!empty($validated['assignedNurses'])) {
+            foreach ($validated['assignedNurses'] as $nurseId) {
+                \Illuminate\Support\Facades\DB::table('rota_user')->insert([
+                    'rota_id' => $rotaId,
+                    'user_id' => $nurseId,
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Duty rota scheduled successfully.');
     });
 });
 
