@@ -7,7 +7,8 @@ import {
   AlertTriangle, UserCheck, ChevronRight,
   ChevronLeft, Search, Loader2, Scale,
   Pill, ClipboardCheck, X, Check, Plus, Calendar, Phone,
-  ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart
+  ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart,
+  Calculator, BookOpen
 } from 'lucide-react';
 
 export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [], flashcards = [], scenarios = [] }) {
