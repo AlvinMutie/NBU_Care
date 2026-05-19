@@ -38,7 +38,9 @@ Route::get('/dashboard', function () {
         });
 
     $auditLogs = \Illuminate\Support\Facades\DB::table('audit_logs')
-        ->orderBy('created_at', 'desc')
+        ->leftJoin('users', 'audit_logs.user_id', '=', 'users.id')
+        ->select('audit_logs.*', 'users.name as user_name')
+        ->orderBy('audit_logs.created_at', 'desc')
         ->take(50)
         ->get();
 
@@ -97,12 +99,10 @@ Route::middleware('auth')->group(function () {
 
         \Illuminate\Support\Facades\DB::table('audit_logs')->insert([
             'user_id' => auth()->id(),
-            'user_name' => auth()->user()->name,
             'action' => $validated['action'],
-            'calculation_type' => $validated['type'],
-            'input_parameters' => json_encode($request->all()),
-            'output_result' => json_encode(['status' => $validated['status']]),
-            'is_flagged' => false,
+            'type' => $validated['type'],
+            'status' => 'Checked', // Match migration enum: 'Checked', 'Review', 'Waiting'
+            'metadata' => json_encode($request->all()),
             'created_at' => now(),
             'updated_at' => now(),
         ]);

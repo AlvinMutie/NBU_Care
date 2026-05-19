@@ -569,7 +569,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                             <td className="p-5 max-w-sm truncate font-medium">{log.action}</td>
                             <td className="p-5">
                               <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-md text-[9px] font-black uppercase tracking-wider">
-                                {log.calculation_type}
+                                {log.type}
                               </span>
                             </td>
                             <td className="p-5">
