@@ -72,8 +72,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
 
   const handleSaveNeonate = (e) => {
     e.preventDefault();
-    postNeonate(route('dashboard'), {
-      url: '/neonates',
+    postNeonate('/neonates', {
       onSuccess: () => {
         setIsModalOpen(false);
         resetNeonate();
