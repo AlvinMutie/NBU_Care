@@ -191,102 +191,138 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               Welcome back, {auth.user.name} ({auth.user.role})
             </p>
           </div>
-
-          {/* tab toggle */}
-          <div className="flex bg-gray-100 dark:bg-gray-800/80 p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50 shadow-inner overflow-x-auto max-w-full gap-1">
-            <button
-              onClick={() => setActiveTab('registry')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'registry'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              Registry
-            </button>
-            <button
-              onClick={() => setActiveTab('calculator')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'calculator'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              Pipeline Calculator
-            </button>
-            <button
-              onClick={() => setActiveTab('handovers')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'handovers'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              Shift Handovers
-            </button>
-            <button
-              onClick={() => setActiveTab('rota')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'rota'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-550 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              Duty Rota
-            </button>
-            <button
-              onClick={() => setActiveTab('flashcards')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'flashcards'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-550 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              📖 Training Flashcards
-            </button>
-            <button
-              onClick={() => setActiveTab('scenarios')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'scenarios'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-550 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              🩺 Interactive Scenarios
-            </button>
-            <button
-              onClick={() => setActiveTab('audit')}
-              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                activeTab === 'audit'
-                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-555 hover:text-gray-900 dark:hover:text-gray-100'
-              }`}
-            >
-              Audit Trail
-            </button>
-            {['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'].includes(auth.user.role) && (
-              <button
-                onClick={() => setActiveTab('admin')}
-                className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
-                  activeTab === 'admin'
-                    ? 'bg-red-650/10 text-rose-600 dark:text-rose-450 border border-rose-500/25 shadow-sm font-black'
-                    : 'text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 bg-rose-50/50 dark:bg-rose-950/10'
-                }`}
-              >
-                🛡️ Admin Portal
-              </button>
-            )}
-          </div>
         </div>
       }
     >
       <Head title="Clinical Dashboard" />
 
       <div className="py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-8">
-          
-          {/* TAB 1: REGISTRY */}
-          {activeTab === 'registry' && (
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            {/* Left Main Navigation Sidebar */}
+            <aside className="lg:col-span-3 bg-white dark:bg-gray-800 p-5 rounded-[28px] border border-gray-100 dark:border-gray-700/60 shadow-sm space-y-6 lg:sticky lg:top-24 text-left">
+              <div className="space-y-4">
+                <div>
+                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 block mb-1">Ward Workspace</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400">NBU Clinical Tools</span>
+                </div>
+                
+                <nav className="flex flex-row lg:flex-col gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none max-w-full">
+                  {/* Registry Tab */}
+                  <button
+                    onClick={() => setActiveTab('registry')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'registry'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <Baby className="w-4 h-4" />
+                    Registry
+                  </button>
+
+                  {/* Calculator Tab */}
+                  <button
+                    onClick={() => setActiveTab('calculator')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'calculator'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <Calculator className="w-4 h-4" />
+                    Pipeline Calculator
+                  </button>
+
+                  {/* Handovers Tab */}
+                  <button
+                    onClick={() => setActiveTab('handovers')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'handovers'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <ArrowRightLeft className="w-4 h-4" />
+                    Shift Handovers
+                  </button>
+
+                  {/* Rota Tab */}
+                  <button
+                    onClick={() => setActiveTab('rota')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'rota'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <Calendar className="w-4 h-4" />
+                    Duty Rota
+                  </button>
+
+                  {/* Flashcards Tab */}
+                  <button
+                    onClick={() => setActiveTab('flashcards')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'flashcards'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <BookOpen className="w-4 h-4" />
+                    Training Flashcards
+                  </button>
+
+                  {/* Scenarios Tab */}
+                  <button
+                    onClick={() => setActiveTab('scenarios')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'scenarios'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <Activity className="w-4 h-4" />
+                    Interactive Scenarios
+                  </button>
+
+                  {/* Audit Trail Tab */}
+                  <button
+                    onClick={() => setActiveTab('audit')}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                      activeTab === 'audit'
+                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
+                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
+                    }`}
+                  >
+                    <ClipboardCheck className="w-4 h-4" />
+                    Audit Trail
+                  </button>
+
+                  {/* Admin Portal Tab */}
+                  {['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'].includes(auth.user.role) && (
+                    <button
+                      onClick={() => setActiveTab('admin')}
+                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
+                        activeTab === 'admin'
+                          ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/15 border border-rose-600/10'
+                          : 'text-rose-500 hover:text-rose-700 dark:hover:text-rose-450 bg-rose-50/50 dark:bg-rose-950/10 hover:bg-rose-100/50 dark:hover:bg-rose-950/20'
+                      }`}
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                      Admin Portal
+                    </button>
+                  )}
+                </nav>
+              </div>
+            </aside>
+
+            {/* Right Main Content Workspace */}
+            <main className="lg:col-span-9 space-y-8">
+              
+              {/* TAB 1: REGISTRY */}
+              {activeTab === 'registry' && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -1803,7 +1839,8 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               </div>
             </div>
           )}
-
+            </main>
+          </div>
         </div>
       </div>
 
