@@ -7,17 +7,20 @@ import {
   AlertTriangle, UserCheck, ChevronRight,
   ChevronLeft, Search, Loader2, Scale,
   Pill, ClipboardCheck, X, Check, Plus, Calendar, Phone,
-  ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart,
+  ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart, BarChart2, CheckSquare, TrendingUp,
   Calculator, BookOpen
 } from 'lucide-react';
 
 export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [], flashcards = [], scenarios = [] }) {
-  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'audit', 'handovers', 'rota', 'flashcards', 'scenarios'
+  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'rota', 'academics', 'admin'
+  const [registrySubTab, setRegistrySubTab] = useState('overview'); // 'overview', 'active-patients', 'handovers'
+  const [calcSubTab, setCalcSubTab] = useState('calculator-workbench'); // 'overview', 'calculator-workbench'
+  const [rotaSubTab, setRotaSubTab] = useState('overview'); // 'overview', 'rota-schedule'
+  const [academySubTab, setAcademySubTab] = useState('overview'); // 'overview', 'flashcards', 'scenarios'
+  const [adminSubTab, setAdminSubTab] = useState('overview'); // 'overview', 'vetting', 'directory'
+  
   const [flippedCardId, setFlippedCardId] = useState(null);
   const [flashcardCategory, setFlashcardCategory] = useState('All');
-  
-  // Admin Portal Sub-States
-  const [adminSubTab, setAdminSubTab] = useState('overview'); // 'overview', 'vetting', 'directory'
   const [isAdminLightMode, setIsAdminLightMode] = useState(false);
   const [adminSearchTerm, setAdminSearchTerm] = useState('');
 
@@ -52,6 +55,275 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
   useEffect(() => {
     setRotas(initialRotas || []);
   }, [initialRotas]);
+
+  const renderRoleSpecificDashboard = () => {
+    const role = auth.user.role || 'Nurse';
+    
+    const heatmapValues = {
+      'Nursing In-Charge': [
+        { day: 'Mon', vals: [5, 3, 0, 9, 0, 2, 4, 1, 8, 4, 4, 8] },
+        { day: 'Tue', vals: [0, 0, 0, 3, 2, 1, 8, 6, 0, 9, 0, 0] },
+        { day: 'Wed', vals: [1, 2, 0, 7, 0, 0, 0, 9, 0, 4, 4, 0] },
+        { day: 'Thu', vals: [7, 9, 0, 0, 2, 0, 0, 0, 1, 1, 0, 5] },
+        { day: 'Fri', vals: [0, 0, 4, 4, 0, 0, 7, 1, 0, 1, 0, 1] },
+        { day: 'Sat', vals: [0, 0, 0, 2, 1, 3, 8, 5, 0, 7, 0, 0] },
+        { day: 'Sun', vals: [3, 2, 0, 7, 0, 0, 0, 8, 0, 4, 5, 0] }
+      ],
+      'Nurse': [
+        { day: 'Mon', vals: [1, 2, 5, 0, 0, 4, 3, 0, 2, 2, 1, 4] },
+        { day: 'Tue', vals: [0, 1, 4, 2, 1, 3, 0, 5, 2, 0, 0, 1] },
+        { day: 'Wed', vals: [2, 0, 3, 4, 0, 0, 5, 2, 0, 3, 1, 2] },
+        { day: 'Thu', vals: [1, 3, 0, 0, 4, 2, 1, 0, 3, 5, 2, 0] },
+        { day: 'Fri', vals: [0, 2, 2, 3, 1, 0, 4, 4, 0, 1, 2, 3] },
+        { day: 'Sat', vals: [3, 0, 1, 2, 0, 5, 2, 1, 4, 0, 0, 2] },
+        { day: 'Sun', vals: [1, 4, 0, 3, 2, 1, 0, 2, 3, 4, 1, 1] }
+      ],
+      'Consultant Pediatrician': [
+        { day: 'Mon', vals: [2, 1, 0, 4, 1, 0, 3, 2, 0, 1, 2, 3] },
+        { day: 'Tue', vals: [0, 0, 2, 1, 0, 3, 4, 1, 0, 2, 0, 0] },
+        { day: 'Wed', vals: [1, 1, 0, 3, 2, 0, 2, 4, 1, 0, 1, 1] },
+        { day: 'Thu', vals: [3, 2, 1, 0, 0, 1, 0, 1, 2, 3, 0, 2] },
+        { day: 'Fri', vals: [0, 0, 3, 2, 1, 0, 3, 1, 0, 1, 2, 0] },
+        { day: 'Sat', vals: [1, 2, 0, 1, 0, 2, 4, 2, 1, 0, 0, 1] },
+        { day: 'Sun', vals: [2, 0, 1, 3, 0, 1, 0, 2, 1, 3, 2, 0] }
+      ]
+    };
+    
+    const activeValues = heatmapValues[role] || heatmapValues['Nursing In-Charge'];
+    
+    const metricsData = {
+      'Nursing In-Charge': [
+        { title: 'Bed Occupancy', value: '18 / 20 Beds', desc: '90.0% census capacity', change: '+5.5%', up: true, color: 'text-indigo-650 dark:text-indigo-400', stroke: '#4f46e5', path: 'M10 80 Q 80 20 150 70 T 290 30' },
+        { title: 'Nurse-Patient Ratio', value: '1:3 Ratio', desc: '6 clinical nurses active', change: 'Balanced', up: true, color: 'text-emerald-600 dark:text-emerald-400', stroke: '#10b981', path: 'M10 50 Q 80 80 150 40 T 290 60' },
+        { title: 'Critical Care Babies', value: '4 Neonates', desc: 'Require high frequency observation', change: 'Stable', up: false, color: 'text-amber-600 dark:text-amber-400', stroke: '#f59e0b', path: 'M10 30 Q 80 60 150 20 T 290 80' }
+      ],
+      'Nurse': [
+        { title: 'Vitals Checklist', value: '3 Due Now', desc: 'Requires hourly bed checks', change: 'Action Required', up: false, color: 'text-rose-600 dark:text-rose-450', stroke: '#ef4444', path: 'M10 80 L 100 40 L 200 60 L 290 20' },
+        { title: 'Active Med Rounds', value: '12 Doses', desc: 'Next round scheduled in 25m', change: 'On Track', up: true, color: 'text-indigo-600 dark:text-indigo-400', stroke: '#4f46e5', path: 'M10 50 Q 100 20 200 80 T 290 40' },
+        { title: 'Flashcards Studied', value: '14 / 20 Manuals', desc: '85.0% training completion', change: '+12.5%', up: true, color: 'text-emerald-600 dark:text-emerald-400', stroke: '#10b981', path: 'M10 60 Q 80 40 150 70 T 290 20' }
+      ],
+      'Consultant Pediatrician': [
+        { title: 'ELBW Active Babies', value: '5 Infants', desc: 'Under 1.5kg neonatal weight', change: 'High Monitor', up: true, color: 'text-indigo-650 dark:text-indigo-400', stroke: '#4f46e5', path: 'M10 70 Q 80 30 150 60 T 290 30' },
+        { title: 'Med Verification Latency', value: '12.5s Speed', desc: 'Ultra-fast WHO safety checklist', change: '-12.8% delay', up: true, color: 'text-emerald-600 dark:text-emerald-400', stroke: '#10b981', path: 'M10 40 Q 80 60 150 20 T 290 10' },
+        { title: 'Critical Clinical Alarms', value: '2 Triggered', desc: 'All verified by attending MO', change: 'Addressed', up: false, color: 'text-amber-600 dark:text-amber-400', stroke: '#f59e0b', path: 'M10 20 Q 80 80 150 40 T 290 70' }
+      ],
+      'default': [
+        { title: 'New conversations', value: '327', desc: 'Active clinical discussions', change: '10.6%', up: true, color: 'text-indigo-650 dark:text-indigo-400', stroke: '#3b82f6', path: 'M10 80 Q 80 20 150 70 T 290 30' },
+        { title: 'Average reply time', value: '7m 4s', desc: 'Support response speed', change: '1.58%', up: false, color: 'text-amber-600 dark:text-amber-405', stroke: '#f59e0b', path: 'M10 50 Q 80 80 150 40 T 290 60' },
+        { title: 'Average first reply time', value: '4m 8s', desc: 'Initial triage contact', change: '11.00%', up: true, color: 'text-emerald-650 dark:text-emerald-400', stroke: '#10b981', path: 'M10 70 Q 80 30 150 60 T 290 35' }
+      ]
+    };
+    
+    const activeMetrics = metricsData[role] || metricsData['default'];
+
+    return (
+      <div className="space-y-8 animate-in fade-in duration-300">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {activeMetrics.map((m, idx) => (
+            <div key={idx} className="bg-white dark:bg-[#0c1220] p-6 rounded-[28px] border border-slate-200/50 dark:border-slate-850/40 shadow-sm flex items-center justify-between group hover:shadow-md transition text-left">
+              <div className="space-y-2">
+                <span className="text-[10px] font-black uppercase text-slate-450 dark:text-slate-500 tracking-wider block">{m.title}</span>
+                <div className="flex items-baseline gap-2.5">
+                  <h4 className="text-2xl font-black text-slate-850 dark:text-white tracking-tight">{m.value}</h4>
+                  <span className={`text-[10px] font-black flex items-center gap-0.5 px-2 py-0.5 rounded-full ${
+                    m.up 
+                      ? 'bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400' 
+                      : 'bg-amber-50 dark:bg-amber-950/20 text-amber-600 dark:text-amber-400'
+                  }`}>
+                    {m.up ? '↑' : '↓'} {m.change}
+                  </span>
+                </div>
+                <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 leading-none">{m.desc}</p>
+              </div>
+              <div className="w-20 h-10 shrink-0">
+                <svg className="w-full h-full" viewBox="0 0 300 100">
+                  <path d={m.path} fill="none" stroke={m.stroke} strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
+          <div className="lg:col-span-8 bg-white dark:bg-[#0c1220] p-6 rounded-[32px] border border-slate-200/50 dark:border-slate-850/40 shadow-sm flex flex-col justify-between text-left">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-850/30">
+              <div>
+                <h4 className="text-sm font-black text-slate-850 dark:text-white">Workload over time</h4>
+                <p className="text-[10px] text-slate-450 dark:text-slate-500">Live operational data updated in real-time.</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2.5 py-1 bg-slate-50 dark:bg-slate-900 border border-slate-200/50 dark:border-slate-800 text-slate-500 dark:text-slate-400 rounded-lg text-[9px] font-black uppercase tracking-wider">
+                  Default View
+                </span>
+                <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-750 dark:text-indigo-400 border border-indigo-200/20 rounded-lg text-[9px] font-black uppercase tracking-wider cursor-pointer">
+                  + Add Filter
+                </span>
+              </div>
+            </div>
+            
+            <div className="py-6 shrink-0">
+              <svg className="w-full h-48" viewBox="0 0 500 200">
+                <line x1="30" y1="30" x2="480" y2="30" stroke="#f1f5f9" strokeWidth="1" className="dark:stroke-slate-850/30" />
+                <line x1="30" y1="75" x2="480" y2="75" stroke="#f1f5f9" strokeWidth="1" className="dark:stroke-slate-850/30" />
+                <line x1="30" y1="120" x2="480" y2="120" stroke="#f1f5f9" strokeWidth="1" className="dark:stroke-slate-850/30" />
+                <line x1="30" y1="165" x2="480" y2="165" stroke="#f1f5f9" strokeWidth="1" className="dark:stroke-slate-850/30" />
+                
+                <text x="15" y="35" className="text-[8px] font-black fill-slate-350 dark:fill-slate-650">50</text>
+                <text x="15" y="80" className="text-[8px] font-black fill-slate-350 dark:fill-slate-650">30</text>
+                <text x="15" y="125" className="text-[8px] font-black fill-slate-350 dark:fill-slate-650">20</text>
+                <text x="15" y="170" className="text-[8px] font-black fill-slate-350 dark:fill-slate-650">0</text>
+                
+                <path 
+                  d="M 50 120 C 100 130, 120 70, 160 85 C 200 100, 240 50, 280 60 C 320 70, 360 110, 400 90 C 440 70, 460 30, 480 40" 
+                  fill="none" 
+                  stroke="#3b82f6" 
+                  strokeWidth="3" 
+                  strokeLinecap="round"
+                />
+                
+                <path 
+                  d="M 50 90 C 100 95, 120 110, 160 90 C 200 70, 240 90, 280 80 C 320 80, 360 85, 400 110 C 440 105, 460 70, 480 80" 
+                  fill="none" 
+                  stroke="#93c5fd" 
+                  strokeWidth="2.5" 
+                  strokeDasharray="2"
+                  strokeLinecap="round"
+                  className="dark:stroke-blue-400/40"
+                />
+
+                <circle cx="480" cy="40" r="4.5" fill="#3b82f6" stroke="#ffffff" strokeWidth="1.5" />
+                <circle cx="280" cy="60" r="3.5" fill="#3b82f6" />
+                <circle cx="160" cy="85" r="3.5" fill="#3b82f6" />
+                
+                <text x="45" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Mon</text>
+                <text x="110" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Tue</text>
+                <text x="175" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Wed</text>
+                <text x="240" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Thu</text>
+                <text x="305" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Fri</text>
+                <text x="370" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Sat</text>
+                <text x="435" y="195" className="text-[8px] font-black fill-slate-400 dark:fill-slate-500">Sun</text>
+              </svg>
+            </div>
+            
+            <div className="flex items-center gap-6 pt-4 border-t border-slate-100 dark:border-slate-850/30 text-[9px] font-black uppercase text-slate-400 tracking-wider">
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-blue-500 rounded-full"></span> New conversations</span>
+              <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 bg-blue-350 rounded-full dark:bg-blue-400/40"></span> Active admins</span>
+            </div>
+          </div>
+
+          <div className="lg:col-span-4 bg-white dark:bg-[#0c1220] p-6 rounded-[32px] border border-slate-200/50 dark:border-slate-850/40 shadow-sm flex flex-col justify-between text-left">
+            <div className="pb-4 border-b border-slate-100 dark:border-slate-850/30">
+              <h4 className="text-sm font-black text-slate-850 dark:text-white">Efficiency</h4>
+              <p className="text-[10px] text-slate-450 dark:text-slate-500">Average response times across support channels.</p>
+            </div>
+            
+            <div className="flex justify-center py-6">
+              <div className="relative w-36 h-36 flex items-center justify-center">
+                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                  <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" className="dark:stroke-slate-800" />
+                  <circle 
+                    cx="50" 
+                    cy="50" 
+                    r="40" 
+                    fill="none" 
+                    stroke="#3b82f6" 
+                    strokeWidth="8" 
+                    strokeDasharray="251.2" 
+                    strokeDashoffset="62.8" 
+                    strokeLinecap="round" 
+                  />
+                </svg>
+                <div className="absolute text-center animate-pulse">
+                  <h4 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">7m 4s</h4>
+                  <span className="text-[8px] font-black uppercase text-slate-400 tracking-widest block mt-0.5">Reply time (Avg)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-1.5 text-[10px] font-bold text-slate-500 dark:text-slate-400">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 bg-blue-500 rounded-full"></span> Less than 15m</span>
+                <span className="font-black text-slate-800 dark:text-white">41%</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 bg-blue-400 rounded-full"></span> 15 - 45m</span>
+                <span className="font-black text-slate-800 dark:text-white">33%</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5"><span className="w-2 h-2 bg-blue-300 rounded-full"></span> 45m - 1h</span>
+                <span className="font-black text-slate-800 dark:text-white">11%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 bg-white dark:bg-[#0c1220] p-6 rounded-[32px] border border-slate-200/50 dark:border-slate-850/40 shadow-sm text-left">
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="text-sm font-black text-slate-850 dark:text-white">Busiest time</h4>
+              <p className="text-[10px] text-slate-450 dark:text-slate-500">Live operational density tracking patient admissions and events.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className="text-[8px] font-bold text-slate-400">0</span>
+              <div className="w-20 h-2 bg-gradient-to-r from-blue-100 to-blue-600 rounded-full"></div>
+              <span className="text-[8px] font-bold text-slate-400">10</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto pb-2 scrollbar-none">
+            <div className="min-w-[640px] space-y-2.5">
+              {activeValues.map((row, rIdx) => (
+                <div key={rIdx} className="flex items-center gap-3">
+                  <span className="w-10 text-[10px] font-black text-slate-400 uppercase tracking-widest">{row.day}</span>
+                  <div className="flex-1 grid grid-cols-12 gap-2">
+                    {row.vals.map((v, cIdx) => {
+                      let cellClass = 'bg-slate-50 dark:bg-slate-900/50 text-slate-350';
+                      if (v > 7) {
+                        cellClass = 'bg-blue-600 text-white shadow-sm font-black scale-[1.03]';
+                      } else if (v > 4) {
+                        cellClass = 'bg-blue-400 text-white font-extrabold';
+                      } else if (v > 1) {
+                        cellClass = 'bg-blue-100 text-blue-700 dark:bg-blue-950/20 dark:text-blue-350';
+                      } else if (v > 0) {
+                        cellClass = 'bg-blue-50/50 text-blue-400 dark:bg-blue-950/10 dark:text-blue-400/70';
+                      }
+                      
+                      return (
+                        <div 
+                          key={cIdx} 
+                          className={`h-9 rounded-xl flex items-center justify-center text-[10px] transition-all cursor-pointer hover:ring-2 hover:ring-blue-400/50 ${cellClass}`}
+                          title={`Workload score: ${v}`}
+                        >
+                          {v}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+              <div className="flex items-center gap-3 pt-2">
+                <span className="w-10"></span>
+                <div className="flex-1 grid grid-cols-12 gap-2 text-center text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                  <span>8 AM</span>
+                  <span>9 AM</span>
+                  <span>10 AM</span>
+                  <span>11 AM</span>
+                  <span>12 PM</span>
+                  <span>1 PM</span>
+                  <span>2 PM</span>
+                  <span>3 PM</span>
+                  <span>4 PM</span>
+                  <span>5 PM</span>
+                  <span>6 PM</span>
+                  <span>7 PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   // Neonate Admission Form Hook
   const { data: neonateData, setData: setNeonateData, post: postNeonate, processing: neonateProcessing, errors: neonateErrors, reset: resetNeonate } = useForm({
@@ -180,150 +452,402 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
   );
 
   return (
-    <AuthenticatedLayout
-      header={
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-bold leading-tight text-gray-800 dark:text-gray-100 flex items-center gap-2">
-              <Baby className="w-6 h-6 text-indigo-500" />
-              NBU Care Center
-            </h2>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Welcome back, {auth.user.name} ({auth.user.role})
-            </p>
-          </div>
-        </div>
-      }
-    >
+    <AuthenticatedLayout customLayout={true}>
       <Head title="Clinical Dashboard" />
-
-      <div className="py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+      
+      {/* Outer Immersive Frame Container */}
+      <div className="flex h-screen w-screen overflow-hidden bg-[#F8F9FA] dark:bg-slate-950 font-sans text-slate-805 dark:text-slate-100 antialiased">
+        
+        {/* SIDEBAR 1: FAR-LEFT NARROW DARK ICON STRIP */}
+        <aside className="w-[72px] bg-slate-900 dark:bg-[#070B13] text-slate-400 flex flex-col justify-between py-6 items-center shrink-0 border-r border-slate-850/30 z-20 shadow-xl">
+          {/* Top Logo */}
+          <div className="flex flex-col items-center gap-6">
+            <div className="w-10 h-10 bg-indigo-650 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center cursor-pointer transition shadow-md shadow-indigo-600/20 active:scale-95">
+              <Baby className="w-5 h-5" />
+            </div>
             
-            {/* Left Main Navigation Sidebar */}
-            <aside className="lg:col-span-3 bg-white dark:bg-gray-800 p-5 rounded-[28px] border border-gray-100 dark:border-gray-700/60 shadow-sm space-y-6 lg:sticky lg:top-24 text-left">
-              <div className="space-y-4">
-                <div>
-                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400 dark:text-gray-500 block mb-1">Ward Workspace</span>
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400">NBU Clinical Tools</span>
-                </div>
-                
-                <nav className="flex flex-row lg:flex-col gap-1.5 overflow-x-auto pb-2 lg:pb-0 scrollbar-none max-w-full">
-                  {/* Registry Tab */}
-                  <button
-                    onClick={() => setActiveTab('registry')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'registry'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <Baby className="w-4 h-4" />
-                    Registry
-                  </button>
+            {/* Navigation Strip */}
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={() => { setActiveTab('registry'); setRegistrySubTab('overview'); }}
+                title="Ward Registry"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === 'registry'
+                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
+                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Baby className="w-5 h-5" />
+              </button>
 
-                  {/* Calculator Tab */}
-                  <button
-                    onClick={() => setActiveTab('calculator')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'calculator'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <Calculator className="w-4 h-4" />
-                    Pipeline Calculator
-                  </button>
+              <button
+                onClick={() => { setActiveTab('calculator'); setCalcSubTab('calculator-workbench'); }}
+                title="Clinical Calculator"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === 'calculator'
+                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
+                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Calculator className="w-5 h-5" />
+              </button>
 
-                  {/* Handovers Tab */}
-                  <button
-                    onClick={() => setActiveTab('handovers')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'handovers'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <ArrowRightLeft className="w-4 h-4" />
-                    Shift Handovers
-                  </button>
+              <button
+                onClick={() => { setActiveTab('rota'); setRotaSubTab('overview'); }}
+                title="Shift Roster"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === 'rota'
+                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
+                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Calendar className="w-5 h-5" />
+              </button>
 
-                  {/* Rota Tab */}
-                  <button
-                    onClick={() => setActiveTab('rota')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'rota'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <Calendar className="w-4 h-4" />
-                    Duty Rota
-                  </button>
+              <button
+                onClick={() => { setActiveTab('academics'); setAcademySubTab('overview'); }}
+                title="Academics & Training"
+                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                  activeTab === 'academics'
+                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
+                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <BookOpen className="w-5 h-5" />
+              </button>
 
-                  {/* Flashcards Tab */}
-                  <button
-                    onClick={() => setActiveTab('flashcards')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'flashcards'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <BookOpen className="w-4 h-4" />
-                    Training Flashcards
-                  </button>
+              {['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'].includes(auth.user.role) && (
+                <button
+                  onClick={() => { setActiveTab('admin'); setAdminSubTab('overview'); }}
+                  title="Admin Portal"
+                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+                    activeTab === 'admin'
+                      ? 'bg-rose-950/20 text-rose-450 border border-rose-900/40 shadow-inner'
+                      : 'hover:bg-rose-950/10 text-rose-500 hover:text-rose-450'
+                  }`}
+                >
+                  <ShieldCheck className="w-5 h-5" />
+                </button>
+              )}
+            </div>
+          </div>
+          
+          {/* Bottom Buttons */}
+          <div className="flex flex-col gap-4">
+            <button
+              title="Help Center"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-450 hover:bg-slate-800/40 hover:text-slate-200 transition"
+            >
+              <Phone className="w-4 h-4" />
+            </button>
+            <button
+              title="System Information"
+              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-450 hover:bg-slate-800/40 hover:text-slate-200 transition"
+            >
+              <Info className="w-4 h-4" />
+            </button>
+          </div>
+        </aside>
 
-                  {/* Scenarios Tab */}
-                  <button
-                    onClick={() => setActiveTab('scenarios')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'scenarios'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <Activity className="w-4 h-4" />
-                    Interactive Scenarios
-                  </button>
+        {/* SIDEBAR 2: INNER CATEGORY SIDEBAR */}
+        <aside className="w-60 bg-white dark:bg-[#0c1220] border-r border-slate-200/50 dark:border-slate-850/40 flex flex-col justify-between p-6 shrink-0 z-10 text-left shadow-sm">
+          <div className="space-y-6">
+            {/* Header category name */}
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 block mb-1">
+                {activeTab === 'registry' && 'Ward Registry'}
+                {activeTab === 'calculator' && 'Clinical Calculators'}
+                {activeTab === 'rota' && 'Shift Planner'}
+                {activeTab === 'academics' && 'Academics & Training'}
+                {activeTab === 'admin' && 'Admin Workbench'}
+              </span>
+              <h2 className="text-sm font-black text-slate-850 dark:text-slate-200 capitalize flex items-center gap-2">
+                {activeTab === 'registry' && <Baby className="w-4 h-4 text-indigo-500" />}
+                {activeTab === 'calculator' && <Calculator className="w-4 h-4 text-indigo-500" />}
+                {activeTab === 'rota' && <Calendar className="w-4 h-4 text-indigo-500" />}
+                {activeTab === 'academics' && <BookOpen className="w-4 h-4 text-indigo-500" />}
+                {activeTab === 'admin' && <ShieldCheck className="w-4 h-4 text-rose-500" />}
+                {activeTab}
+              </h2>
+            </div>
 
-                  {/* Audit Trail Tab */}
-                  <button
-                    onClick={() => setActiveTab('audit')}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                      activeTab === 'audit'
-                        ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15'
-                        : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-900/50'
-                    }`}
-                  >
-                    <ClipboardCheck className="w-4 h-4" />
-                    Audit Trail
-                  </button>
+            {/* List navigation links */}
+            <div className="space-y-6">
+              {/* Spaces Block */}
+              <div className="space-y-2">
+                <span className="text-[9px] font-black uppercase tracking-wider text-slate-400/80 block">SPACES</span>
+                <nav className="space-y-1">
+                  
+                  {activeTab === 'registry' && (
+                    <>
+                      <button
+                        onClick={() => setRegistrySubTab('overview')}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          registrySubTab === 'overview'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <Activity className="w-4 h-4" /> Workload Overview
+                        </span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                      </button>
 
-                  {/* Admin Portal Tab */}
-                  {['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'].includes(auth.user.role) && (
-                    <button
-                      onClick={() => setActiveTab('admin')}
-                      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all text-left whitespace-nowrap shrink-0 ${
-                        activeTab === 'admin'
-                          ? 'bg-rose-600 text-white shadow-lg shadow-rose-600/15 border border-rose-600/10'
-                          : 'text-rose-500 hover:text-rose-700 dark:hover:text-rose-450 bg-rose-50/50 dark:bg-rose-950/10 hover:bg-rose-100/50 dark:hover:bg-rose-950/20'
-                      }`}
-                    >
-                      <ShieldCheck className="w-4 h-4" />
-                      Admin Portal
-                    </button>
+                      <button
+                        onClick={() => setRegistrySubTab('active-patients')}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          registrySubTab === 'active-patients'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <Baby className="w-4 h-4" /> Active Patients
+                        </span>
+                        <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-650 dark:text-indigo-400 rounded-md text-[9px] font-black">{neonates.length}</span>
+                      </button>
+
+                      <button
+                        onClick={() => setRegistrySubTab('handovers')}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          registrySubTab === 'handovers'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <ArrowRightLeft className="w-4 h-4" /> Shift Handovers
+                        </span>
+                      </button>
+                    </>
                   )}
+
+                  {activeTab === 'calculator' && (
+                    <>
+                      <button
+                        onClick={() => setCalcSubTab('calculator-workbench')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          calcSubTab === 'calculator-workbench'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <Calculator className="w-4 h-4" /> Pipeline Calculator
+                      </button>
+                      <button
+                        onClick={() => setCalcSubTab('overview')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          calcSubTab === 'overview'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <Scale className="w-4 h-4" /> Formulary Reference
+                      </button>
+                    </>
+                  )}
+
+                  {activeTab === 'rota' && (
+                    <>
+                      <button
+                        onClick={() => setRotaSubTab('overview')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          rotaSubTab === 'overview'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <Activity className="w-4 h-4" /> Roster Analytics
+                      </button>
+                      <button
+                        onClick={() => setRotaSubTab('rota-schedule')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          rotaSubTab === 'rota-schedule'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <Calendar className="w-4 h-4" /> Duty Schedule
+                      </button>
+                    </>
+                  )}
+
+                  {activeTab === 'academics' && (
+                    <>
+                      <button
+                        onClick={() => setAcademySubTab('overview')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          academySubTab === 'overview'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <Activity className="w-4 h-4" /> Study Overview
+                      </button>
+                      <button
+                        onClick={() => setAcademySubTab('flashcards')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          academySubTab === 'flashcards'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <BookOpen className="w-4 h-4" /> Flashcards Manuals
+                      </button>
+                      <button
+                        onClick={() => setAcademySubTab('scenarios')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          academySubTab === 'scenarios'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <CheckSquare className="w-4 h-4" /> Interactive Cases
+                      </button>
+                    </>
+                  )}
+
+                  {activeTab === 'admin' && (
+                    <>
+                      <button
+                        onClick={() => setAdminSubTab('overview')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          adminSubTab === 'overview'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <BarChart2 className="w-4 h-4" /> System Stats
+                      </button>
+                      <button
+                        onClick={() => setAdminSubTab('vetting')}
+                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          adminSubTab === 'vetting'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <span className="flex items-center gap-2.5">
+                          <UserCheck className="w-4 h-4" /> Access Vetting
+                        </span>
+                        {allUsers.filter(u => u.status === 'Pending').length > 0 && (
+                          <span className="px-2 py-0.5 bg-rose-100 dark:bg-rose-950/30 text-rose-700 dark:text-rose-450 rounded-md text-[9px] font-black">{allUsers.filter(u => u.status === 'Pending').length}</span>
+                        )}
+                      </button>
+                      <button
+                        onClick={() => setAdminSubTab('directory')}
+                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                          adminSubTab === 'directory'
+                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
+                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
+                        }`}
+                      >
+                        <Users className="w-4 h-4" /> Clinician Directory
+                      </button>
+                    </>
+                  )}
+
                 </nav>
               </div>
-            </aside>
 
-            {/* Right Main Content Workspace */}
-            <main className="lg:col-span-9 space-y-8">
-              
-              {/* TAB 1: REGISTRY */}
+              {/* Self Services Block */}
+              <div className="space-y-2">
+                <span className="text-[9px] font-black uppercase tracking-wider text-slate-400/80 block">SELF SERVICES</span>
+                <nav className="space-y-1">
+                  <button
+                    onClick={() => { setActiveTab('academics'); setAcademySubTab('flashcards'); }}
+                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30"
+                  >
+                    <BookOpen className="w-4 h-4 text-slate-400" /> Knowledge Base
+                  </button>
+                </nav>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom user settings trigger */}
+          <div className="border-t border-slate-100 dark:border-slate-850/40 pt-4 flex flex-col gap-2">
+            <span className="text-[8px] font-black uppercase text-slate-450 dark:text-slate-500 tracking-wider block">ACCOUNT SETTINGS</span>
+            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-black rounded-lg flex items-center justify-center text-[10px]">
+                  {auth.user.name.charAt(0).toUpperCase()}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-black text-slate-850 dark:text-slate-200 truncate leading-tight">{auth.user.name}</p>
+                  <span className="text-[8px] font-bold text-slate-400 block truncate mt-0.5 leading-none">{auth.user.role}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+
+        {/* MAIN CONTAINER: RIGHT VIEWPORT */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50 dark:bg-[#070b13]">
+          
+          {/* Top HUD navigation / Breadcrumbs / Quick actions */}
+          <header className="h-16 bg-white dark:bg-[#090d16] border-b border-slate-200/50 dark:border-slate-850/40 flex items-center justify-between px-8 shrink-0 z-10 shadow-sm">
+            {/* Breadcrumbs */}
+            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
+              <span className="hover:text-slate-600 cursor-pointer">NBU Command</span>
+              <span>&rarr;</span>
+              <span className="capitalize hover:text-slate-600 cursor-pointer">{activeTab}</span>
+              <span>&rarr;</span>
+              <span className="text-slate-805 dark:text-slate-350 font-bold capitalize">
+                {activeTab === 'registry' && registrySubTab}
+                {activeTab === 'calculator' && calcSubTab}
+                {activeTab === 'rota' && rotaSubTab}
+                {activeTab === 'academics' && academySubTab}
+                {activeTab === 'admin' && adminSubTab}
+              </span>
+            </div>
+
+            {/* Right actions */}
+            <div className="flex items-center gap-4">
+              {/* Quick admission button contextually rendered */}
               {activeTab === 'registry' && (
+                <button
+                  onClick={() => setIsModalOpen(true)}
+                  className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-indigo-600/10 transition-all hover:scale-[1.01]"
+                >
+                  <Plus className="w-3.5 h-3.5" /> Admit Baby
+                </button>
+              )}
+
+              {/* Settings Info */}
+              <div className="w-px h-6 bg-slate-200 dark:bg-slate-800/80"></div>
+              
+              {/* Profile dropdown trigger */}
+              <div className="flex items-center gap-3">
+                <Link
+                  href={route('logout')}
+                  method="post"
+                  as="button"
+                  className="text-[10px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition"
+                >
+                  Log Out
+                </Link>
+              </div>
+            </div>
+          </header>
+
+          {/* MAIN PAGE VIEWPORT BODY: SCROLLABLE WORKSPACE */}
+          <main className="flex-1 overflow-y-auto p-8 space-y-8 min-w-0">
+            
+            {/* SUBTAB 1.1: REGISTRY OVERVIEW STATS */}
+            {activeTab === 'registry' && registrySubTab === 'overview' && (
+              <div className="space-y-8 text-left">
+                <div>
+                  <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">Ward Command Center Overview</h3>
+                  <p className="text-xs text-gray-500">Live clinical ward census, nurse allocations, and patient workload analytics.</p>
+                </div>
+                {renderRoleSpecificDashboard()}
+              </div>
+            )}
+            
+            {/* TAB 1: REGISTRY ACTIVE PATIENTS */}
+            {activeTab === 'registry' && registrySubTab === 'active-patients' && (
             <div className="space-y-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -421,7 +945,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
           )}
 
           {/* TAB 2: CALCULATOR PIPELINE */}
-          {activeTab === 'calculator' && (
+          {activeTab === 'calculator' && calcSubTab === 'calculator-workbench' && (
             <div className="max-w-4xl mx-auto space-y-6">
               {/* Steps Header */}
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-white dark:bg-gray-800 p-6 rounded-3xl border border-gray-100 dark:border-gray-700/60 shadow-sm">
@@ -695,6 +1219,59 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               </div>
             </div>
           )}
+          {/* SUBTAB 2.2: DRUG FORMULARY QUICK-REFERENCE INDEX */}
+          {activeTab === 'calculator' && calcSubTab === 'overview' && (
+            <div className="space-y-6 text-left max-w-5xl mx-auto">
+              <div>
+                <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">NBU Neonatal Drug Formulary</h3>
+                <p className="text-xs text-gray-500">Official medication protocols, dilution procedures, safety parameters, and warnings.</p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[
+                  { name: 'Ampicillin', dose: '50 mg/kg', freq: 'q12h (neonates < 7 days), q8h (neonates > 7 days)', route: 'IV / IM slow push', dilution: 'Reconstitute 250mg/500mg vial with sterile water to 100mg/mL concentration.', warning: 'Rapid injection may cause seizures. Administer slowly over 3-5 minutes.' },
+                  { name: 'Gentamicin', dose: '5 mg/kg', freq: 'q24h (preterm < 32 wks q36h)', route: 'IV infusion over 30 mins', dilution: 'Dilute required dose in Normal Saline or D5W to max concentration of 2mg/mL.', warning: 'Nephrotoxic and ototoxic. Requires peak and trough blood level monitoring on Day 3.' },
+                  { name: 'Cefotaxime', dose: '50 mg/kg', freq: 'q12h (birth < 7 days), q8h (birth > 7 days)', route: 'IV slow push or infusion', dilution: 'Reconstitute 500mg vial with sterile water to 100mg/mL concentration.', warning: 'Ensure proper renal adjustment if neonate has oliguria. Protect from light.' },
+                  { name: 'Dopamine', dose: '5 - 20 mcg/kg/min', freq: 'Continuous IV Infusion', route: 'Central Venous Line / Large Vein', dilution: 'Dilute in D5W or NS. Must be administered via syringe pump to ensure constant rate.', warning: 'Extravasation causes tissue necrosis. Monitor infusion site hourly for blanching/swelling.' },
+                  { name: 'Phenobarbitone', dose: '20 mg/kg loading, then 2.5-5 mg/kg maintenance', freq: 'q12h - q24h', route: 'Slow IV push', dilution: 'Administer loading dose over 20 minutes. Dilute with sterile water.', warning: 'Can cause respiratory depression and hypotension. Have bag-valve-mask ventilating set ready.' },
+                  { name: 'Aminophylline', dose: '5 mg/kg loading, then 1.5-3 mg/kg maintenance', freq: 'q12h', route: 'Slow IV infusion over 30 mins', dilution: 'Dilute in D5W or Normal Saline. Never give as direct IV push.', warning: 'Narrow therapeutic window. Monitor heart rate continuously. Hold dose if HR > 180 bpm.' },
+                ].map((d, i) => (
+                  <div key={i} className="bg-white dark:bg-gray-800 p-6 rounded-[28px] border border-gray-150 dark:border-gray-700/60 shadow-sm hover:shadow-md transition flex flex-col justify-between gap-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center border-b border-gray-100 dark:border-gray-700 pb-3">
+                        <h4 className="font-black text-sm text-indigo-650 dark:text-indigo-400 uppercase tracking-wider">{d.name}</h4>
+                        <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-455 rounded-md text-[9px] font-black uppercase tracking-wider">{d.route}</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-4 text-xs font-semibold text-gray-700 dark:text-gray-300">
+                        <div>
+                          <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Standard Dosage</span>
+                          <span className="text-slate-850 dark:text-white font-extrabold">{d.dose}</span>
+                        </div>
+                        <div>
+                          <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block mb-0.5">Frequency Interval</span>
+                          <span className="text-slate-850 dark:text-white font-extrabold">{d.freq}</span>
+                        </div>
+                      </div>
+
+                      <div className="p-3 bg-gray-50 dark:bg-gray-900 rounded-xl border border-gray-100/50 dark:border-gray-800/40 space-y-1">
+                        <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest block">Reconstitution & Dilution</span>
+                        <p className="text-xs text-gray-655 dark:text-gray-450 leading-relaxed">{d.dilution}</p>
+                      </div>
+                    </div>
+
+                    <div className="p-3.5 bg-rose-50/50 dark:bg-rose-950/10 rounded-2xl border border-rose-100/60 dark:border-rose-900/20 flex gap-2.5 items-start">
+                      <ShieldAlert className="w-4 h-4 text-rose-500 shrink-0 mt-0.5" />
+                      <div className="min-w-0">
+                        <span className="text-[8px] font-black text-rose-700 dark:text-rose-455 uppercase tracking-wider block">Clinical Safety Alert</span>
+                        <p className="text-[10px] text-rose-600/90 dark:text-rose-400/90 leading-normal font-bold mt-0.5">{d.warning}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* TAB 3: AUDIT TRAIL */}
           {activeTab === 'audit' && (
@@ -939,7 +1516,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
           )}
 
           {/* TAB 5: DUTY ROTA */}
-          {activeTab === 'rota' && (
+          {activeTab === 'rota' && rotaSubTab === 'rota-schedule' && (
             <div className="space-y-6 animate-in fade-in duration-300">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -1014,8 +1591,116 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
             </div>
           )}
 
+          {/* SUBTAB 4.2: ROSTER ANALYTICS & COVERAGE STATUS */}
+          {activeTab === 'rota' && rotaSubTab === 'overview' && (
+            <div className="space-y-6 text-left max-w-5xl mx-auto">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">Clinician Shift & Coverage Analytics</h3>
+                  <p className="text-xs text-gray-500">Real-time clinical ward census coverage, duty rosters, and nurse staffing charts.</p>
+                </div>
+                <button
+                  onClick={() => setRotaSubTab('rota-schedule')}
+                  className="flex items-center gap-2 bg-indigo-655 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm shadow-indigo-600/10"
+                >
+                  <Calendar className="w-4 h-4" /> View Full Schedule
+                </button>
+              </div>
+
+              {/* Roster Coverage HUD Indicators */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-[28px] border border-gray-150 dark:border-gray-700/60 shadow-sm space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block font-mono">Shift Coverage Index</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/10">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-2xl font-black text-emerald-600">96.4%</span>
+                      <span className="text-[10px] block font-semibold text-gray-400">Target Coverage Met</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-[28px] border border-gray-150 dark:border-gray-700/60 shadow-sm space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block font-mono">Clinician Nurse Ratio</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-650 dark:text-indigo-400 rounded-2xl flex items-center justify-center border border-indigo-500/10">
+                      <Baby className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-2xl font-black text-slate-805 dark:text-white">1:4</span>
+                      <span className="text-[10px] block font-semibold text-gray-400">Optimal Safe Ratio</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#0c1220] p-6 rounded-[28px] border border-slate-200 dark:border-slate-850/40 shadow-sm space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block font-mono">Active On Call Today</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center border border-amber-500/10">
+                      <Users className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-2xl font-black text-amber-600">8 Nurses</span>
+                      <span className="text-[10px] block font-semibold text-gray-400">Across 3 Rotations</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Roster Coverage Details */}
+              <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-150 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">
+                  📅 Scheduled Shift Allocations Today
+                </h4>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Morning Shift */}
+                  <div className="p-5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">🌅 Morning Rotation</span>
+                      <span className="text-[9px] font-black uppercase bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 px-2 py-0.5 rounded-md">08:00 - 14:00</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs">
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">Consultant:</strong> Dr. Alvin Mutie</p>
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">In-Charge:</strong> Sister Mercyline</p>
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">Nurses:</strong> 3 Ward Nurses</p>
+                    </div>
+                  </div>
+
+                  {/* Afternoon Shift */}
+                  <div className="p-5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">☀️ Afternoon Rotation</span>
+                      <span className="text-[9px] font-black uppercase bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 px-2 py-0.5 rounded-md">14:00 - 20:00</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs">
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">Consultant:</strong> Dr. Christine Ouma</p>
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">In-Charge:</strong> Sister Evelyn</p>
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">Nurses:</strong> 2 Ward Nurses</p>
+                    </div>
+                  </div>
+
+                  {/* Night Shift */}
+                  <div className="p-5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">🌙 Night Rotation</span>
+                      <span className="text-[9px] font-black uppercase bg-indigo-50 dark:bg-indigo-950/40 text-indigo-650 dark:text-indigo-400 px-2 py-0.5 rounded-md">20:00 - 08:00</span>
+                    </div>
+                    <div className="space-y-1.5 text-xs">
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">Consultant:</strong> Dr. Patrick Wamalwa</p>
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">In-Charge:</strong> Sister Mercyline</p>
+                      <p className="font-bold text-gray-600 dark:text-gray-400"><strong className="text-slate-850 dark:text-white">Nurses:</strong> 3 Ward Nurses</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* TAB: TRAINING FLASHCARDS */}
-          {activeTab === 'flashcards' && (
+          {activeTab === 'academics' && academySubTab === 'flashcards' && (
             <div className="space-y-6 animate-in fade-in duration-300 text-left">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
@@ -1355,6 +2040,105 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                 </div>
               )}
 
+            </div>
+          )}
+
+          {/* SUBTAB 5.2: CLINICAL ACADEMY STUDY OVERVIEW */}
+          {activeTab === 'academics' && academySubTab === 'overview' && (
+            <div className="space-y-6 text-left max-w-5xl mx-auto">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">NBU Clinical Training Academy</h3>
+                  <p className="text-xs text-gray-500">Interactive patient simulations, ward resuscitation drills, and baby thermal care protocols.</p>
+                </div>
+                <button
+                  onClick={() => setAcademySubTab('flashcards')}
+                  className="flex items-center gap-2 bg-indigo-655 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm shadow-indigo-600/10"
+                >
+                  <BookOpen className="w-4 h-4" /> Open Flashcards
+                </button>
+              </div>
+
+              {/* Academy HUD indicators */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-[28px] border border-gray-150 dark:border-gray-700/60 shadow-sm space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block font-mono">Course Completion Status</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/10">
+                      <GraduationCap className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-2xl font-black text-emerald-600">80%</span>
+                      <span className="text-[10px] block font-semibold text-gray-400">4 / 5 Lessons Cleared</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-gray-800 p-6 rounded-[28px] border border-gray-150 dark:border-gray-700/60 shadow-sm space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block font-mono">Resuscitation Drill Score</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-650 dark:text-indigo-400 rounded-2xl flex items-center justify-center border border-indigo-500/10">
+                      <CheckCircle2 className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-2xl font-black text-slate-805 dark:text-white">100%</span>
+                      <span className="text-[10px] block font-semibold text-gray-400">Perfect APGAR Drill</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-white dark:bg-[#0c1220] p-6 rounded-[28px] border border-slate-200 dark:border-slate-850/40 shadow-sm space-y-2">
+                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 block font-mono">Thermal Care Scenarios</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center border border-amber-500/10">
+                      <Flame className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <span className="text-2xl font-black text-amber-600">3 Drills</span>
+                      <span className="text-[10px] block font-semibold text-gray-400">Warm Chain Mastered</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Simulation Modules list */}
+              <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-150 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
+                <h4 className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">
+                  🏆 NBU Core Ward Practice Simulators
+                </h4>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Module 1 */}
+                  <div className="p-5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">🚨 Resuscitation Pathway</span>
+                      <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-455 text-[9px] font-black rounded uppercase">Critical</span>
+                    </div>
+                    <p className="text-xs font-semibold text-gray-500 leading-normal">Interactive step-by-step guidance on initial newborn airway management, positive pressure ventilation, and cardiac compression protocols.</p>
+                    <button
+                      onClick={() => setAcademySubTab('flashcards')}
+                      className="text-[10px] font-black uppercase tracking-wider text-indigo-650 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                      Launch Guide <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
+                  {/* Module 2 */}
+                  <div className="p-5 bg-slate-50 dark:bg-slate-900/40 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
+                    <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800">
+                      <span className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">🌡️ The Baby Warm Chain</span>
+                      <span className="px-2 py-0.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-455 text-[9px] font-black rounded uppercase">Routine</span>
+                    </div>
+                    <p className="text-xs font-semibold text-gray-500 leading-normal">Thermal protection index, skin-to-skin Kangaroo Mother Care (KMC) standards, incubator calibration settings, and monitoring charts.</p>
+                    <button
+                      onClick={() => setAcademySubTab('flashcards')}
+                      className="text-[10px] font-black uppercase tracking-wider text-indigo-650 dark:text-indigo-400 hover:underline flex items-center gap-1"
+                    >
+                      Launch Guide <ChevronRight className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -1840,8 +2624,8 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               </div>
             </div>
           )}
-            </main>
-          </div>
+          
+          </main>
         </div>
       </div>
 
