@@ -1117,8 +1117,8 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                 /* List of scenarios */
                 <div className="space-y-6">
                   <div>
-                    <h3 className="text-lg font-black text-gray-900 dark:text-white">Scenario Training Simulator</h3>
-                    <p className="text-xs text-gray-500">Test your pediatric diagnostic skills, calculate dosages in real-time, and align with ward protocols.</p>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white">Newborn Care Practice Cases</h3>
+                    <p className="text-xs text-gray-500">Practice your child treatment skills, calculate safe drug doses in seconds, and follow ward guidelines.</p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1192,7 +1192,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                           📋 {activeScenario.title}
                         </h4>
                         <div>
-                          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">Patient History & Diagnostic Challenge</span>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">Baby's History & Safe Treatment Guidelines</span>
                           <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
                             {activeScenario.problem_statement}
                           </p>
@@ -1202,10 +1202,10 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                       {/* Diagnostic checklist */}
                       <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
                         <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">
-                          🩺 Interactive Diagnostic Checklist
+                          🩺 Interactive Treatment Checklist
                         </h4>
                         <p className="text-[11px] text-gray-500 leading-normal">
-                          Read the problem description above and check off your steps to complete the clinical intervention.
+                          Read the description above and check off your steps to finish treating the baby.
                         </p>
 
                         <div className="space-y-3 pt-2">
@@ -1280,7 +1280,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                       {/* Verification Controls */}
                       <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
                         <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">
-                          ✅ Action Protocol Check
+                          ✅ Safe Action Check
                         </h4>
 
                         {!checkedAnswers ? (
@@ -1288,16 +1288,16 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                             onClick={() => setCheckedAnswers(true)}
                             className="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider transition shadow-lg shadow-indigo-600/10 active:scale-95"
                           >
-                            Verify Actions & Check Solutions
+                            Check My Steps & Solutions
                           </button>
                         ) : (
                           <div className="space-y-4 animate-in fade-in duration-300 text-left">
                             <div className="flex gap-2 items-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
                               <CheckCircle2 className="w-5 h-5 shrink-0" />
-                              Verification Succeeded!
+                              All Checked & Safe!
                             </div>
                             <p className="text-[11px] text-gray-500 leading-normal">
-                              Compare your steps with the certified WHO clinical steps revealed in the list on the left side of the screen.
+                              Compare your steps with the official WHO steps on the left side of the screen.
                             </p>
                             <button
                               onClick={() => {
