@@ -121,14 +121,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
         {/* Hero Section */}
         <main className="relative min-h-screen flex items-center px-6 pt-24 md:pt-32 pb-16 overflow-hidden">
-          {/* Background Image Layer with Premium Glass Dark Overlay */}
+          {/* Background Image Layer with Optimized Display */}
           <div 
             className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-1000 scale-100 z-0" 
             style={{ backgroundImage: "url('/hero-bg.jpg')" }} 
           />
-          {/* Advanced overlay filters for perfect text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-900/40 z-0" />
-          <div className="absolute inset-0 bg-slate-950/30 backdrop-blur-[2px] z-0" />
+          {/* Advanced overlay filters for perfect text contrast and vibrant visibility */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/40 z-0" />
 
           <div className="max-w-7xl mx-auto w-full relative z-10 grid lg:grid-cols-12 gap-12 items-center">
             
@@ -240,7 +239,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <section id="about" className="py-32 px-6 border-t border-slate-900/60 bg-slate-950/40 relative">
           <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
             
-            <div className="space-y-6">
+            <ScrollReveal className="space-y-6">
               <span className="text-xs font-black text-teal-400 uppercase tracking-[0.4em] block">How NBU Care Works</span>
               <h3 className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-[1.1]">
                 An easy newborn care system <br />
@@ -260,9 +259,9 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                   By automating everyday steps, we remove calculation mistakes, save time, and give newborns the safe, high-quality care they deserve.
                 </p>
               </div>
-            </div>
+            </ScrollReveal>
             
-            <div className="relative">
+            <ScrollReveal className="relative" delay={150}>
               <div className="grid grid-cols-1 gap-4">
                 {[
                   { title: "Easy Drug Calculators", icon: Calculator, desc: "Find correct drug doses automatically based on the baby's weight.", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
@@ -282,7 +281,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                   </div>
                 ))}
               </div>
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -290,16 +289,16 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <section id="workflow" className="py-32 px-6 border-y border-slate-900 bg-slate-900/20 relative">
           <div className="max-w-7xl mx-auto">
             
-            <div className="text-center mb-20">
+            <ScrollReveal className="text-center mb-20">
               <span className="text-xs font-black text-teal-400 uppercase tracking-[0.4em] block mb-3">Simple Steps</span>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">How we support you at the bedside.</h2>
-              <p className="text-sm text-slate-500 font-bold max-w-xl mx-auto mt-4">A clear, step-by-step layout designed to make your daily ward activities stress-free and accurate.</p>
-            </div>
-
+              <p className="text-sm text-slate-555 max-w-xl mx-auto mt-4 font-bold">A clear, step-by-step layout designed to make your daily ward activities stress-free and accurate.</p>
+            </ScrollReveal>
+ 
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               
               {/* Interactive Step Blocks */}
-              <div className="space-y-4">
+              <ScrollReveal className="space-y-4">
                 {[
                   { title: "Simple Log In", desc: "Log in securely as a nurse, doctor, or student to access your ward dashboard.", icon: UserCheck },
                   { title: "Dose Safety Check", desc: "The app automatically checks drug doses against official guidelines to keep the baby safe.", icon: Activity },
@@ -322,10 +321,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                     </div>
                   </div>
                 ))}
-              </div>
-
+              </ScrollReveal>
+ 
               {/* Glowing Phone Mockup Display */}
-              <div className="relative">
+              <ScrollReveal className="relative" delay={150}>
                 <div className="absolute -inset-1 rounded-[2.5rem] bg-teal-500/10 opacity-30 blur-2xl pointer-events-none" />
                 <div className="aspect-[4/5] bg-slate-950 rounded-[2.5rem] p-1.5 overflow-hidden border border-slate-800 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.7)]">
                    <div className="w-full h-full bg-slate-900 rounded-[2.3rem] flex flex-col p-8 relative overflow-hidden">
@@ -351,7 +350,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                          
                          {/* Validation Layer View */}
                          <div className={`transition-all duration-500 ${activeStep === 1 ? 'opacity-100 scale-100' : 'opacity-25'}`}>
-                            <div className="text-[9px] uppercase font-black text-slate-500 tracking-widest mb-1.5">Safe Drug Dose Checks</div>
+                            <div className="text-[9px] uppercase font-black text-slate-555 tracking-widest mb-1.5">Safe Drug Dose Checks</div>
                             <div className="p-3.5 bg-teal-950/20 rounded-xl border border-teal-500/25">
                                <div className="flex justify-between mb-2">
                                   <span className="text-[10px] text-slate-400 font-bold">Newborn Medicine</span>
@@ -365,7 +364,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                          {/* Handover Log View */}
                          <div className={`transition-all duration-500 ${activeStep === 2 ? 'opacity-100 translate-x-0' : 'opacity-25'}`}>
-                            <div className="text-[9px] uppercase font-black text-slate-500 tracking-widest mb-1.5">Shift Vitals</div>
+                            <div className="text-[9px] uppercase font-black text-slate-555 tracking-widest mb-1.5">Shift Vitals</div>
                             <div className="p-3.5 bg-slate-950/80 rounded-xl border border-slate-900 space-y-2">
                                <div className="flex items-center gap-2.5">
                                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
@@ -380,7 +379,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
 
                          {/* Audit Log View */}
                          <div className={`transition-all duration-500 ${activeStep === 3 ? 'opacity-100 scale-100' : 'opacity-25'}`}>
-                            <div className="text-[9px] uppercase font-black text-slate-500 tracking-widest mb-1.5">Saved to Registry</div>
+                            <div className="text-[9px] uppercase font-black text-slate-555 tracking-widest mb-1.5">Saved to Registry</div>
                             <div className="p-3 bg-slate-950 rounded-xl border border-slate-900 flex items-center justify-between">
                               <span className="text-[9px] font-mono text-slate-400">ID: 8a9d10e82c</span>
                               <span className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Saved</span>
@@ -393,7 +392,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                       </div>
                    </div>
                 </div>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -402,14 +401,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <section id="roles" className="py-32 px-6 bg-slate-950 relative">
           <div className="max-w-7xl mx-auto">
             
-            <div className="flex flex-col items-center text-center mb-16">
+            <ScrollReveal className="flex flex-col items-center text-center mb-16">
               <span className="text-xs font-black text-teal-400 uppercase tracking-[0.4em] block mb-3">Who Uses the App</span>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">Tailored for every member of the team.</h2>
-              <p className="text-sm text-slate-550 max-w-xl mt-4 leading-relaxed font-bold">Your dashboard matches your role. We provide simple tools made specifically for nurses, doctors, and students.</p>
-            </div>
-
+              <p className="text-sm text-slate-555 max-w-xl mt-4 leading-relaxed font-bold">Your dashboard matches your role. We provide simple tools made specifically for nurses, doctors, and students.</p>
+            </ScrollReveal>
+ 
             {/* Role Selectors */}
-            <div className="flex flex-wrap justify-center gap-3 mb-12">
+            <ScrollReveal className="flex flex-wrap justify-center gap-3 mb-12" delay={100}>
               {[
                 { id: 'nurse', label: 'Ward Nurses', icon: Users },
                 { id: 'consultant', label: 'Senior Doctors', icon: UserCog },
@@ -423,10 +422,10 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                   <role.icon className="w-4 h-4" /> {role.label}
                 </button>
               ))}
-            </div>
-
+            </ScrollReveal>
+ 
             {/* Role Features Grid */}
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <ScrollReveal className="grid md:grid-cols-2 lg:grid-cols-4 gap-6" delay={150}>
               {activeRole === 'nurse' && [
                 { t: 'Drug Dosing', d: 'Find safe drug amounts based on weight.', i: Calculator },
                 { t: 'Fluid Logs', d: 'Calculate safe fluid needs for the day.', i: Activity },
@@ -440,14 +439,14 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                 { t: 'Ward Statistics', d: 'Monitor calculations and completed shifts.', i: BarChart },
                 { t: 'App Guidelines', d: 'Update drug guidelines and system rules.', i: Shield }
               ].map((f, i) => <RoleFeature key={i} {...f} />)}
-
+ 
               {activeRole === 'student' && [
                 { t: 'Learning Guides', d: 'Easy charts to learn ward protocols.', i: GraduationCap },
                 { t: 'Practice Cases', d: 'Try real-world training cases safely.', i: Activity },
                 { t: 'Ward Handbooks', d: 'Quick reference guides at your fingertips.', i: BookOpen },
                 { t: 'Approve Doses', d: 'Ask senior doctors to verify drug calculations.', i: CheckCircle2 }
               ].map((f, i) => <RoleFeature key={i} {...f} />)}
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -455,13 +454,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <section id="capabilities" className="py-32 px-6 bg-slate-900/30 border-y border-slate-900/80 relative">
           <div className="max-w-7xl mx-auto">
             
-            <div className="flex flex-col items-center text-center mb-20">
+            <ScrollReveal className="flex flex-col items-center text-center mb-20">
               <span className="text-xs font-black text-teal-400 uppercase tracking-[0.4em] block mb-3">Key Features</span>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">Simple, smart features.</h2>
-              <p className="text-sm text-slate-550 max-w-xl mt-4 font-bold">Everything you need to do your best work and keep babies safe in the ward.</p>
-            </div>
+              <p className="text-sm text-slate-555 max-w-xl mt-4 font-bold">Everything you need to do your best work and keep babies safe in the ward.</p>
+            </ScrollReveal>
             
-            <div className="grid md:grid-cols-3 gap-8">
+            <ScrollReveal className="grid md:grid-cols-3 gap-8" delay={150}>
               {[
                 { title: "Easy Calculator", desc: "Calculate weight-based drug doses in seconds. Avoid calculations under pressure.", icon: Calculator, color: "text-teal-400", border: "border-teal-500/20 bg-teal-500/5" },
                 { title: "Rota Planner", desc: "View schedules for nurses and doctors to make sure there is always someone on duty.", icon: Lock, color: "text-indigo-400", border: "border-indigo-500/20 bg-indigo-500/5" },
@@ -479,7 +478,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                   </div>
                 </div>
               ))}
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -487,12 +486,12 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <section id="standards" className="py-32 px-6 bg-slate-950 relative">
           <div className="max-w-7xl mx-auto">
             
-            <div className="text-center mb-20">
+            <ScrollReveal className="text-center mb-20">
               <span className="text-xs font-black text-teal-400 uppercase tracking-[0.4em] block mb-3">Our Medical Guidelines</span>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">Trusted hospital guidelines.</h2>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8">
+            </ScrollReveal>
+ 
+            <ScrollReveal className="grid md:grid-cols-3 gap-8" delay={150}>
               {[
                 { t: 'WHO Standards', d: 'Calculations and dilutions are based directly on the World Health Organization guidelines.', i: ShieldCheck, c: 'text-emerald-400', bg: 'bg-emerald-500/10 border-emerald-500/20' },
                 { t: 'Secure Patient Files', d: 'User roles and security layers protect baby records and patient logs.', i: Lock, c: 'text-teal-400', bg: 'bg-teal-500/10 border-teal-500/20' },
@@ -506,7 +505,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                   <p className="text-xs text-slate-500 font-bold leading-relaxed">{std.d}</p>
                 </div>
               ))}
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -514,13 +513,13 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
         <section id="faq" className="py-32 px-6 bg-slate-950/60 border-t border-slate-900 relative">
           <div className="max-w-3xl mx-auto">
             
-            <div className="text-center mb-20">
+            <ScrollReveal className="text-center mb-20">
               <span className="text-xs font-black text-teal-400 uppercase tracking-[0.4em] block mb-3">Help Center</span>
               <h2 className="text-3xl md:text-5xl font-black text-white tracking-tight">Common Questions</h2>
-              <p className="text-sm text-slate-500 font-bold mt-4">Learn about safe drug calculations, account approvals, and clinical logs.</p>
-            </div>
+              <p className="text-sm text-slate-555 font-bold mt-4">Learn about safe drug calculations, account approvals, and clinical logs.</p>
+            </ScrollReveal>
             
-            <div className="space-y-4">
+            <ScrollReveal className="space-y-4" delay={150}>
               {[
                 { q: "Are the calculators accurate?", a: "Yes. The math is based on standard WHO guidelines and checks all doses against safe limits for a baby's weight." },
                 { q: "How are new registrations approved?", a: "New accounts are reviewed by senior doctors or administrators before they can access ward calculations." },
@@ -548,7 +547,7 @@ export default function Welcome({ auth, laravelVersion, phpVersion }) {
                   </div>
                 </div>
               ))}
-            </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -640,6 +639,50 @@ function RoleFeature({ t, d, i: Icon }) {
       </div>
       <h5 className="font-extrabold text-sm text-slate-100 mb-2">{t}</h5>
       <p className="text-xs text-slate-500 leading-relaxed font-semibold">{d}</p>
+    </div>
+  );
+}
+
+function ScrollReveal({ children, className = "", delay = 0 }) {
+  const [isVisible, setIsVisible] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsVisible(true);
+          observer.unobserve(entry.target);
+        }
+      },
+      {
+        threshold: 0.05,
+        rootMargin: '0px 0px -40px 0px'
+      }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div
+      ref={ref}
+      style={{ transitionDelay: `${delay}ms` }}
+      className={`transition-all duration-1000 ease-out transform ${
+        isVisible 
+          ? 'opacity-100 translate-y-0 scale-100' 
+          : 'opacity-0 translate-y-8 scale-[0.98]'
+      } ${className}`}
+    >
+      {children}
     </div>
   );
 }
