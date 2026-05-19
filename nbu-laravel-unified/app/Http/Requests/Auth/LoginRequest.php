@@ -50,6 +50,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+        if ($user->status !== 'Approved') {
+            Auth::logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'Your account is successfully registered, but is currently pending activation by a Nursing In-Charge.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

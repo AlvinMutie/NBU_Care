@@ -9,6 +9,7 @@ export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
         name: '',
         email: '',
+        hospital_id: '',
         password: '',
         password_confirmation: '',
     });
@@ -41,6 +42,22 @@ export default function Register() {
                     />
 
                     <InputError message={errors.name} className="mt-2" />
+                </div>
+
+                <div className="mt-4">
+                    <InputLabel htmlFor="hospital_id" value="Hospital Staff ID" />
+
+                    <TextInput
+                        id="hospital_id"
+                        name="hospital_id"
+                        value={data.hospital_id}
+                        className="mt-1 block w-full placeholder-gray-400 dark:placeholder-gray-600"
+                        placeholder="e.g. NBU-2026-001"
+                        onChange={(e) => setData('hospital_id', e.target.value)}
+                        required
+                    />
+
+                    <InputError message={errors.hospital_id} className="mt-2" />
                 </div>
 
                 <div className="mt-4">

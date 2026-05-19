@@ -35,18 +35,28 @@ class RegisteredUserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'hospital_id' => 'required|string|exists:preauthorized_staff,hospital_id|unique:users,hospital_id',
+        ], [
+            'hospital_id.exists' => 'This Hospital Staff ID is not authorized to register. Please contact ICT Support.',
+            'hospital_id.unique' => 'This Hospital Staff ID has already been registered to an active account.',
         ]);
+
+        $staff = \Illuminate\Support\Facades\DB::table('preauthorized_staff')
+            ->where('hospital_id', $request->hospital_id)
+            ->first();
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'hospital_id' => $request->hospital_id,
+            'role' => $staff->role ?? 'Student',
+            'status' => 'Pending',
+            'is_verified' => false,
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('pending-approval'));
     }
 }

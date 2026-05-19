@@ -17,6 +17,10 @@ Route::middleware('guest')->group(function () {
 
     Route::post('register', [RegisteredUserController::class, 'store']);
 
+    Route::get('pending-approval', function () {
+        return Inertia\Inertia::render('Auth/PendingApproval');
+    })->name('pending-approval');
+
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
