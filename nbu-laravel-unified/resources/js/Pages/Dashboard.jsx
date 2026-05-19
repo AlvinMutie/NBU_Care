@@ -637,6 +637,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     value={neonateData.name}
                     onChange={(e) => setNeonateData('name', e.target.value)}
                   />
+                  {neonateErrors.name && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.name}</span>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -648,6 +649,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     value={neonateData.dob}
                     onChange={(e) => setNeonateData('dob', e.target.value)}
                   />
+                  {neonateErrors.dob && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.dob}</span>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -661,6 +663,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     <option>Female</option>
                     <option>Other</option>
                   </select>
+                  {neonateErrors.gender && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.gender}</span>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -673,6 +676,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     value={neonateData.birthWeight}
                     onChange={(e) => setNeonateData('birthWeight', e.target.value)}
                   />
+                  {neonateErrors.birthWeight && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.birthWeight}</span>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -685,6 +689,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     value={neonateData.currentWeight}
                     onChange={(e) => setNeonateData('currentWeight', e.target.value)}
                   />
+                  {neonateErrors.currentWeight && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.currentWeight}</span>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -697,6 +702,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     value={neonateData.gestationalAge}
                     onChange={(e) => setNeonateData('gestationalAge', e.target.value)}
                   />
+                  {neonateErrors.gestationalAge && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.gestationalAge}</span>}
                 </div>
 
                 <div className="space-y-1.5">
@@ -708,6 +714,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs }) {
                     value={neonateData.motherPhone}
                     onChange={(e) => setNeonateData('motherPhone', e.target.value)}
                   />
+                  {neonateErrors.motherPhone && <span className="text-[10px] text-red-500 font-bold block ml-1">{neonateErrors.motherPhone}</span>}
                 </div>
 
               </div>

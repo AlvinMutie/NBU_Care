@@ -62,7 +62,7 @@ Route::middleware('auth')->group(function () {
             'gender' => 'required|string|in:Male,Female,Other',
             'birthWeight' => 'required|numeric|min:0',
             'currentWeight' => 'required|numeric|min:0',
-            'gestationalAge' => 'required|integer|min:20|max:45',
+            'gestationalAge' => 'required|integer|min:1|max:45',
             'admissionDiagnosis' => 'nullable|string',
             'history' => 'nullable|string',
             'motherPhone' => 'nullable|string',
