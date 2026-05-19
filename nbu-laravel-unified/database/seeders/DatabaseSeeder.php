@@ -252,5 +252,84 @@ class DatabaseSeeder extends Seeder
                 'updated_at' => now(),
             ]
         ]);
+
+        // Seed Clinical Flashcards
+        \Illuminate\Support\Facades\DB::table('flashcards')->insert([
+            [
+                'title' => 'Neonatal Resuscitation Protocol',
+                'category' => 'Critical',
+                'when_to_perform' => 'Perform immediately at birth if the newborn is apneic, limp, or has a heart rate < 100 bpm.',
+                'steps' => json_encode([
+                    'Provide warmth: Place infant under a radiant warmer and dry completely.',
+                    'Clear airway: Position head in sniffing position; suction mouth then nose if obstructed.',
+                    'Initiate PPV: Start Positive Pressure Ventilation with room air if HR < 100 or infant is gasping.',
+                    'Start compressions: If HR < 60 after 30 seconds of effective ventilation, start chest compressions (3:1 ratio).'
+                ]),
+                'warning' => 'Do not perform vigorous deep suctioning immediately as it can induce vagal bradycardia.',
+                'tips' => 'Always ensure MR. SOPA checklist is executed if chest movement is inadequate during PPV.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'title' => 'Kangaroo Mother Care (KMC)',
+                'category' => 'Routine',
+                'when_to_perform' => 'Indicated for stable low birth weight newborns (< 2.0 kg) to maintain normothermia.',
+                'steps' => json_encode([
+                    'Secure skin-to-skin: Place infant upright inside mother\'s gown between breasts.',
+                    'Ensure airway protection: Keep head turned to one side and slightly extended to keep airway open.',
+                    'Exclusive Breastfeeding: Promote frequent breastfeeding (every 2-3 hours) or express breast milk feeding.',
+                    'Continuous monitoring: Track breathing patterns and check feet warmth.'
+                ]),
+                'warning' => 'Discontinue KMC and seek urgent help if chest indrawings or grunting occurs.',
+                'tips' => 'Encourage fathers or other family members to take shifts in providing KMC to support the mother.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'title' => 'Neonatal Hypoglycemia Protocol',
+                'category' => 'Clinical',
+                'when_to_perform' => 'Check blood glucose at 2 hours of life for high-risk neonates (preterms, diabetic mother infants, SGA).',
+                'steps' => json_encode([
+                    'Measure Sugar: Check heel-prick blood glucose using a calibrated glucometer.',
+                    'Immediate Feed: If glucose is < 2.6 mmol/L but baby is stable, initiate immediate breastfeed or cup feed.',
+                    'Start IV Fluids: If glucose < 1.6 mmol/L or baby is symptomatic, give D10W bolus (2 mL/kg) and start infusion.',
+                    'Re-check: Re-measure blood glucose 30 minutes post intervention.'
+                ]),
+                'warning' => 'Delayed treatment of severe neonatal hypoglycemia can lead to irreversible neurological injury or seizures.',
+                'tips' => 'Avoid rapid termination of high-concentration glucose infusions to prevent rebound hypoglycemia.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
+
+        // Seed Clinical Training Scenarios
+        \Illuminate\Support\Facades\DB::table('scenarios')->insert([
+            [
+                'title' => 'Preterm Hypoglycemia Maintenance Infusion',
+                'problem_statement' => 'A 32-week preterm baby weighing 1.8 kg has a blood sugar of 1.8 mmol/L at 2 hours of life and is lethargic. Prescribe a 2 mL/kg D10W bolus and calculate the ongoing D10W maintenance fluid rate at 80 mL/kg/day.',
+                'solution_steps' => json_encode([
+                    'Calculate D10W Bolus: 1.8 kg * 2 mL/kg = 3.6 mL of D10W administered over 5-10 minutes.',
+                    'Calculate Daily Maintenance Vol: 1.8 kg * 80 mL/kg/day = 144 mL/day.',
+                    'Calculate Hourly Infusion Rate: 144 mL / 24 hours = 6.0 mL/hour of D10W.'
+                ]),
+                'formulas_used' => 'Bolus Vol = Weight (kg) * 2 mL/kg; Hourly Rate = (Weight * Daily TFI) / 24',
+                'warning' => 'Confirm IV patency before administering D10W; extravasation can cause skin necrosis and severe chemical cellulitis.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ],
+            [
+                'title' => 'Apneic Neonatal Resuscitation',
+                'problem_statement' => 'A term male baby is delivered via emergency Caesarean section due to cord prolapse. The baby is born limp, pale, and is not breathing. The heart rate is 50 beats per minute. Describe the resuscitation sequence.',
+                'solution_steps' => json_encode([
+                    'Initial steps: Place baby under radiant heater, dry vigorously, position head, and clear airway (mouth then nose). Time target: 30 seconds.',
+                    'Ventilation: Baby remains apneic; initiate positive pressure ventilation (PPV) using a T-piece or self-inflating bag. Time target: 30 seconds.',
+                    'Cardiopulmonary resuscitation: HR is checked and is still 50 bpm despite chest expansion. Initiate chest compressions at 3:1 ratio combined with 100% oxygen.'
+                ]),
+                'formulas_used' => 'Compressions to Ventilation Ratio = 3:1 (90 compressions and 30 breaths per minute)',
+                'warning' => 'Never start chest compressions without first completing 30 seconds of effective positive pressure ventilation.',
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]
+        ]);
     }
 }

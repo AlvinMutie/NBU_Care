@@ -69,9 +69,26 @@ Route::get('/dashboard', function () {
     });
 
     $allUsers = \Illuminate\Support\Facades\DB::table('users')
-        ->select('id', 'name', 'role', 'email')
-        ->orderBy('name', 'asc')
+        ->select('id', 'name', 'role', 'email', 'status', 'is_verified', 'phone', 'id_number', 'created_at')
+        ->orderBy('created_at', 'desc')
         ->get();
+
+    $flashcards = \Illuminate\Support\Facades\DB::table('flashcards')
+        ->orderBy('category', 'asc')
+        ->orderBy('title', 'asc')
+        ->get()
+        ->map(function ($f) {
+            $f->steps = json_decode($f->steps ?? '[]');
+            return $f;
+        });
+
+    $scenarios = \Illuminate\Support\Facades\DB::table('scenarios')
+        ->orderBy('title', 'asc')
+        ->get()
+        ->map(function ($s) {
+            $s->solution_steps = json_decode($s->solution_steps ?? '[]');
+            return $s;
+        });
 
     return Inertia::render('Dashboard', [
         'initialNeonates' => $neonates,
@@ -79,6 +96,8 @@ Route::get('/dashboard', function () {
         'initialHandovers' => $handovers,
         'initialRotas' => $rotas,
         'allUsers' => $allUsers,
+        'flashcards' => $flashcards,
+        'scenarios' => $scenarios,
     ]);
 })->middleware(['auth'])->name('dashboard');
 
@@ -242,6 +261,89 @@ Route::middleware('auth')->group(function () {
         }
 
         return redirect()->back()->with('success', 'Duty rota scheduled successfully.');
+    });
+
+    // Approve user registration
+    Route::post('/admin/users/{user}/approve', function (\App\Models\User $user) {
+        if (!in_array(auth()->user()->role, ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support'])) {
+            return redirect()->back()->withErrors(['role' => 'Unauthorized action.']);
+        }
+        
+        \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'status' => 'Approved',
+                'is_verified' => true,
+                'verified_by' => auth()->id(),
+                'verification_date' => now(),
+            ]);
+
+        // Audit log
+        \Illuminate\Support\Facades\DB::table('audit_logs')->insert([
+            'user_id' => auth()->id(),
+            'action' => "USER APPROVED: Approved access request for {$user->name} ({$user->role})",
+            'type' => 'Medication',
+            'status' => 'Checked',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', "Approved {$user->name} successfully.");
+    });
+
+    // Reject user registration
+    Route::post('/admin/users/{user}/reject', function (\App\Models\User $user) {
+        if (!in_array(auth()->user()->role, ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support'])) {
+            return redirect()->back()->withErrors(['role' => 'Unauthorized action.']);
+        }
+
+        \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'status' => 'Rejected',
+                'is_verified' => false,
+            ]);
+
+        // Audit log
+        \Illuminate\Support\Facades\DB::table('audit_logs')->insert([
+            'user_id' => auth()->id(),
+            'action' => "USER REJECTED: Rejected access request for {$user->name} ({$user->role})",
+            'type' => 'Medication',
+            'status' => 'Checked',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', "Rejected {$user->name} successfully.");
+    });
+
+    // Update user role
+    Route::post('/admin/users/{user}/update-role', function (\App\Models\User $user, \Illuminate\Http\Request $request) {
+        if (!in_array(auth()->user()->role, ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support'])) {
+            return redirect()->back()->withErrors(['role' => 'Unauthorized action.']);
+        }
+
+        $validated = $request->validate([
+            'role' => 'required|string|in:Nursing In-Charge,Nurse,Consultant Pediatrician,CO Pediatrics / MO,Student,ICT / IT Support,Hospital Management',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'role' => $validated['role'],
+            ]);
+
+        // Audit log
+        \Illuminate\Support\Facades\DB::table('audit_logs')->insert([
+            'user_id' => auth()->id(),
+            'action' => "USER ROLE UPDATED: Changed role of {$user->name} to {$validated['role']}",
+            'type' => 'Medication',
+            'status' => 'Checked',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', "Updated role for {$user->name} to {$validated['role']} successfully.");
     });
 });
 

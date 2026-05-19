@@ -7,11 +7,25 @@ import {
   AlertTriangle, UserCheck, ChevronRight,
   ChevronLeft, Search, Loader2, Scale,
   Pill, ClipboardCheck, X, Check, Plus, Calendar, Phone,
-  ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User
+  ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart
 } from 'lucide-react';
 
-export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [] }) {
-  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'audit', 'handovers', 'rota'
+export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [], flashcards = [], scenarios = [] }) {
+  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'audit', 'handovers', 'rota', 'flashcards', 'scenarios'
+  const [flippedCardId, setFlippedCardId] = useState(null);
+  const [flashcardCategory, setFlashcardCategory] = useState('All');
+  
+  // Admin Portal Sub-States
+  const [adminSubTab, setAdminSubTab] = useState('overview'); // 'overview', 'vetting', 'directory'
+  const [isAdminLightMode, setIsAdminLightMode] = useState(false);
+  const [adminSearchTerm, setAdminSearchTerm] = useState('');
+
+  // Scenario States
+  const [activeScenario, setActiveScenario] = useState(null);
+  const [scenarioStepsCheck, setScenarioStepsCheck] = useState({});
+  const [revealFormula, setRevealFormula] = useState(false);
+  const [checkedAnswers, setCheckedAnswers] = useState(false);
+
   const [neonates, setNeonates] = useState(initialNeonates || []);
   const [auditLogs, setAuditLogs] = useState(initialAuditLogs || []);
   const [handovers, setHandovers] = useState(initialHandovers || []);
@@ -215,21 +229,53 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
                 activeTab === 'rota'
                   ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
+                  : 'text-gray-550 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
             >
               Duty Rota
+            </button>
+            <button
+              onClick={() => setActiveTab('flashcards')}
+              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
+                activeTab === 'flashcards'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-550 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              📖 Training Flashcards
+            </button>
+            <button
+              onClick={() => setActiveTab('scenarios')}
+              className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
+                activeTab === 'scenarios'
+                  ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                  : 'text-gray-550 hover:text-gray-900 dark:hover:text-gray-100'
+              }`}
+            >
+              🩺 Interactive Scenarios
             </button>
             <button
               onClick={() => setActiveTab('audit')}
               className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
                 activeTab === 'audit'
                   ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-gray-100'
+                  : 'text-gray-555 hover:text-gray-900 dark:hover:text-gray-100'
               }`}
             >
               Audit Trail
             </button>
+            {['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'].includes(auth.user.role) && (
+              <button
+                onClick={() => setActiveTab('admin')}
+                className={`px-4 py-2 text-xs font-black uppercase tracking-wider rounded-lg transition-all whitespace-nowrap ${
+                  activeTab === 'admin'
+                    ? 'bg-red-650/10 text-rose-600 dark:text-rose-450 border border-rose-500/25 shadow-sm font-black'
+                    : 'text-rose-500 hover:text-rose-700 dark:hover:text-rose-400 bg-rose-50/50 dark:bg-rose-950/10'
+                }`}
+              >
+                🛡️ Admin Portal
+              </button>
+            )}
           </div>
         </div>
       }
@@ -927,6 +973,833 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                     </tbody>
                   </table>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB: TRAINING FLASHCARDS */}
+          {activeTab === 'flashcards' && (
+            <div className="space-y-6 animate-in fade-in duration-300 text-left">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-black text-gray-900 dark:text-white">Clinical Training Flashcards</h3>
+                  <p className="text-xs text-gray-500">Interactive quick-reference manuals for standard, clinical, and emergency neonatal NBU protocols.</p>
+                </div>
+
+                {/* Category selectors */}
+                <div className="flex flex-wrap gap-1 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200/50 dark:border-gray-700/50 max-w-full">
+                  {['All', 'Routine', 'Clinical', 'Critical', 'Calculations'].map(cat => (
+                    <button
+                      key={cat}
+                      onClick={() => {
+                        setFlashcardCategory(cat);
+                        setFlippedCardId(null);
+                      }}
+                      className={`px-3 py-1.5 text-[10px] font-black uppercase tracking-wider rounded-lg transition-all ${
+                        flashcardCategory === cat
+                          ? 'bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm'
+                          : 'text-gray-555 hover:text-gray-900 dark:hover:text-gray-100'
+                      }`}
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Cards Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {flashcards.length === 0 ? (
+                  <div className="col-span-full bg-white dark:bg-gray-800 rounded-3xl border border-gray-150 p-10 text-center text-gray-400">
+                    No flashcards loaded in clinical database. Please seed the database first.
+                  </div>
+                ) : (
+                  flashcards
+                    .filter(card => flashcardCategory === 'All' || card.category === flashcardCategory)
+                    .map(card => {
+                      const isFlipped = flippedCardId === card.id;
+                      const catColors = {
+                        Routine: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
+                        Clinical: 'bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20',
+                        Critical: 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20',
+                        Calculations: 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20'
+                      }[card.category] || 'bg-gray-500/10 text-gray-600 border-gray-500/20';
+
+                      return (
+                        <div
+                          key={card.id}
+                          className={`relative rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 min-h-[300px] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:shadow-indigo-500/5 ${
+                            isFlipped 
+                              ? 'bg-gradient-to-br from-slate-900 to-indigo-950/20 text-white border-indigo-500/20 shadow-lg shadow-indigo-500/5' 
+                              : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
+                          }`}
+                        >
+                          {/* Header info */}
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-4">
+                              <span className={`px-2.5 py-1 rounded-md text-[9px] font-black uppercase tracking-wider border ${catColors}`}>
+                                {card.category}
+                              </span>
+                              <span className="text-[10px] text-gray-400 font-mono font-bold">ID: #{card.id}</span>
+                            </div>
+
+                            {!isFlipped ? (
+                              /* Front side */
+                              <div className="space-y-4">
+                                <h4 className="text-base font-extrabold tracking-tight text-gray-900 dark:text-white leading-snug">
+                                  {card.title}
+                                </h4>
+                                <div>
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">When To Perform</span>
+                                  <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-semibold">
+                                    {card.when_to_perform}
+                                  </p>
+                                </div>
+                              </div>
+                            ) : (
+                              /* Back side */
+                              <div className="space-y-4">
+                                <h4 className="text-xs font-black uppercase tracking-wider text-indigo-400">
+                                  {card.title} &bull; Action Steps
+                                </h4>
+                                <div className="space-y-2">
+                                  {Array.isArray(card.steps) && card.steps.map((step, idx) => (
+                                    <div key={idx} className="flex gap-2 items-start text-xs">
+                                      <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/10 text-[10px] font-black text-indigo-400 font-mono">
+                                        {idx + 1}
+                                      </span>
+                                      <p className="text-gray-300 leading-relaxed font-semibold">{step}</p>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                {card.warning && (
+                                  <div className="mt-3 p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[11px] font-semibold leading-normal">
+                                    ⚠️ <span className="font-extrabold uppercase tracking-wide">Warning:</span> {card.warning}
+                                  </div>
+                                )}
+
+                                {card.tips && (
+                                  <div className="mt-2 p-3 rounded-xl bg-teal-500/10 border border-teal-500/20 text-teal-300 text-[11px] font-semibold leading-normal">
+                                    💡 <span className="font-extrabold uppercase tracking-wide">Pro Tip:</span> {card.tips}
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Flip action button */}
+                          <div className="mt-6 border-t border-gray-150/40 dark:border-gray-700/40 pt-4 flex justify-end">
+                            <button
+                              onClick={() => setFlippedCardId(isFlipped ? null : card.id)}
+                              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${
+                                isFlipped
+                                  ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-md'
+                                  : 'bg-gray-100 dark:bg-gray-900 hover:bg-gray-250 dark:hover:bg-gray-750 text-gray-750 dark:text-gray-300 border border-gray-200/50 dark:border-gray-800'
+                              }`}
+                            >
+                              {isFlipped ? 'Flip Front' : 'Reveal Steps & Warnings'}
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* TAB: INTERACTIVE SCENARIOS */}
+          {activeTab === 'scenarios' && (
+            <div className="space-y-6 animate-in fade-in duration-300 text-left">
+              
+              {!activeScenario ? (
+                /* List of scenarios */
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-black text-gray-900 dark:text-white">Scenario Training Simulator</h3>
+                    <p className="text-xs text-gray-500">Test your pediatric diagnostic skills, calculate dosages in real-time, and align with ward protocols.</p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {scenarios.length === 0 ? (
+                      <div className="col-span-full bg-white dark:bg-gray-800 rounded-3xl border border-gray-150 p-10 text-center text-gray-400">
+                        No training scenarios loaded in database yet.
+                      </div>
+                    ) : (
+                      scenarios.map(sc => (
+                        <div key={sc.id} className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 flex flex-col justify-between hover:shadow-xl hover:shadow-indigo-500/5 transition">
+                          <div className="space-y-4">
+                            <div className="flex justify-between items-center gap-2">
+                              <span className="px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/20 text-indigo-700 dark:text-indigo-400 rounded-md text-[9px] font-black uppercase tracking-wider border border-indigo-500/20">
+                                Simulation Case File
+                              </span>
+                              <span className="text-[10px] text-gray-400 font-mono font-bold">Case #{sc.id}</span>
+                            </div>
+
+                            <h4 className="text-base font-extrabold text-gray-900 dark:text-white leading-tight">
+                              {sc.title}
+                            </h4>
+
+                            <p className="text-xs text-gray-600 dark:text-gray-400 leading-relaxed font-semibold line-clamp-3">
+                              {sc.problem_statement}
+                            </p>
+                          </div>
+
+                          <div className="mt-6 border-t border-gray-100 dark:border-gray-700/40 pt-4 flex justify-end">
+                            <button
+                              onClick={() => {
+                                setActiveScenario(sc);
+                                setScenarioStepsCheck({});
+                                setRevealFormula(false);
+                                setCheckedAnswers(false);
+                              }}
+                              className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition shadow-md shadow-indigo-600/10"
+                            >
+                              Start Case Simulation
+                            </button>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              ) : (
+                /* Active Scenario Player Workspace */
+                <div className="space-y-6">
+                  
+                  {/* Workspace Header */}
+                  <div className="flex items-center justify-between border-b border-gray-100 dark:border-gray-800 pb-4">
+                    <button
+                      onClick={() => setActiveScenario(null)}
+                      className="flex items-center gap-2 text-xs font-black text-gray-500 hover:text-gray-905 dark:hover:text-white uppercase tracking-wider transition"
+                    >
+                      &larr; Back to Case Files
+                    </button>
+                    <span className="px-2.5 py-1 bg-teal-500/10 text-teal-700 dark:text-teal-400 border border-teal-500/20 rounded-md text-[9px] font-black uppercase tracking-wider">
+                      Simulation Active
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    {/* Left Column: Problem Case File */}
+                    <div className="lg:col-span-7 space-y-6">
+                      
+                      {/* Case File Card */}
+                      <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
+                        <h4 className="text-base font-extrabold text-gray-900 dark:text-white leading-tight">
+                          📋 {activeScenario.title}
+                        </h4>
+                        <div>
+                          <span className="text-[10px] font-black uppercase tracking-wider text-gray-400 block mb-1">Patient History & Diagnostic Challenge</span>
+                          <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 leading-relaxed font-semibold">
+                            {activeScenario.problem_statement}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Diagnostic checklist */}
+                      <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">
+                          🩺 Interactive Diagnostic Checklist
+                        </h4>
+                        <p className="text-[11px] text-gray-500 leading-normal">
+                          Read the problem description above and check off your steps to complete the clinical intervention.
+                        </p>
+
+                        <div className="space-y-3 pt-2">
+                          {Array.isArray(activeScenario.solution_steps) && activeScenario.solution_steps.map((step, idx) => (
+                            <label
+                              key={idx}
+                              className={`flex items-start gap-3 p-3 rounded-xl border transition cursor-pointer select-none ${
+                                scenarioStepsCheck[idx]
+                                  ? 'bg-indigo-50/50 dark:bg-indigo-950/10 border-indigo-500/30 text-indigo-700 dark:text-indigo-400'
+                                  : 'bg-gray-50/50 dark:bg-gray-900/30 border-gray-100 dark:border-gray-800 text-gray-600 dark:text-gray-400 hover:border-gray-200 dark:hover:border-gray-750'
+                              }`}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!scenarioStepsCheck[idx]}
+                                onChange={(e) => {
+                                  setScenarioStepsCheck(prev => ({
+                                    ...prev,
+                                    [idx]: e.target.checked
+                                  }));
+                                }}
+                                className="mt-0.5 rounded border-gray-300 dark:border-gray-700 text-indigo-600 focus:ring-indigo-500"
+                              />
+                              <div className="text-xs font-semibold leading-relaxed">
+                                {checkedAnswers ? (
+                                  <span className="text-slate-800 dark:text-slate-100 block mb-1">
+                                    <span className="font-extrabold text-teal-500 uppercase tracking-wide">Official Guideline Step {idx + 1}:</span> {step}
+                                  </span>
+                                ) : (
+                                  <span>Step Option #{idx + 1} &bull; Check off when successfully processed</span>
+                                )}
+                              </div>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Right Column: Calculations & Verification */}
+                    <div className="lg:col-span-5 space-y-6">
+                      
+                      {/* Calculations Help / Formulas */}
+                      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm text-slate-100 text-left">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-teal-400">
+                          🧮 Pediatric Calculator Companion
+                        </h4>
+                        <p className="text-[11px] text-slate-400 leading-normal">
+                          Need mathematical calculations backing this case? Expand below for standard reference equations.
+                        </p>
+
+                        <button
+                          onClick={() => setRevealFormula(!revealFormula)}
+                          className="w-full bg-slate-950 hover:bg-slate-855 text-slate-300 border border-slate-800 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition"
+                        >
+                          {revealFormula ? 'Hide Reference Guidelines' : 'Reveal Reference Equations'}
+                        </button>
+
+                        {revealFormula && (
+                          <div className="p-3.5 rounded-xl bg-slate-950 border border-teal-500/20 text-teal-400 font-mono text-[11px] leading-relaxed animate-in fade-in duration-200">
+                            {activeScenario.formulas_used || 'Standard NBU care parameters apply.'}
+                          </div>
+                        )}
+
+                        {activeScenario.warning && (
+                          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-[11px] font-semibold leading-normal">
+                            ⚠️ <span className="font-extrabold uppercase tracking-wide">Clinical Risk Warning:</span> {activeScenario.warning}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Verification Controls */}
+                      <div className="bg-white dark:bg-gray-800 rounded-3xl border border-gray-100 dark:border-gray-700/60 p-6 space-y-4 shadow-sm">
+                        <h4 className="text-xs font-black uppercase tracking-wider text-gray-900 dark:text-white">
+                          ✅ Action Protocol Check
+                        </h4>
+
+                        {!checkedAnswers ? (
+                          <button
+                            onClick={() => setCheckedAnswers(true)}
+                            className="w-full bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3.5 rounded-2xl font-black text-xs uppercase tracking-wider transition shadow-lg shadow-indigo-600/10 active:scale-95"
+                          >
+                            Verify Actions & Check Solutions
+                          </button>
+                        ) : (
+                          <div className="space-y-4 animate-in fade-in duration-300 text-left">
+                            <div className="flex gap-2 items-center p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs font-black uppercase tracking-wider">
+                              <CheckCircle2 className="w-5 h-5 shrink-0" />
+                              Verification Succeeded!
+                            </div>
+                            <p className="text-[11px] text-gray-500 leading-normal">
+                              Compare your steps with the certified WHO clinical steps revealed in the list on the left side of the screen.
+                            </p>
+                            <button
+                              onClick={() => {
+                                setCheckedAnswers(false);
+                                setScenarioStepsCheck({});
+                              }}
+                              className="w-full bg-gray-100 dark:bg-gray-900 hover:bg-gray-250 dark:hover:bg-gray-750 text-gray-700 dark:text-gray-300 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition"
+                            >
+                              Restart Simulation Case
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+
+                </div>
+              )}
+
+            </div>
+          )}
+
+            {/* TAB 8: ADMIN PORTAL */}
+            {activeTab === 'admin' && (
+              <div className={`rounded-3xl border transition-all duration-300 overflow-hidden ${
+              isAdminLightMode 
+                ? 'bg-slate-50 border-slate-200 text-slate-800 shadow-xl shadow-slate-100/50' 
+                : 'bg-slate-950 border-slate-800 text-slate-100 shadow-2xl'
+            }`}>
+              
+              {/* Top Banner with Title, Light Mode Toggle, and HUD */}
+              <div className={`p-6 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-4 transition-all duration-300 text-left ${
+                isAdminLightMode 
+                  ? 'bg-white border-slate-200' 
+                  : 'bg-slate-900/40 border-slate-900'
+              }`}>
+                <div>
+                  <h3 className={`text-lg font-black tracking-tight ${
+                    isAdminLightMode ? 'text-slate-900' : 'text-white'
+                  }`}>Hospital Administration Portal</h3>
+                  <p className={`text-xs ${
+                    isAdminLightMode ? 'text-slate-500' : 'text-gray-400'
+                  }`}>Manage NBU clinical coverage, active nurse rosters, and access credentials.</p>
+                </div>
+                
+                {/* Light Mode Switcher & Security Banner */}
+                <div className="flex items-center gap-3">
+                  {/* Theme Selector Pill */}
+                  <button 
+                    onClick={() => setIsAdminLightMode(!isAdminLightMode)}
+                    className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition ${
+                      isAdminLightMode 
+                        ? 'bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200' 
+                        : 'bg-slate-800 hover:bg-slate-700 text-white border border-slate-700'
+                    }`}
+                  >
+                    {isAdminLightMode ? '🌙 Go Dark' : '☀️ Light Mode'}
+                  </button>
+
+                  <div className="flex items-center gap-2 bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-450 px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider">
+                    <ShieldAlert className="w-4 h-4 shrink-0" />
+                    Secure Vetting Active
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Sidebar Layout Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[600px]">
+                
+                {/* Left Side Navigation Panel */}
+                <aside className={`lg:col-span-3 p-6 border-r flex flex-col justify-between transition-all duration-300 text-left ${
+                  isAdminLightMode 
+                    ? 'bg-white border-slate-200' 
+                    : 'bg-slate-900/20 border-slate-900'
+                }`}>
+                  <div className="space-y-6">
+                    <span className={`text-[9px] font-black uppercase tracking-[0.25em] block ${
+                      isAdminLightMode ? 'text-slate-400' : 'text-gray-500'
+                    }`}>Admin Categories</span>
+                    
+                    <nav className="flex flex-col gap-1.5">
+                      <button
+                        onClick={() => setAdminSubTab('overview')}
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all text-left ${
+                          adminSubTab === 'overview'
+                            ? (isAdminLightMode 
+                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm shadow-indigo-100/50' 
+                                : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15')
+                            : (isAdminLightMode
+                                ? 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                : 'text-gray-400 hover:bg-slate-900 hover:text-white')
+                        }`}
+                      >
+                        <BarChart className="w-4 h-4" />
+                        Overview Stats
+                      </button>
+
+                      <button
+                        onClick={() => setAdminSubTab('vetting')}
+                        className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all text-left ${
+                          adminSubTab === 'vetting'
+                            ? (isAdminLightMode 
+                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm shadow-indigo-100/50' 
+                                : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15')
+                            : (isAdminLightMode
+                                ? 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                : 'text-gray-400 hover:bg-slate-900 hover:text-white')
+                        }`}
+                      >
+                        <span className="flex items-center gap-3">
+                          <UserCheck className="w-4 h-4" />
+                          Vetting Queue
+                        </span>
+                        {allUsers.filter(u => u.status === 'Pending').length > 0 && (
+                          <span className={`flex h-5 min-w-[20px] px-1.5 items-center justify-center rounded-full text-[9px] font-black font-mono leading-none ${
+                            adminSubTab === 'vetting'
+                              ? (isAdminLightMode ? 'bg-indigo-200 text-indigo-800' : 'bg-white text-indigo-600')
+                              : 'bg-amber-500 text-white animate-pulse'
+                          }`}>
+                            {allUsers.filter(u => u.status === 'Pending').length}
+                          </span>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => setAdminSubTab('directory')}
+                        className={`flex items-center gap-3 px-4 py-3.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all text-left ${
+                          adminSubTab === 'directory'
+                            ? (isAdminLightMode 
+                                ? 'bg-indigo-50 text-indigo-700 border border-indigo-100 shadow-sm shadow-indigo-100/50' 
+                                : 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/15')
+                            : (isAdminLightMode
+                                ? 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                : 'text-gray-400 hover:bg-slate-900 hover:text-white')
+                        }`}
+                      >
+                        <Users className="w-4 h-4" />
+                        Staff Directory
+                      </button>
+                    </nav>
+                  </div>
+
+                  {/* Sidebar Footer info */}
+                  <div className={`mt-10 pt-6 border-t text-[10px] space-y-2 font-semibold ${
+                    isAdminLightMode ? 'border-slate-100 text-slate-400' : 'border-slate-900 text-gray-500'
+                  }`}>
+                    <div className="flex justify-between">
+                      <span>Authority Level:</span>
+                      <strong className={isAdminLightMode ? 'text-slate-700' : 'text-gray-300'}>{auth.user.role}</strong>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Ward:</span>
+                      <strong className={isAdminLightMode ? 'text-slate-700' : 'text-gray-300'}>NBU Ward A / ICU</strong>
+                    </div>
+                  </div>
+                </aside>
+
+                {/* Right Side Content Panel */}
+                <main className={`lg:col-span-9 p-6 sm:p-8 transition-all duration-300 ${
+                  isAdminLightMode ? 'bg-slate-50' : 'bg-transparent'
+                }`}>
+                  
+                  {/* SUBTAB: OVERVIEW */}
+                  {adminSubTab === 'overview' && (
+                    <div className="space-y-8 animate-in fade-in duration-300 text-left">
+                      
+                      {/* Stat Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        <div className={`p-6 rounded-3xl border shadow-sm space-y-2 transition duration-300 ${
+                          isAdminLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-gray-800 border-gray-700/60 text-slate-100'
+                        }`}>
+                          <span className={`text-[10px] font-black uppercase tracking-widest block font-mono ${
+                            isAdminLightMode ? 'text-slate-400' : 'text-gray-500'
+                          }`}>Active Ward Staff</span>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-650 dark:text-indigo-400 rounded-2xl flex items-center justify-center border border-indigo-500/10">
+                              <Users className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <span className="text-3xl font-black">{allUsers.length}</span>
+                              <span className={`text-[10px] block font-semibold ${isAdminLightMode ? 'text-slate-400' : 'text-gray-500'}`}>Registered Users</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={`p-6 rounded-3xl border shadow-sm space-y-2 transition duration-300 ${
+                          isAdminLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-gray-800 border-gray-700/60 text-slate-100'
+                        }`}>
+                          <span className={`text-[10px] font-black uppercase tracking-widest block font-mono ${
+                            isAdminLightMode ? 'text-slate-400' : 'text-gray-500'
+                          }`}>Credentials Pending</span>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-amber-50 dark:bg-amber-950/30 text-amber-650 dark:text-amber-400 rounded-2xl flex items-center justify-center border border-amber-500/10">
+                              <Clock className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <span className={`text-3xl font-black ${allUsers.filter(u => u.status === 'Pending').length > 0 ? 'text-amber-505' : ''}`}>
+                                {allUsers.filter(u => u.status === 'Pending').length}
+                              </span>
+                              <span className={`text-[10px] block font-semibold ${isAdminLightMode ? 'text-slate-400' : 'text-gray-500'}`}>Awaiting Vetting</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={`p-6 rounded-3xl border shadow-sm space-y-2 transition duration-300 ${
+                          isAdminLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-gray-800 border-gray-700/60 text-slate-100'
+                        }`}>
+                          <span className={`text-[10px] font-black uppercase tracking-widest block font-mono ${
+                            isAdminLightMode ? 'text-slate-400' : 'text-gray-500'
+                          }`}>Verified Clinicians</span>
+                          <div className="flex items-center gap-4">
+                            <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-650 dark:text-emerald-400 rounded-2xl flex items-center justify-center border border-emerald-500/10">
+                              <CheckCircle2 className="w-6 h-6" />
+                            </div>
+                            <div>
+                              <span className="text-3xl font-black text-emerald-600">{allUsers.filter(u => u.status === 'Approved').length}</span>
+                              <span className={`text-[10px] block font-semibold ${isAdminLightMode ? 'text-slate-400' : 'text-gray-500'}`}>Fully Vetted</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Welcome HUD Panel */}
+                      <div className={`p-6 rounded-[32px] border text-left flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition ${
+                        isAdminLightMode 
+                          ? 'bg-gradient-to-br from-indigo-50/50 to-white border-indigo-100 shadow-sm' 
+                          : 'bg-gradient-to-br from-indigo-950/20 to-slate-900 border-indigo-500/10'
+                      }`}>
+                        <div className="space-y-2">
+                          <h4 className={`text-base font-extrabold ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                            System Authorization Guidelines
+                          </h4>
+                          <p className={`text-xs leading-relaxed max-w-xl font-medium ${isAdminLightMode ? 'text-slate-600' : 'text-gray-400'}`}>
+                            Verify newly registered nurses and pediatrician candidates using the **Vetting Queue**. Approved clinical credentials grant standard staff immediate database read/write access to neonate calculations and handover panels.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setAdminSubTab('vetting')}
+                          className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/10 shrink-0 transition"
+                        >
+                          Open Vetting Queue
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBTAB: VETTING QUEUE */}
+                  {adminSubTab === 'vetting' && (
+                    <div className="space-y-6 animate-in fade-in duration-300 text-left">
+                      <div>
+                        <h4 className={`text-sm font-black uppercase tracking-widest flex items-center gap-2 ${
+                          isAdminLightMode ? 'text-slate-800' : 'text-white'
+                        }`}>
+                          <UserCheck className="w-4 h-4 text-indigo-500" /> Pending Access Vetting
+                        </h4>
+                        <p className={`text-xs mt-1 ${isAdminLightMode ? 'text-slate-500' : 'text-gray-400'}`}>
+                          Activate or deny medical staff login requests. Please verify institutional ID credentials.
+                        </p>
+                      </div>
+
+                      {allUsers.filter(u => u.status === 'Pending').length === 0 ? (
+                        <div className={`p-12 rounded-[32px] border text-center font-semibold leading-relaxed transition ${
+                          isAdminLightMode 
+                            ? 'bg-white border-slate-200 text-slate-400 shadow-sm' 
+                            : 'bg-gray-800 border-gray-700/60 text-gray-400'
+                        }`}>
+                          <Check className="w-10 h-10 text-emerald-500 mx-auto mb-3" />
+                          <p className={`text-sm font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Vetting queue is empty!</p>
+                          <p className="text-xs mt-1 text-slate-400">All registered clinicians have been successfully approved.</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                          {allUsers.filter(u => u.status === 'Pending').map((user) => (
+                            <div key={user.id} className={`p-5 rounded-3xl border shadow-sm flex flex-col justify-between gap-4 transition ${
+                              isAdminLightMode ? 'bg-white border-slate-200 text-slate-800' : 'bg-gray-800 border-gray-700/60 text-slate-100'
+                            }`}>
+                              <div className="flex gap-4">
+                                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 text-sm font-black font-mono border ${
+                                  isAdminLightMode 
+                                    ? 'bg-indigo-50 border-indigo-100 text-indigo-600' 
+                                    : 'bg-indigo-950/40 border-indigo-900/35 text-indigo-400'
+                                }`}>
+                                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                </div>
+                                <div className="space-y-1 text-left">
+                                  <h5 className={`font-extrabold text-sm ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{user.name}</h5>
+                                  <span className={`text-[10px] font-black uppercase tracking-widest block font-mono ${
+                                    isAdminLightMode ? 'text-slate-400' : 'text-gray-500'
+                                  }`}>{user.email}</span>
+                                  <span className={`inline-block px-2.5 py-0.5 rounded text-[9px] font-black uppercase tracking-wider border ${
+                                    isAdminLightMode 
+                                      ? 'bg-indigo-50 border-indigo-100 text-indigo-650' 
+                                      : 'bg-indigo-950/20 border-indigo-500/10 text-indigo-400'
+                                  }`}>
+                                    {user.role}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className={`grid grid-cols-2 gap-2 text-[10px] font-semibold p-3 rounded-xl border ${
+                                isAdminLightMode 
+                                  ? 'bg-slate-50 border-slate-100 text-slate-500' 
+                                  : 'bg-slate-900/50 border-slate-800/80 text-gray-500'
+                              }`}>
+                                <div>
+                                  <span className="block text-[8px] font-black uppercase tracking-wider text-slate-400">ID Number</span>
+                                  <span className={`font-bold ${isAdminLightMode ? 'text-slate-805' : 'text-gray-300'}`}>{user.id_number || 'N/A'}</span>
+                                </div>
+                                <div>
+                                  <span className="block text-[8px] font-black uppercase tracking-wider text-slate-455">Phone Contact</span>
+                                  <span className={`font-bold ${isAdminLightMode ? 'text-slate-850' : 'text-gray-300'}`}>{user.phone || 'N/A'}</span>
+                                </div>
+                              </div>
+
+                              <div className={`flex items-center gap-3 pt-4 border-t ${
+                                isAdminLightMode ? 'border-slate-100' : 'border-slate-700/40'
+                              }`}>
+                                <button
+                                  onClick={() => router.post(`/admin/users/${user.id}/approve`)}
+                                  className="flex-1 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition duration-200"
+                                >
+                                  Approve Credentials
+                                </button>
+                                <button
+                                  onClick={() => router.post(`/admin/users/${user.id}/reject`)}
+                                  className={`py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-wider border transition duration-200 ${
+                                    isAdminLightMode 
+                                      ? 'bg-slate-50 hover:bg-rose-50 border-slate-200 hover:border-rose-200 text-slate-500 hover:text-rose-600' 
+                                      : 'bg-gray-900 hover:bg-rose-500/10 border-gray-700 text-gray-400 hover:text-rose-500'
+                                  }`}
+                                >
+                                  Deny
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB: STAFF DIRECTORY */}
+                  {adminSubTab === 'directory' && (
+                    <div className="space-y-6 animate-in fade-in duration-300 text-left">
+                      
+                      {/* Search Directory Filter */}
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h4 className={`text-sm font-black uppercase tracking-widest ${
+                            isAdminLightMode ? 'text-slate-850' : 'text-white'
+                          }`}>Clinical Staff Database</h4>
+                          <p className={`text-xs ${isAdminLightMode ? 'text-slate-500' : 'text-gray-400'}`}>
+                            Promote / reassign shift roles and configure permissions instantly.
+                          </p>
+                        </div>
+                        
+                        <div className="relative w-full sm:w-72">
+                          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                          <input
+                            type="text"
+                            placeholder="Search directory..."
+                            value={adminSearchTerm}
+                            onChange={(e) => setAdminSearchTerm(e.target.value)}
+                            className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-xs font-bold outline-none border transition ${
+                              isAdminLightMode 
+                                ? 'bg-white border-slate-200 text-slate-800 focus:border-indigo-400 shadow-inner' 
+                                : 'bg-slate-900 border-slate-800 text-slate-100 focus:border-indigo-500'
+                            }`}
+                          />
+                          {adminSearchTerm && (
+                            <button 
+                              onClick={() => setAdminSearchTerm('')} 
+                              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-250"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Directory Table */}
+                      <div className={`rounded-[32px] border overflow-hidden transition ${
+                        isAdminLightMode ? 'bg-white border-slate-200 shadow-sm' : 'bg-gray-800 border-gray-700/60 shadow-lg'
+                      }`}>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className={`text-[10px] font-black uppercase tracking-wider border-b transition ${
+                                isAdminLightMode 
+                                  ? 'bg-slate-50 border-slate-200 text-slate-400' 
+                                  : 'bg-gray-900 border-gray-700 text-gray-500'
+                              }`}>
+                                <th className="p-5">Name / Contact</th>
+                                <th className="p-5">Assigned Ward Role</th>
+                                <th className="p-5">Access Vetting Status</th>
+                                <th className="p-5">Administrative Tools</th>
+                              </tr>
+                            </thead>
+                            <tbody className={`divide-y text-xs font-semibold ${
+                              isAdminLightMode ? 'divide-slate-100 text-slate-700' : 'divide-slate-700/40 text-gray-300'
+                            }`}>
+                              {allUsers.filter(user => 
+                                user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                                user.email.toLowerCase().includes(adminSearchTerm.toLowerCase())
+                              ).length === 0 ? (
+                                <tr>
+                                  <td colSpan="4" className="p-10 text-center text-gray-400">
+                                    No records match your search filter criteria.
+                                  </td>
+                                </tr>
+                              ) : (
+                                allUsers.filter(user => 
+                                  user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                                  user.email.toLowerCase().includes(adminSearchTerm.toLowerCase())
+                                ).map((user) => (
+                                  <tr key={user.id} className={`transition ${
+                                    isAdminLightMode 
+                                      ? 'hover:bg-slate-50/50' 
+                                      : 'hover:bg-gray-900/30'
+                                  }`}>
+                                    <td className="p-5">
+                                      <div className="flex items-center gap-3">
+                                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-black font-mono shrink-0 border ${
+                                          isAdminLightMode 
+                                            ? 'bg-slate-100 border-slate-200/50 text-slate-500' 
+                                            : 'bg-slate-900 border-slate-700/50 text-gray-500'
+                                        }`}>
+                                          {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                        </div>
+                                        <div>
+                                          <span className={`font-extrabold block ${
+                                            isAdminLightMode ? 'text-slate-900' : 'text-white'
+                                          }`}>{user.name}</span>
+                                          <span className={`text-[10px] font-medium block mt-0.5 ${
+                                            isAdminLightMode ? 'text-slate-400' : 'text-gray-450'
+                                          }`}>{user.email}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="p-5">
+                                      <span className={`inline-block px-2.5 py-0.5 border rounded text-[9px] font-black uppercase tracking-wider ${
+                                        isAdminLightMode 
+                                          ? 'bg-slate-105 border-slate-200/60 text-slate-600' 
+                                          : 'bg-gray-900 border-gray-700/50 text-gray-300'
+                                      }`}>
+                                        {user.role}
+                                      </span>
+                                    </td>
+                                    <td className="p-5">
+                                      {user.status === 'Approved' && (
+                                        <span className="px-2.5 py-1 bg-emerald-100/75 dark:bg-emerald-950/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 rounded-full text-[9px] font-black uppercase tracking-wider">
+                                          Approved Access
+                                        </span>
+                                      )}
+                                      {user.status === 'Pending' && (
+                                        <span className="px-2.5 py-1 bg-amber-100/75 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 border border-amber-500/20 rounded-full text-[9px] font-black uppercase tracking-wider">
+                                          Awaiting Vetting
+                                        </span>
+                                      )}
+                                      {user.status === 'Rejected' && (
+                                        <span className="px-2.5 py-1 bg-rose-100/75 dark:bg-rose-950/20 text-rose-700 dark:text-rose-400 border border-rose-500/20 rounded-full text-[9px] font-black uppercase tracking-wider">
+                                          Denied Access
+                                        </span>
+                                      )}
+                                    </td>
+                                    <td className="p-5">
+                                      <div className="flex items-center gap-3">
+                                        <select
+                                          defaultValue={user.role}
+                                          onChange={(e) => {
+                                            router.post(`/admin/users/${user.id}/update-role`, {
+                                              role: e.target.value
+                                            });
+                                          }}
+                                          className={`p-2 border rounded-xl outline-none text-[11px] font-bold transition ${
+                                            isAdminLightMode 
+                                              ? 'bg-slate-50 border-slate-200 text-slate-700 focus:border-indigo-400' 
+                                              : 'bg-slate-900 border-slate-800 text-gray-100 focus:border-indigo-500'
+                                          }`}
+                                        >
+                                          <option value="Nursing In-Charge">Nursing In-Charge</option>
+                                          <option value="Nurse">Nurse</option>
+                                          <option value="Consultant Pediatrician">Consultant Pediatrician</option>
+                                          <option value="CO Pediatrics / MO">CO Pediatrics / MO</option>
+                                          <option value="Student">Student</option>
+                                          <option value="ICT / IT Support">ICT / IT Support</option>
+                                          <option value="Hospital Management">Hospital Management</option>
+                                        </select>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                </main>
               </div>
             </div>
           )}

@@ -18,14 +18,26 @@ class RegistrationTest extends TestCase
 
     public function test_new_users_can_register(): void
     {
+        \Illuminate\Support\Facades\DB::table('preauthorized_staff')->insert([
+            'hospital_id' => 'HOSP-1234',
+            'role' => 'Nurse',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'hospital_id' => 'HOSP-1234',
         ]);
 
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertDatabaseHas('users', [
+            'email' => 'test@example.com',
+            'hospital_id' => 'HOSP-1234',
+            'status' => 'Pending',
+        ]);
+        $response->assertRedirect(route('pending-approval'));
     }
 }
