@@ -77,21 +77,35 @@ hospital/
     └── package.json
 ```
 
-## Deployment
+## 🔑 Test Credentials
 
-### Deploying to Render
+Use these accounts to explore different roles within the system. The password for **all** accounts is `password`.
 
-This project is configured for one-click deployment using Render Blueprints.
+| Role | Email Address | Description |
+| :--- | :--- | :--- |
+| **System Admin** | `admin@neodesk.org` | Full access to logs, settings, and users. |
+| **Consultant** | `angela.omwansa@hospital.go.ke` | High-level clinical oversight. |
+| **Nurse In-Charge** | `teresa.njoroge@hospital.go.ke` | Ward management and staff approval. |
+| **Nurse** | `patrick.kamau@hospital.go.ke` | Vitals and handovers. |
+| **Medical Officer** | `cynthia.wekesa@hospital.go.ke` | Clinical calculations. |
 
-1.  **Database**: Create a free MongoDB cluster on [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-2.  **Connect Repo**: Push this project to GitHub and connect the repository to your Render account.
-3.  **Blueprints**: Render will automatically detect the `render.yaml` file. Click **Apply** to create the services.
-4.  **Environment Variables**:
-    -   In the `nbu-backend` service, add `MONGODB_URI` with your Atlas connection string.
-    -   The `JWT_SECRET` will be automatically generated, but you can override it if needed.
-    -   The `VITE_API_BASE_URL` for the frontend is automatically linked to the backend service.
+---
 
-## Clinical Safety Mandate
+## 🚀 Deployment (Render)
+
+This project is configured for deployment using Render Blueprints.
+
+1.  **Connect Repo**: Push this project to GitHub.
+2.  **Blueprints**: Render will detect `render.yaml`. Click **Apply**.
+3.  **Automatic Setup**: The system will automatically:
+    *   Provision a PostgreSQL database.
+    *   Build the Docker container.
+    *   Run migrations and seed the test users.
+
+---
+
+## Technical Specification
+
 
 NeoDesk is a decision-support tool designed to enhance clinical precision. It is not a substitute for professional clinical judgment. All software-generated calculations must be verified by a secondary clinician in accordance with standard neonatal ward protocols and institutional guidelines.
 
