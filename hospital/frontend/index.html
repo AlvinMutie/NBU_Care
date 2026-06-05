@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NBU Nurse Assistant – Full System</title>
+    <link rel="stylesheet" href="assets/css/styles.css" />
+  </head>
+  <body>
+    <div id="app">
+      <div class="topbar">
+        <div class="brand">
+          <div class="brandMark">NBU</div>
+          <div class="brandText">
+            <div class="brandTitle">NBU Nurse Assistant</div>
+            <div class="brandSub">Admission → Discharge guidance</div>
+          </div>
+        </div>
+        <div class="topbarRight">
+          <div id="netStatus" class="pill pillWarn" title="API connectivity status">Offline</div>
+          <button id="logoutBtn" class="btn btnGhost hidden" type="button">Logout</button>
+        </div>
+      </div>
+
+      <div class="layout">
+        <aside class="sidebar" id="sidebar">
+          <div class="sidebarSection">
+            <div class="sidebarTitle">Navigation</div>
+            <a class="navLink" href="#/flashcards" data-route="flashcards">Flashcards</a>
+            <a class="navLink" href="#/calculators" data-route="calculators">Calculators</a>
+            <a class="navLink" href="#/scenarios" data-route="scenarios">Scenarios</a>
+            <a class="navLink adminOnly hidden" href="#/admin/users" data-route="admin-users">Users</a>
+            <a class="navLink" href="#/display" data-route="display">Display Mode</a>
+          </div>
+
+          <div class="sidebarSection">
+            <div class="sidebarTitle">Filters</div>
+            <div class="filters">
+              <input id="searchInput" class="input" type="search" placeholder="Search..." autocomplete="off" />
+              <div class="chipRow">
+                <button class="chip" data-category="">All</button>
+                <button class="chip" data-category="ROUTINE">Routine</button>
+                <button class="chip" data-category="CLINICAL">Clinical</button>
+                <button class="chip" data-category="CRITICAL">Critical</button>
+                <button class="chip" data-category="CALCULATIONS">Calculations</button>
+              </div>
+              <label class="checkRow">
+                <input id="favoritesOnly" type="checkbox" />
+                <span>Favorites only</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="sidebarSection">
+            <div class="sidebarTitle">Signed in as</div>
+            <div id="meBox" class="meBox">Not signed in</div>
+          </div>
+        </aside>
+
+        <main class="main">
+          <div id="routeRoot"></div>
+        </main>
+      </div>
+
+      <div id="modalRoot" class="modalRoot hidden"></div>
+    </div>
+
+    <script src="assets/js/config.js"></script>
+    <script src="assets/js/app.js" type="module"></script>
+  </body>
+</html>
+
