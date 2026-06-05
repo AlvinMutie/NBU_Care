@@ -1,4 +1,4 @@
-import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
+import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm, router, Link } from '@inertiajs/react';
 import React, { useState, useEffect } from 'react';
 import { 
@@ -8,18 +8,21 @@ import {
   ChevronLeft, Search, Loader2, Scale,
   Pill, ClipboardCheck, X, Check, Plus, Calendar, Phone,
   ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart, BarChart2, CheckSquare, TrendingUp,
-  Calculator, BookOpen, BadgeCheck
+  Calculator, BookOpen, BadgeCheck, LayoutDashboard, FileCode, ExternalLink, ArrowUpRight
 } from 'lucide-react';
 
 export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [], flashcards = [], scenarios = [] }) {
-  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'rota', 'academics'
+  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'rota', 'academics', 'admin'
   const [registrySubTab, setRegistrySubTab] = useState('overview'); // 'overview', 'active-patients', 'handovers'
   const [calcSubTab, setCalcSubTab] = useState('calculator-workbench'); // 'overview', 'calculator-workbench'
   const [rotaSubTab, setRotaSubTab] = useState('overview'); // 'overview', 'rota-schedule'
   const [academySubTab, setAcademySubTab] = useState('overview'); // 'overview', 'flashcards', 'scenarios'
+  const [adminSubTab, setAdminSubTab] = useState('overview'); // 'overview', 'vetting', 'directory'
   
   const [flippedCardId, setFlippedCardId] = useState(null);
   const [flashcardCategory, setFlashcardCategory] = useState('All');
+  const [isAdminLightMode, setIsAdminLightMode] = useState(false);
+  const [adminSearchTerm, setAdminSearchTerm] = useState('');
 
   // Scenario States
   const [activeScenario, setActiveScenario] = useState(null);
@@ -449,348 +452,13 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
   );
 
   return (
-    <AuthenticatedLayout customLayout={true}>
+    <AppLayout activeTab={activeTab} setActiveTab={setActiveTab}>
       <Head title="Clinical Dashboard" />
       
-      {/* Outer Immersive Frame Container */}
-      <div className="flex h-screen w-screen overflow-hidden bg-[#F8F9FA] dark:bg-slate-950 font-sans text-slate-805 dark:text-slate-100 antialiased">
-        
-        {/* SIDEBAR 1: FAR-LEFT NARROW DARK ICON STRIP */}
-        <aside className="w-[72px] bg-slate-900 dark:bg-[#070B13] text-slate-400 flex flex-col justify-between py-6 items-center shrink-0 border-r border-slate-850/30 z-20 shadow-xl">
-          {/* Top Logo */}
-          <div className="flex flex-col items-center gap-6">
-            <div className="w-10 h-10 bg-indigo-650 hover:bg-indigo-500 text-white rounded-xl flex items-center justify-center cursor-pointer transition shadow-md shadow-indigo-600/20 active:scale-95">
-              <Baby className="w-5 h-5" />
-            </div>
+      <div className="space-y-8 animate-in fade-in duration-500">
             
-            {/* Navigation Strip */}
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={() => { setActiveTab('registry'); setRegistrySubTab('overview'); }}
-                title="Ward Registry"
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                  activeTab === 'registry'
-                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
-                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Baby className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => { setActiveTab('calculator'); setCalcSubTab('calculator-workbench'); }}
-                title="Clinical Calculator"
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                  activeTab === 'calculator'
-                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
-                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Calculator className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => { setActiveTab('rota'); setRotaSubTab('overview'); }}
-                title="Shift Roster"
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                  activeTab === 'rota'
-                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
-                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Calendar className="w-5 h-5" />
-              </button>
-
-              <button
-                onClick={() => { setActiveTab('academics'); setAcademySubTab('overview'); }}
-                title="Academics & Training"
-                className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                  activeTab === 'academics'
-                    ? 'bg-slate-800 text-white shadow-inner border border-slate-700/50'
-                    : 'hover:bg-slate-800/50 text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <BookOpen className="w-5 h-5" />
-              </button>
-
-              {['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'].includes(auth.user.role) && (
-                <Link
-                  href={route('admin.dashboard')}
-                  title="Admin Portal"
-                  className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
-                    route().current('admin.dashboard')
-                      ? 'bg-rose-950/20 text-rose-450 border border-rose-900/40 shadow-inner'
-                      : 'hover:bg-rose-950/10 text-rose-500 hover:text-rose-450'
-                  }`}
-                >
-                  <ShieldCheck className="w-5 h-5" />
-                </Link>
-              )}
-            </div>
-          </div>
-          
-          {/* Bottom Buttons */}
-          <div className="flex flex-col gap-4">
-            <button
-              title="Help Center"
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-450 hover:bg-slate-800/40 hover:text-slate-200 transition"
-            >
-              <Phone className="w-4 h-4" />
-            </button>
-            <button
-              title="System Information"
-              className="w-10 h-10 rounded-xl flex items-center justify-center text-slate-450 hover:bg-slate-800/40 hover:text-slate-200 transition"
-            >
-              <Info className="w-4 h-4" />
-            </button>
-          </div>
-        </aside>
-
-        {/* SIDEBAR 2: INNER CATEGORY SIDEBAR */}
-        <aside className="w-60 bg-white dark:bg-[#0c1220] border-r border-slate-200/50 dark:border-slate-850/40 flex flex-col justify-between p-6 shrink-0 z-10 text-left shadow-sm">
-          <div className="space-y-6">
-            {/* Header category name */}
-            <div>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-500 block mb-1">
-                {activeTab === 'registry' && 'Ward Registry'}
-                {activeTab === 'calculator' && 'Clinical Calculators'}
-                {activeTab === 'rota' && 'Shift Planner'}
-                {activeTab === 'academics' && 'Academics & Training'}
-              </span>
-              <h2 className="text-sm font-black text-slate-850 dark:text-slate-200 capitalize flex items-center gap-2">
-                {activeTab === 'registry' && <Baby className="w-4 h-4 text-indigo-500" />}
-                {activeTab === 'calculator' && <Calculator className="w-4 h-4 text-indigo-500" />}
-                {activeTab === 'rota' && <Calendar className="w-4 h-4 text-indigo-500" />}
-                {activeTab === 'academics' && <BookOpen className="w-4 h-4 text-indigo-500" />}
-                {activeTab}
-              </h2>
-            </div>
-
-            {/* List navigation links */}
-            <div className="space-y-6">
-              {/* Spaces Block */}
-              <div className="space-y-2">
-                <span className="text-[9px] font-black uppercase tracking-wider text-slate-400/80 block">SPACES</span>
-                <nav className="space-y-1">
-                  
-                  {activeTab === 'registry' && (
-                    <>
-                      <button
-                        onClick={() => setRegistrySubTab('overview')}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          registrySubTab === 'overview'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2.5">
-                          <Activity className="w-4 h-4" /> Workload Overview
-                        </span>
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      </button>
-
-                      <button
-                        onClick={() => setRegistrySubTab('active-patients')}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          registrySubTab === 'active-patients'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2.5">
-                          <Baby className="w-4 h-4" /> Active Patients
-                        </span>
-                        <span className="px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-650 dark:text-indigo-400 rounded-md text-[9px] font-black">{neonates.length}</span>
-                      </button>
-
-                      <button
-                        onClick={() => setRegistrySubTab('handovers')}
-                        className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          registrySubTab === 'handovers'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <span className="flex items-center gap-2.5">
-                          <ArrowRightLeft className="w-4 h-4" /> Shift Handovers
-                        </span>
-                      </button>
-                    </>
-                  )}
-
-                  {activeTab === 'calculator' && (
-                    <>
-                      <button
-                        onClick={() => setCalcSubTab('calculator-workbench')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          calcSubTab === 'calculator-workbench'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <Calculator className="w-4 h-4" /> Pipeline Calculator
-                      </button>
-                      <button
-                        onClick={() => setCalcSubTab('overview')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          calcSubTab === 'overview'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <Scale className="w-4 h-4" /> Formulary Reference
-                      </button>
-                    </>
-                  )}
-
-                  {activeTab === 'rota' && (
-                    <>
-                      <button
-                        onClick={() => setRotaSubTab('overview')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          rotaSubTab === 'overview'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-650 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <Activity className="w-4 h-4" /> Roster Analytics
-                      </button>
-                      <button
-                        onClick={() => setRotaSubTab('rota-schedule')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          rotaSubTab === 'rota-schedule'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <Calendar className="w-4 h-4" /> Duty Schedule
-                      </button>
-                    </>
-                  )}
-
-                  {activeTab === 'academics' && (
-                    <>
-                      <button
-                        onClick={() => setAcademySubTab('overview')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          academySubTab === 'overview'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <Activity className="w-4 h-4" /> Study Overview
-                      </button>
-                      <button
-                        onClick={() => setAcademySubTab('flashcards')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          academySubTab === 'flashcards'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <BookOpen className="w-4 h-4" /> Flashcards Manuals
-                      </button>
-                      <button
-                        onClick={() => setAcademySubTab('scenarios')}
-                        className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold transition-all ${
-                          academySubTab === 'scenarios'
-                            ? 'bg-slate-100 dark:bg-slate-850/50 text-indigo-600 dark:text-indigo-400 font-extrabold shadow-sm'
-                            : 'text-slate-655 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30'
-                        }`}
-                      >
-                        <CheckSquare className="w-4 h-4" /> Interactive Cases
-                      </button>
-                    </>
-                  )}
-
-                </nav>
-              </div>
-
-              {/* Self Services Block */}
-              <div className="space-y-2">
-                <span className="text-[9px] font-black uppercase tracking-wider text-slate-400/80 block">SELF SERVICES</span>
-                <nav className="space-y-1">
-                  <button
-                    onClick={() => { setActiveTab('academics'); setAcademySubTab('flashcards'); }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900/30"
-                  >
-                    <BookOpen className="w-4 h-4 text-slate-400" /> Knowledge Base
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
-
-          {/* Bottom user settings trigger */}
-          <div className="border-t border-slate-100 dark:border-slate-850/40 pt-4 flex flex-col gap-2">
-            <span className="text-[8px] font-black uppercase text-slate-450 dark:text-slate-500 tracking-wider block">ACCOUNT SETTINGS</span>
-            <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-900/40 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-black rounded-lg flex items-center justify-center text-[10px]">
-                  {auth.user.name.charAt(0).toUpperCase()}
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-[10px] font-black text-slate-850 dark:text-slate-200 truncate leading-tight">{auth.user.name}</p>
-                  <span className="text-[8px] font-bold text-slate-400 block truncate mt-0.5 leading-none">{auth.user.role}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </aside>
-
-        {/* MAIN CONTAINER: RIGHT VIEWPORT */}
-        <div className="flex-1 flex flex-col min-w-0 overflow-hidden bg-slate-50 dark:bg-[#070b13]">
-          
-          {/* Top HUD navigation / Breadcrumbs / Quick actions */}
-          <header className="h-16 bg-white dark:bg-[#090d16] border-b border-slate-200/50 dark:border-slate-850/40 flex items-center justify-between px-8 shrink-0 z-10 shadow-sm">
-            {/* Breadcrumbs */}
-            <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 dark:text-slate-500">
-              <span className="hover:text-slate-600 cursor-pointer">NBU Command</span>
-              <span>&rarr;</span>
-              <span className="capitalize hover:text-slate-600 cursor-pointer">{activeTab}</span>
-              <span>&rarr;</span>
-              <span className="text-slate-805 dark:text-slate-350 font-bold capitalize">
-                {activeTab === 'registry' && registrySubTab}
-                {activeTab === 'calculator' && calcSubTab}
-                {activeTab === 'rota' && rotaSubTab}
-                {activeTab === 'academics' && academySubTab}
-              </span>
-            </div>
-
-            {/* Right actions */}
-            <div className="flex items-center gap-4">
-              {/* Quick admission button contextually rendered */}
-              {activeTab === 'registry' && (
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-[10px] uppercase tracking-wider shadow-lg shadow-indigo-600/10 transition-all hover:scale-[1.01]"
-                >
-                  <Plus className="w-3.5 h-3.5" /> Admit Baby
-                </button>
-              )}
-
-              {/* Settings Info */}
-              <div className="w-px h-6 bg-slate-200 dark:bg-slate-800/80"></div>
-              
-              {/* Profile dropdown trigger */}
-              <div className="flex items-center gap-3">
-                <Link
-                  href={route('logout')}
-                  method="post"
-                  as="button"
-                  className="text-[10px] font-black text-slate-400 hover:text-rose-500 uppercase tracking-widest transition"
-                >
-                  Log Out
-                </Link>
-              </div>
-            </div>
-          </header>
-
-          {/* MAIN PAGE VIEWPORT BODY: SCROLLABLE WORKSPACE */}
-          <main className="flex-1 overflow-y-auto p-8 space-y-8 min-w-0">
-            
-            {/* SUBTAB 1.1: REGISTRY OVERVIEW STATS */}
-            {activeTab === 'registry' && registrySubTab === 'overview' && (
+            {/* TAB 0: OVERVIEW (SYSTEM DASHBOARD) */}
+            {activeTab === 'overview' && (
               <div className="space-y-8 text-left">
                 <div>
                   <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">Ward Command Center Overview</h3>
@@ -800,23 +468,41 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               </div>
             )}
             
-            {/* TAB 1: REGISTRY ACTIVE PATIENTS */}
-            {activeTab === 'registry' && registrySubTab === 'active-patients' && (
-            <div className="space-y-6">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                  <h3 className="text-lg font-black text-gray-900 dark:text-white">Active Ward Patients</h3>
-                  <p className="text-xs text-gray-500">Currently admitted in Neonatal Intensive Care.</p>
+            {/* TAB 1: REGISTRY (PATIENTS) */}
+            {activeTab === 'registry' && (
+              <div className="space-y-8 text-left">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                  <div>
+                    <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">Ward Registry</h3>
+                    <p className="text-xs text-gray-500">Manage neonatal admissions and clinical records.</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => setRegistrySubTab('active-patients')}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                        registrySubTab === 'active-patients'
+                          ? 'bg-indigo-600 text-white shadow-lg'
+                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500'
+                      }`}
+                    >
+                      Active Patients
+                    </button>
+                    <button
+                      onClick={() => setRegistrySubTab('handovers')}
+                      className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                        registrySubTab === 'handovers'
+                          ? 'bg-indigo-600 text-white shadow-lg'
+                          : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-500'
+                      }`}
+                    >
+                      Shift Handovers
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => setIsModalOpen(true)}
-                  className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-3 rounded-xl font-bold text-xs uppercase tracking-wider shadow-lg shadow-indigo-600/10 transition-all hover:scale-[1.02] active:scale-95"
-                >
-                  <Plus className="w-4 h-4" /> Admit Neonate
-                </button>
-              </div>
 
-              {/* Search Registry */}
+                {registrySubTab === 'active-patients' && (
+                  <div className="space-y-6">
+                    {/* Search Registry */}
               <div className="flex flex-col md:flex-row gap-4 items-center bg-white dark:bg-gray-800 p-4 rounded-2xl border border-gray-100 dark:border-gray-700/60 shadow-sm">
                 <div className="relative flex-1 w-full">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -2108,6 +1794,691 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
             </div>
           )}
 
+            {/* TAB 8: ADMIN PORTAL */}
+            {activeTab === 'admin' && (
+              <div className={`rounded-3xl border transition-all duration-300 overflow-hidden ${
+              isAdminLightMode 
+                ? 'bg-white border-slate-200 text-slate-800 shadow-xl shadow-slate-100/50' 
+                : 'bg-[#0f172a] border-slate-800 text-slate-100 shadow-2xl'
+            }`}>
+              
+              {/* Top Banner with Title, Light Mode Toggle, and HUD */}
+              <div className={`p-8 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all duration-300 text-left ${
+                isAdminLightMode 
+                  ? 'bg-slate-50 border-slate-200' 
+                  : 'bg-slate-900/40 border-slate-800/50'
+              }`}>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <ShieldCheck className={`w-6 h-6 ${isAdminLightMode ? 'text-indigo-600' : 'text-indigo-400'}`} />
+                    <h3 className={`text-xl font-black tracking-tight ${
+                      isAdminLightMode ? 'text-slate-900' : 'text-white'
+                    }`}>System Administration</h3>
+                  </div>
+                  <p className={`text-xs font-medium ${
+                    isAdminLightMode ? 'text-slate-500' : 'text-slate-400'
+                  }`}>Clinical coverage, nurse vetting, and system audit logs.</p>
+                </div>
+                
+                <div className="flex items-center gap-4">
+                  <button 
+                    onClick={() => setIsAdminLightMode(!isAdminLightMode)}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
+                      isAdminLightMode 
+                        ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200 shadow-sm' 
+                        : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700 shadow-lg shadow-black/20'
+                    }`}
+                  >
+                    {isAdminLightMode ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                    {isAdminLightMode ? 'Dark Theme' : 'Light Theme'}
+                  </button>
+
+                  <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-colors ${
+                    isAdminLightMode 
+                      ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
+                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                  }`}>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    Security Validated
+                  </div>
+                </div>
+              </div>
+
+              {/* Main Sidebar Layout Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[650px]">
+                
+                {/* Left Side Navigation Panel */}
+                <aside className={`lg:col-span-3 p-8 border-r flex flex-col justify-between transition-all duration-300 text-left ${
+                  isAdminLightMode 
+                    ? 'bg-slate-50/50 border-slate-200' 
+                    : 'bg-slate-900/30 border-slate-800/50'
+                }`}>
+                  <div className="space-y-8">
+                    <div className="space-y-4">
+                      <span className={`text-[10px] font-black uppercase tracking-[0.2em] block ${
+                        isAdminLightMode ? 'text-slate-400' : 'text-slate-500'
+                      }`}>Control Center</span>
+                      
+                      <nav className="flex flex-col gap-2">
+                        <button
+                          onClick={() => setAdminSubTab('overview')}
+                          className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
+                            adminSubTab === 'overview'
+                              ? (isAdminLightMode 
+                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
+                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
+                              : (isAdminLightMode
+                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
+                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
+                          }`}
+                        >
+                          <LayoutDashboard className={`w-4 h-4 transition-transform group-hover:scale-110`} />
+                          Analytics Overview
+                        </button>
+
+                        <button
+                          onClick={() => setAdminSubTab('vetting')}
+                          className={`flex items-center justify-between gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
+                            adminSubTab === 'vetting'
+                              ? (isAdminLightMode 
+                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
+                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
+                              : (isAdminLightMode
+                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
+                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
+                          }`}
+                        >
+                          <span className="flex items-center gap-3">
+                            <ShieldAlert className={`w-4 h-4 transition-transform group-hover:scale-110`} />
+                            Vetting Queue
+                          </span>
+                          {allUsers.filter(u => u.status === 'Pending').length > 0 && (
+                            <span className={`flex h-5 min-w-[20px] px-2 items-center justify-center rounded-lg text-[10px] font-black font-mono leading-none ${
+                              adminSubTab === 'vetting'
+                                ? (isAdminLightMode ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-indigo-600')
+                                : 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 animate-pulse'
+                            }`}>
+                              {allUsers.filter(u => u.status === 'Pending').length}
+                            </span>
+                          )}
+                        </button>
+
+                        <button
+                          onClick={() => setAdminSubTab('directory')}
+                          className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
+                            adminSubTab === 'directory'
+                              ? (isAdminLightMode 
+                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
+                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
+                              : (isAdminLightMode
+                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
+                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
+                          }`}
+                        >
+                          <Users className={`w-4 h-4 transition-transform group-hover:scale-110`} />
+                          Staff Management
+                        </button>
+
+                        <button
+                          onClick={() => setAdminSubTab('audit')}
+                          className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
+                            adminSubTab === 'audit'
+                              ? (isAdminLightMode 
+                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
+                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
+                              : (isAdminLightMode
+                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
+                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
+                          }`}
+                        >
+                          <FileCode className={`w-4 h-4 transition-transform group-hover:scale-110`} />
+                          System Audit Logs
+                        </button>
+                      </nav>
+                    </div>
+                  </div>
+
+                  {/* Sidebar Footer info */}
+                  <div className={`mt-10 pt-8 border-t space-y-4 transition-colors ${
+                    isAdminLightMode ? 'border-slate-100' : 'border-slate-800/50'
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-black ${
+                        isAdminLightMode ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-indigo-950 border-indigo-900 text-indigo-400'
+                      }`}>
+                        {auth.user.name[0]}
+                      </div>
+                      <div className="text-left overflow-hidden">
+                        <span className={`block text-[11px] font-black truncate ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                          {auth.user.name}
+                        </span>
+                        <span className={`block text-[9px] font-bold uppercase tracking-wider truncate ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                          {auth.user.role}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </aside>
+
+                {/* Right Side Content Panel */}
+                <main className={`lg:col-span-9 p-8 sm:p-10 transition-all duration-300 ${
+                  isAdminLightMode ? 'bg-white' : 'bg-[#0f172a]'
+                }`}>
+                  
+                  {/* SUBTAB: OVERVIEW */}
+                  {adminSubTab === 'overview' && (
+                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500 text-left">
+                      
+                      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                        <div className="space-y-1">
+                          <h4 className={`text-2xl font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>System Vitality</h4>
+                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Real-time overview of staff distribution and clinical credentials.</p>
+                        </div>
+                        <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border font-mono ${
+                          isAdminLightMode ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-slate-900/50 border-slate-800 text-slate-400'
+                        }`}>
+                          Last Updated: {new Date().toLocaleTimeString()}
+                        </div>
+                      </div>
+
+                      {/* Stat Grid */}
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                        <div className={`p-8 rounded-[32px] border transition-all duration-300 group hover:-translate-y-1 ${
+                          isAdminLightMode 
+                            ? 'bg-white border-slate-100 shadow-xl shadow-slate-100/40' 
+                            : 'bg-slate-900/40 border-slate-800 shadow-2xl shadow-black/20'
+                        }`}>
+                          <div className="flex flex-col gap-6">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
+                              isAdminLightMode ? 'bg-indigo-50 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400'
+                            }`}>
+                              <Users className="w-7 h-7" />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-4xl font-black tracking-tighter">{allUsers.length}</span>
+                              <span className={`text-[10px] block font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Total Registered Staff</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={`p-8 rounded-[32px] border transition-all duration-300 group hover:-translate-y-1 ${
+                          isAdminLightMode 
+                            ? 'bg-white border-slate-100 shadow-xl shadow-slate-100/40' 
+                            : 'bg-slate-900/40 border-slate-800 shadow-2xl shadow-black/20'
+                        }`}>
+                          <div className="flex flex-col gap-6">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
+                              isAdminLightMode ? 'bg-amber-50 text-amber-600' : 'bg-amber-500/10 text-amber-400'
+                            }`}>
+                              <ShieldAlert className="w-7 h-7" />
+                            </div>
+                            <div className="space-y-1">
+                              <span className={`text-4xl font-black tracking-tighter ${allUsers.filter(u => u.status === 'Pending').length > 0 ? (isAdminLightMode ? 'text-amber-600' : 'text-amber-400') : ''}`}>
+                                {allUsers.filter(u => u.status === 'Pending').length}
+                              </span>
+                              <span className={`text-[10px] block font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Awaiting Vetting</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className={`p-8 rounded-[32px] border transition-all duration-300 group hover:-translate-y-1 ${
+                          isAdminLightMode 
+                            ? 'bg-white border-slate-100 shadow-xl shadow-slate-100/40' 
+                            : 'bg-slate-900/40 border-slate-800 shadow-2xl shadow-black/20'
+                        }`}>
+                          <div className="flex flex-col gap-6">
+                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
+                              isAdminLightMode ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'
+                            }`}>
+                              <BadgeCheck className="w-7 h-7" />
+                            </div>
+                            <div className="space-y-1">
+                              <span className="text-4xl font-black tracking-tighter text-emerald-600 dark:text-emerald-400">
+                                {allUsers.filter(u => u.status === 'Approved').length}
+                              </span>
+                              <span className={`text-[10px] block font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Verified Clinicians</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Professional Info Panel */}
+                      <div className={`relative p-10 rounded-[40px] border overflow-hidden transition-all duration-500 ${
+                        isAdminLightMode 
+                          ? 'bg-indigo-600 border-indigo-500 shadow-2xl shadow-indigo-200' 
+                          : 'bg-indigo-900/40 border-indigo-500/20'
+                      }`}>
+                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
+                          <div className="space-y-4">
+                            <h4 className="text-2xl font-black text-white leading-tight tracking-tight">
+                              Credential Integrity Protocols
+                            </h4>
+                            <p className="text-sm text-indigo-100 leading-relaxed max-w-2xl font-medium opacity-90">
+                              Access to neonatal medical records is strictly governed by institutional vetting. Every clinical action is tied to a verified ID, ensuring high-fidelity audit trails for all neonatal interventions.
+                            </p>
+                            <div className="flex items-center gap-3 pt-2">
+                              <div className="flex -space-x-2">
+                                {[1,2,3,4].map(i => (
+                                  <div key={i} className="w-8 h-8 rounded-full border-2 border-indigo-600 bg-indigo-400 flex items-center justify-center text-[8px] font-black text-white">
+                                    {String.fromCharCode(64 + i)}
+                                  </div>
+                                ))}
+                              </div>
+                              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-200">
+                                4 Admin Users Online
+                              </span>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setAdminSubTab('vetting')}
+                            className={`px-8 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 shadow-2xl ${
+                              isAdminLightMode 
+                                ? 'bg-white text-indigo-600 shadow-black/10' 
+                                : 'bg-white text-indigo-900'
+                            }`}
+                          >
+                            Launch Vetting Interface
+                          </button>
+                        </div>
+                        {/* Decorative Background Elements */}
+                        <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
+                        <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-indigo-400/10 rounded-full blur-2xl" />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBTAB: VETTING QUEUE */}
+                  {adminSubTab === 'vetting' && (
+                    <div className="space-y-10 animate-in fade-in slide-in-from-right-2 duration-500 text-left">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h4 className={`text-2xl font-black tracking-tight flex items-center gap-3 ${
+                            isAdminLightMode ? 'text-slate-900' : 'text-white'
+                          }`}>
+                            Credential Vetting Queue
+                          </h4>
+                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                            Perform administrative review of medical staff registration requests.
+                          </p>
+                        </div>
+                      </div>
+
+                      {allUsers.filter(u => u.status === 'Pending').length === 0 ? (
+                        <div className={`p-20 rounded-[48px] border text-center transition-all duration-500 ${
+                          isAdminLightMode 
+                            ? 'bg-slate-50 border-slate-100 text-slate-400' 
+                            : 'bg-slate-900/20 border-slate-800 text-slate-500'
+                        }`}>
+                          <div className={`w-20 h-20 rounded-[32px] mx-auto mb-8 flex items-center justify-center border-2 transition-transform duration-500 hover:rotate-12 ${
+                            isAdminLightMode ? 'bg-white border-emerald-100 text-emerald-500 shadow-xl shadow-emerald-100/30' : 'bg-slate-800 border-emerald-500/20 text-emerald-400'
+                          }`}>
+                            <Check className="w-10 h-10" />
+                          </div>
+                          <h5 className={`text-xl font-black mb-2 ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Queue Fully Audited</h5>
+                          <p className="text-sm font-medium opacity-60">No pending clinician credentials require validation at this time.</p>
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {allUsers.filter(u => u.status === 'Pending').map((user) => (
+                            <div key={user.id} className={`p-8 rounded-[40px] border shadow-sm flex flex-col justify-between gap-8 transition-all duration-300 group hover:-translate-y-1 ${
+                              isAdminLightMode 
+                                ? 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-2xl hover:shadow-indigo-100/50' 
+                                : 'bg-slate-900/40 border-slate-800 hover:border-indigo-500/30'
+                            }`}>
+                              <div className="flex gap-6">
+                                <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center shrink-0 text-xl font-black font-mono border-2 transition-transform group-hover:scale-110 ${
+                                  isAdminLightMode 
+                                    ? 'bg-indigo-50 border-indigo-100 text-indigo-600 shadow-inner' 
+                                    : 'bg-indigo-950/40 border-indigo-500/20 text-indigo-400'
+                                }`}>
+                                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                </div>
+                                <div className="space-y-2 text-left pt-1">
+                                  <h5 className={`font-black text-lg tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{user.name}</h5>
+                                  <div className="flex flex-wrap gap-2">
+                                    <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
+                                      isAdminLightMode 
+                                        ? 'bg-slate-100 border-slate-200 text-slate-500' 
+                                        : 'bg-slate-800 border-slate-700 text-slate-400'
+                                    }`}>
+                                      {user.role}
+                                    </span>
+                                    <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border font-mono ${
+                                      isAdminLightMode 
+                                        ? 'bg-indigo-50 border-indigo-100 text-indigo-600' 
+                                        : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
+                                    }`}>
+                                      {user.email}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className={`grid grid-cols-2 gap-4 p-5 rounded-3xl border transition-colors ${
+                                isAdminLightMode 
+                                  ? 'bg-slate-50 border-slate-100' 
+                                  : 'bg-slate-950/50 border-slate-800/50'
+                              }`}>
+                                <div className="space-y-1">
+                                  <span className={`block text-[8px] font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Employee ID</span>
+                                  <span className={`text-[11px] font-black font-mono ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{user.id_number || 'UNASSIGNED'}</span>
+                                </div>
+                                <div className="space-y-1">
+                                  <span className={`block text-[8px] font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Contact Vector</span>
+                                  <span className={`text-[11px] font-black font-mono ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{user.phone || 'NO RECORD'}</span>
+                                </div>
+                              </div>
+
+                              <div className="flex items-center gap-4">
+                                <button
+                                  onClick={() => router.post(`/admin/users/${user.id}/approve`)}
+                                  className={`flex-1 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] transition-all shadow-lg active:scale-95 ${
+                                    isAdminLightMode 
+                                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-100' 
+                                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-900 shadow-emerald-500/10'
+                                  }`}
+                                >
+                                  Grant Authorization
+                                </button>
+                                <button
+                                  onClick={() => router.post(`/admin/users/${user.id}/reject`)}
+                                  className={`px-6 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] transition-all border active:scale-95 ${
+                                    isAdminLightMode 
+                                      ? 'bg-white hover:bg-rose-50 border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-100' 
+                                      : 'bg-slate-900 hover:bg-rose-500/10 border-slate-800 text-slate-500 hover:text-rose-400 hover:border-rose-500/20'
+                                  }`}
+                                >
+                                  Refuse
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* SUBTAB: STAFF DIRECTORY */}
+                  {adminSubTab === 'directory' && (
+                    <div className="space-y-10 animate-in fade-in slide-in-from-left-2 duration-500 text-left">
+                      
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                        <div className="space-y-1">
+                          <h4 className={`text-2xl font-black tracking-tight ${
+                            isAdminLightMode ? 'text-slate-900' : 'text-white'
+                          }`}>Global Staff Directory</h4>
+                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                            Audit clinical roles and modify database access permissions.
+                          </p>
+                        </div>
+                        
+                        <div className="relative w-full sm:w-80 group">
+                          <Search className={`w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
+                            isAdminLightMode ? 'text-slate-400 group-focus-within:text-indigo-500' : 'text-slate-500 group-focus-within:text-indigo-400'
+                          }`} />
+                          <input
+                            type="text"
+                            placeholder="Filter by name or identity..."
+                            value={adminSearchTerm}
+                            onChange={(e) => setAdminSearchTerm(e.target.value)}
+                            className={`w-full pl-11 pr-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider outline-none border transition-all ${
+                              isAdminLightMode 
+                                ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-indigo-400 focus:shadow-xl focus:shadow-indigo-100/40' 
+                                : 'bg-slate-900 border-slate-800 text-white focus:bg-slate-950 focus:border-indigo-500'
+                            }`}
+                          />
+                          {adminSearchTerm && (
+                            <button 
+                              onClick={() => setAdminSearchTerm('')} 
+                              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Directory Container */}
+                      <div className={`rounded-[40px] border overflow-hidden transition-all duration-300 ${
+                        isAdminLightMode 
+                          ? 'bg-white border-slate-100 shadow-2xl shadow-slate-100/50' 
+                          : 'bg-slate-900/30 border-slate-800 shadow-2xl shadow-black/20'
+                      }`}>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse min-w-[800px]">
+                            <thead>
+                              <tr className={`text-[10px] font-black uppercase tracking-[0.2em] border-b transition-colors ${
+                                isAdminLightMode 
+                                  ? 'bg-slate-50/50 border-slate-100 text-slate-400' 
+                                  : 'bg-slate-950/40 border-slate-800 text-slate-500'
+                              }`}>
+                                <th className="px-8 py-6">Medical Professional</th>
+                                <th className="px-8 py-6 text-center">Ward Role</th>
+                                <th className="px-8 py-6 text-center">Security Clearance</th>
+                                <th className="px-8 py-6 text-right">Administrative Action</th>
+                              </tr>
+                            </thead>
+                            <tbody className={`divide-y transition-colors ${
+                              isAdminLightMode ? 'divide-slate-50' : 'divide-slate-800/40'
+                            }`}>
+                              {allUsers.filter(user => 
+                                user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                                user.email.toLowerCase().includes(adminSearchTerm.toLowerCase())
+                              ).length === 0 ? (
+                                <tr>
+                                  <td colSpan="4" className="py-20 text-center">
+                                    <div className="flex flex-col items-center gap-4 opacity-40">
+                                      <Search className="w-10 h-10" />
+                                      <span className="text-xs font-black uppercase tracking-widest">Zero matches found</span>
+                                    </div>
+                                  </td>
+                                </tr>
+                              ) : (
+                                allUsers.filter(user => 
+                                  user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                                  user.email.toLowerCase().includes(adminSearchTerm.toLowerCase())
+                                ).map((user) => (
+                                  <tr key={user.id} className={`group transition-all duration-200 ${
+                                    isAdminLightMode 
+                                      ? 'hover:bg-indigo-50/30' 
+                                      : 'hover:bg-indigo-500/5'
+                                  }`}>
+                                    <td className="px-8 py-6">
+                                      <div className="flex items-center gap-4">
+                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black font-mono shrink-0 border-2 transition-transform group-hover:scale-110 ${
+                                          isAdminLightMode 
+                                            ? 'bg-white border-slate-100 text-slate-400 group-hover:border-indigo-200 group-hover:text-indigo-600' 
+                                            : 'bg-slate-950 border-slate-800 text-slate-600 group-hover:border-indigo-500/30 group-hover:text-indigo-400'
+                                        }`}>
+                                          {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                        </div>
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <span className={`text-sm font-black tracking-tight ${
+                                              isAdminLightMode ? 'text-slate-900' : 'text-white'
+                                            }`}>{user.name}</span>
+                                            {user.status === 'Approved' && (
+                                              <BadgeCheck className="w-4 h-4 text-indigo-500 fill-indigo-500/10" />
+                                            )}
+                                          </div>
+                                          <span className={`text-[10px] font-black font-mono block mt-1 uppercase tracking-wider ${
+                                            isAdminLightMode ? 'text-slate-400' : 'text-slate-500'
+                                          }`}>{user.email}</span>
+                                        </div>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                      <div className="flex justify-center">
+                                        <span className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-[0.1em] transition-colors ${
+                                          isAdminLightMode 
+                                            ? 'bg-white border-slate-100 text-slate-500 group-hover:border-indigo-100 group-hover:text-indigo-600' 
+                                            : 'bg-slate-950 border-slate-800 text-slate-400 group-hover:border-indigo-500/20 group-hover:text-indigo-400'
+                                        }`}>
+                                          {user.role}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                      <div className="flex flex-col items-center gap-1.5">
+                                        {user.status === 'Approved' ? (
+                                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            isAdminLightMode ? 'bg-emerald-50 text-emerald-700' : 'bg-emerald-500/10 text-emerald-400'
+                                          }`}>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                            Active Clearance
+                                          </div>
+                                        ) : user.status === 'Pending' ? (
+                                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            isAdminLightMode ? 'bg-amber-50 text-amber-700' : 'bg-amber-500/10 text-amber-400'
+                                          }`}>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+                                            Access Locked
+                                          </div>
+                                        ) : (
+                                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
+                                            isAdminLightMode ? 'bg-rose-50 text-rose-700' : 'bg-rose-500/10 text-rose-400'
+                                          }`}>
+                                            <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                                            Authorization Revoked
+                                          </div>
+                                        )}
+                                      </div>
+                                    </td>
+                                    <td className="px-8 py-6 text-right">
+                                      <div className="flex items-center justify-end gap-3">
+                                        <select
+                                          defaultValue={user.role}
+                                          onChange={(e) => {
+                                            router.post(`/admin/users/${user.id}/update-role`, {
+                                              role: e.target.value
+                                            });
+                                          }}
+                                          className={`px-4 py-2.5 rounded-xl outline-none text-[10px] font-black uppercase tracking-wider border transition-all appearance-none cursor-pointer pr-10 relative bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em] ${
+                                            isAdminLightMode 
+                                              ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white hover:border-indigo-300 focus:border-indigo-500' 
+                                              : 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-950 hover:border-indigo-700 focus:border-indigo-500'
+                                          }`}
+                                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E")` }}
+                                        >
+                                          <option value="Nursing In-Charge">Nursing In-Charge</option>
+                                          <option value="Nurse">Nurse</option>
+                                          <option value="Consultant Pediatrician">Consultant Pediatrician</option>
+                                          <option value="CO Pediatrics / MO">CO Pediatrics / MO</option>
+                                          <option value="Student">Student</option>
+                                          <option value="ICT / IT Support">ICT / IT Support</option>
+                                          <option value="Hospital Management">Hospital Management</option>
+                                        </select>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* SUBTAB: AUDIT LOGS */}
+                  {adminSubTab === 'audit' && (
+                    <div className="space-y-10 animate-in fade-in slide-in-from-top-2 duration-500 text-left">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <h4 className={`text-2xl font-black tracking-tight flex items-center gap-3 ${
+                            isAdminLightMode ? 'text-slate-900' : 'text-white'
+                          }`}>
+                            Clinical Ledger Audit
+                          </h4>
+                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                            Comprehensive immutable log of every clinical action, login, and system event.
+                          </p>
+                        </div>
+                        <button 
+                          className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider border transition-all ${
+                            isAdminLightMode ? 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'
+                          }`}
+                        >
+                          Export Ledger (.CSV)
+                        </button>
+                      </div>
+
+                      <div className={`rounded-[40px] border overflow-hidden transition-all duration-300 ${
+                        isAdminLightMode 
+                          ? 'bg-white border-slate-100 shadow-2xl shadow-slate-100/50' 
+                          : 'bg-slate-900/30 border-slate-800 shadow-2xl shadow-black/20'
+                      }`}>
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className={`text-[10px] font-black uppercase tracking-[0.2em] border-b ${
+                                isAdminLightMode ? 'bg-slate-50/50 text-slate-400 border-slate-100' : 'bg-slate-950/40 text-slate-500 border-slate-800'
+                              }`}>
+                                <th className="px-8 py-6">Timestamp</th>
+                                <th className="px-8 py-6">Actor</th>
+                                <th className="px-8 py-6">Clinical Action / System Event</th>
+                                <th className="px-8 py-6 text-right">Origin IP</th>
+                              </tr>
+                            </thead>
+                            <tbody className={`divide-y text-xs font-semibold ${
+                              isAdminLightMode ? 'divide-slate-50 text-slate-700' : 'divide-slate-800/40 text-slate-300'
+                            }`}>
+                              {auditLogs.length === 0 ? (
+                                <tr>
+                                  <td colSpan="4" className="py-20 text-center text-slate-400 font-black uppercase tracking-widest text-[10px]">
+                                    No ledger entries recorded in this session
+                                  </td>
+                                </tr>
+                              ) : (
+                                auditLogs.map((log) => (
+                                  <tr key={log.id} className={`transition-colors ${
+                                    isAdminLightMode ? 'hover:bg-slate-50/50' : 'hover:bg-indigo-500/5'
+                                  }`}>
+                                    <td className="px-8 py-6 font-mono text-[10px] font-black uppercase tracking-wider whitespace-nowrap opacity-60">
+                                      {new Date(log.created_at).toLocaleString()}
+                                    </td>
+                                    <td className="px-8 py-6">
+                                      <div className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-[9px] border ${
+                                          isAdminLightMode ? 'bg-slate-100 border-slate-200 text-slate-500' : 'bg-slate-800 border-slate-700 text-slate-400'
+                                        }`}>
+                                          {log.user ? log.user.name[0] : 'S'}
+                                        </div>
+                                        <span className={`font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                                          {log.user ? log.user.name : 'System'}
+                                        </span>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 py-6">
+                                      <div className="flex items-center gap-3">
+                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-[0.1em] border ${
+                                          log.action.includes('error') || log.action.includes('failed')
+                                            ? 'bg-rose-500/10 border-rose-500/20 text-rose-500'
+                                            : (isAdminLightMode ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400')
+                                        }`}>
+                                          {log.action.split(' ')[0]}
+                                        </span>
+                                        <span className="font-medium opacity-80">{log.action}</span>
+                                      </div>
+                                    </td>
+                                    <td className="px-8 py-6 text-right font-mono text-[10px] font-black opacity-40">
+                                      {log.ip_address || '127.0.0.1'}
+                                    </td>
+                                  </tr>
+                                ))
+                              )}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                </main>
+              </div>
+            </div>
+          )}
+          
           </main>
         </div>
       </div>
@@ -2606,6 +2977,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
           </div>
         </div>
       )}
-    </AuthenticatedLayout>
+      </div>
+    </AppLayout>
   );
 }

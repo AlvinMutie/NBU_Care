@@ -1,39 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, usePage } from '@inertiajs/react';
 import { 
   ShieldCheck, LayoutDashboard, Users, 
   ShieldAlert, FileCode, Bell, Search, 
   Menu, X, Moon, Sun, ChevronRight,
-  LogOut, User, Settings
+  LogOut, User, Settings, Baby, Calculator, Calendar, BookOpen, Activity, BarChart2
 } from 'lucide-react';
 
-export default function AdminLayout({ children }) {
-    const { auth } = usePage().props;
+export default function AppLayout({ children, activeTab, setActiveTab }) {
+    const { auth, allUsers = [] } = usePage().props;
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isDarkMode, setIsDarkMode] = useState(false);
 
-    const navigation = [
-        { name: 'Overview', icon: LayoutDashboard, href: 'admin.dashboard', subTab: 'overview' },
-        { name: 'Vetting Queue', icon: ShieldAlert, href: 'admin.dashboard', subTab: 'vetting', badge: 'pending' },
-        { name: 'Staff Directory', icon: Users, href: 'admin.dashboard', subTab: 'directory' },
-        { name: 'Audit Logs', icon: FileCode, href: 'admin.dashboard', subTab: 'audit' },
+    // Sidebar navigation based on user role and system features
+    const mainNavigation = [
+        { id: 'overview', name: 'Overview', icon: BarChart2, role: 'All' },
+        { id: 'registry', name: 'Ward Registry', icon: Baby, role: 'All' },
+        { id: 'calculator', name: 'Calculators', icon: Calculator, role: 'All' },
+        { id: 'rota', name: 'Shift Planner', icon: Calendar, role: 'All' },
+        { id: 'academics', name: 'Academics', icon: BookOpen, role: 'All' },
     ];
+
+    const adminNavigation = [
+        { id: 'admin', name: 'Admin Portal', icon: ShieldCheck, role: ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'] },
+    ];
+
+    const isAuthorized = (roles) => {
+        if (roles === 'All') return true;
+        return roles.includes(auth.user.role);
+    };
 
     return (
         <div className={`min-h-screen flex transition-colors duration-300 ${isDarkMode ? 'bg-[#0f172a] text-white' : 'bg-[#F8F9FA] text-slate-800'}`}>
             
             {/* Sidebar */}
-            <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#0c1220] text-slate-400 border-r border-slate-800/50 transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}>
+            <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-[#0c1220] text-slate-400 border-r border-slate-800/50 transition-transform duration-300 transform ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 shadow-2xl`}>
                 <div className="flex flex-col h-full">
                     {/* Brand Logo */}
                     <div className="p-8 border-b border-slate-800/40">
                         <div className="flex items-center gap-3">
                             <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-600/20">
-                                <ShieldCheck className="w-6 h-6 text-white" />
+                                <Activity className="w-6 h-6 text-white" />
                             </div>
                             <div>
                                 <h1 className="text-white font-black tracking-tighter text-lg leading-none">NBU Care</h1>
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Admin Portal</span>
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Management Suite</span>
                             </div>
                         </div>
                     </div>
@@ -41,14 +52,14 @@ export default function AdminLayout({ children }) {
                     {/* Navigation */}
                     <nav className="flex-1 p-6 space-y-8 overflow-y-auto">
                         <div className="space-y-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 block px-2">Control Center</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 block px-2">Medical Suite</span>
                             <div className="space-y-2">
-                                {navigation.map((item) => (
-                                    <Link
-                                        key={item.name}
-                                        href={route(item.href, { subTab: item.subTab })}
-                                        className={`flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all group ${
-                                            usePage().url.includes(`subTab=${item.subTab}`)
+                                {mainNavigation.filter(item => isAuthorized(item.role)).map((item) => (
+                                    <button
+                                        key={item.id}
+                                        onClick={() => setActiveTab(item.id)}
+                                        className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all group ${
+                                            activeTab === item.id
                                                 ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20'
                                                 : 'hover:bg-slate-800/50 hover:text-white'
                                         }`}
@@ -57,26 +68,52 @@ export default function AdminLayout({ children }) {
                                             <item.icon className="w-4 h-4" />
                                             {item.name}
                                         </div>
-                                        {item.badge === 'pending' && (
-                                            <span className="bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded-lg animate-pulse">
-                                                Active
-                                            </span>
-                                        )}
-                                    </Link>
+                                    </button>
                                 ))}
                             </div>
                         </div>
 
+                        {/* Admin Section if authorized */}
+                        {adminNavigation.some(item => isAuthorized(item.role)) && (
+                            <div className="space-y-4">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 block px-2">Administration</span>
+                                <div className="space-y-2">
+                                    {adminNavigation.filter(item => isAuthorized(item.role)).map((item) => (
+                                        <button
+                                            key={item.id}
+                                            onClick={() => setActiveTab(item.id)}
+                                            className={`w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all group ${
+                                                activeTab === item.id
+                                                    ? 'bg-rose-600 text-white shadow-xl shadow-rose-600/20'
+                                                    : 'hover:bg-slate-800/50 hover:text-white'
+                                            }`}
+                                        >
+                                            <div className="flex items-center gap-3">
+                                                <item.icon className="w-4 h-4" />
+                                                {item.name}
+                                            </div>
+                                            {allUsers.filter(u => u.status === 'Pending').length > 0 && (
+                                                <span className="bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded-lg animate-pulse">
+                                                    {allUsers.filter(u => u.status === 'Pending').length}
+                                                </span>
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         <div className="space-y-4">
-                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 block px-2">System</span>
+                            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 block px-2">Settings</span>
                             <div className="space-y-2">
-                                <Link className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all hover:bg-slate-800/50 hover:text-white">
-                                    <Settings className="w-4 h-4" />
-                                    Configurations
-                                </Link>
-                                <Link href={route('dashboard')} className="flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all hover:bg-slate-800/50 hover:text-white">
+                                <Link 
+                                    href={route('logout')} 
+                                    method="post" 
+                                    as="button"
+                                    className="w-full flex items-center gap-3 px-4 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all hover:bg-rose-500/20 hover:text-rose-400"
+                                >
                                     <LogOut className="w-4 h-4" />
-                                    Exit to Clinical
+                                    Sign Out
                                 </Link>
                             </div>
                         </div>
@@ -129,15 +166,6 @@ export default function AdminLayout({ children }) {
                     </div>
 
                     <div className="flex items-center gap-4">
-                        <div className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border ${
-                            isDarkMode 
-                                ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' 
-                                : 'bg-emerald-50 border-emerald-100 text-emerald-600'
-                        }`}>
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            Security Validated
-                        </div>
-
                         <button 
                             onClick={() => setIsDarkMode(!isDarkMode)}
                             className={`p-2.5 rounded-xl border transition-all ${

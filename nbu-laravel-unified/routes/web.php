@@ -263,12 +263,39 @@ Route::middleware('auth')->group(function () {
         return redirect()->back()->with('success', 'Duty rota scheduled successfully.');
     });
 
-    // ADMIN PORTAL ROUTES
-    Route::middleware('auth')->prefix('admin')->group(function () {
-        Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminController::class, 'index'])->name('admin.dashboard');
-        Route::post('/users/{user}/approve', [\App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('admin.users.approve');
-        Route::post('/users/{user}/reject', [\App\Http\Controllers\Admin\VerificationController::class, 'reject'])->name('admin.users.reject');
-        Route::post('/users/{user}/update-role', [\App\Http\Controllers\Admin\AdminController::class, 'updateRole'])->name('admin.users.update-role');
+    // Approve user registration
+    Route::post('/admin/users/{user}/approve', [\App\Http\Controllers\Admin\VerificationController::class, 'approve']);
+
+    // Reject user registration
+    Route::post('/admin/users/{user}/reject', [\App\Http\Controllers\Admin\VerificationController::class, 'reject']);
+
+    // Update user role
+    Route::post('/admin/users/{user}/update-role', function (\App\Models\User $user, \Illuminate\Http\Request $request) {
+        if (!in_array(auth()->user()->role, ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support'])) {
+            return redirect()->back()->withErrors(['role' => 'Unauthorized action.']);
+        }
+
+        $validated = $request->validate([
+            'role' => 'required|string|in:Nursing In-Charge,Nurse,Consultant Pediatrician,CO Pediatrics / MO,Student,ICT / IT Support,Hospital Management',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $user->id)
+            ->update([
+                'role' => $validated['role'],
+            ]);
+
+        // Audit log
+        \Illuminate\Support\Facades\DB::table('audit_logs')->insert([
+            'user_id' => auth()->id(),
+            'action' => "USER ROLE UPDATED: Changed role of {$user->name} to {$validated['role']}",
+            'type' => 'Medication',
+            'status' => 'Checked',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return redirect()->back()->with('success', "Updated role for {$user->name} to {$validated['role']} successfully.");
     });
 
     // NEONATAL CLINICAL PROFILE ROUTES
