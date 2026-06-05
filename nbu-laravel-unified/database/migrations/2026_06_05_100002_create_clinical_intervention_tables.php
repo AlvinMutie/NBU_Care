@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('summary_value')->nullable(); // Main result if single
             $table->string('unit')->nullable();
             $table->string('reference_range')->nullable();
-            $table->enum('status', ['Pending', 'Completed', 'Flagged']).default('Pending');
+            $table->enum('status', ['Pending', 'Completed', 'Flagged'])->default('Pending');
             $table->timestamp('ordered_at')->useCurrent();
             $table->timestamp('result_at')->nullable();
             $table->timestamps();
