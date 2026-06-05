@@ -1,12 +1,10 @@
 services:
-  # Laravel Backend & Unified Frontend
+  # Laravel Backend & Unified Frontend (Docker)
   - type: web
     name: nbu-laravel-unified
-    runtime: php
+    runtime: docker
     plan: free
     rootDir: nbu-laravel-unified
-    buildCommand: composer install --no-dev && npm install && npm run build
-    startCommand: php artisan migrate --force && apache2-foreground
     envVars:
       - key: APP_ENV
         value: production
