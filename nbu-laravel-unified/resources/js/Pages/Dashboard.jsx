@@ -581,8 +581,10 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                   ))}
                 </div>
               )}
-            </div>
-          )}
+                  </div>
+                )}
+              </div>
+            )}
 
           {/* TAB 2: CALCULATOR PIPELINE */}
           {activeTab === 'calculator' && calcSubTab === 'calculator-workbench' && (
@@ -2478,10 +2480,6 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
               </div>
             </div>
           )}
-          
-          </main>
-        </div>
-      </div>
 
       {/* Patient Admission Modal Dialog */}
       {isModalOpen && (
