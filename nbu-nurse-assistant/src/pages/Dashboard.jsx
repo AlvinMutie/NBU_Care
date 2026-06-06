@@ -60,7 +60,6 @@ const CapacityChart = ({ data = [65, 82, 45, 90, 70, 55, 85], label = "H", ariaT
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
             {label}{i+1}
           </div>
-          {/* Tooltip or Screen Reader description */}
           <div className="sr-only">Metric for {label}{i+1}: {height}%</div>
         </div>
       ))}
@@ -144,42 +143,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6 text-left">
-          {/* Main Infographic Section */}
-          <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm group hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
-             <div className="flex items-center justify-between mb-10">
-                <div>
-                   <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
-                      <TrendingUp className="w-5 h-5 text-primary" /> Admission Velocity
-                   </h3>
-                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Average admissions per day over the last 7 days.</p>
-                </div>
-                <div className="flex gap-2">
-                   <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 dark:border-slate-800">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Active
-                   </div>
-                </div>
-             </div>
-             
-             <CapacityChart data={[40, 55, 30, 80, 60, 45, 90]} label="D" ariaTitle="Clinical Admission Velocity Chart" />
-             
-             <div className="mt-12 pt-8 border-t border-slate-50 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-6">
-                {[
-                  { l: 'Max Load', v: '100%', i: Zap, c: 'text-amber-500' },
-                  { l: 'Avg Stay', v: '12d', i: Clock, c: 'text-primary' },
-                  { l: 'Beds Avail', v: '04', i: BarChart3, c: 'text-indigo-500' },
-                  { l: 'Error Margin', v: '0%', i: ShieldCheck, c: 'text-emerald-500' }
-                ].map((item, i) => (
-                  <div key={i} className="space-y-1">
-                     <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
-                        <item.i className={`w-3 h-3 ${item.c}`} /> {item.l}
-                     </p>
-                     <p className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{item.v}</p>
-                  </div>
-                ))}
-             </div>
-          </div>
-
-          <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[500px] hover:shadow-2xl transition-all duration-500">
+          <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[600px] hover:shadow-2xl transition-all duration-500">
             <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-900/30">
                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
                   <ActivityIcon className="w-5 h-5 text-primary" /> Unit Action Audit
@@ -235,7 +199,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
 
         <div className="space-y-6 text-left">
            {/* Workforce Health */}
-           <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[400px] flex flex-col justify-between" role="region" aria-label="Shift dynamics overview">
+           <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[300px] flex flex-col justify-between" role="region" aria-label="Shift dynamics overview">
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 dark:bg-white/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
               <div className="relative z-10">
                  <div className="flex items-center justify-between mb-8">
@@ -253,10 +217,6 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                        <CheckCircle2 className="w-5 h-5 text-primary dark:text-white" />
                        <span className="text-xs font-bold text-white tracking-wide">All Shifts Staffed</span>
                     </div>
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-                       <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                       <span className="text-xs font-bold text-white tracking-wide">Manager-on-Duty Verified</span>
-                    </div>
                  </div>
               </div>
               
@@ -268,24 +228,28 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
               </button>
            </div>
 
-           {/* Role Distribution Infographic */}
-           <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm" role="region" aria-label="Clinician role distribution chart">
-              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Role Distribution</h3>
-              <div className="space-y-6">
+           {/* Unit Quick Access */}
+           <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm group hover:shadow-xl transition-all">
+              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Admin Quick Access</h3>
+              <div className="space-y-3">
                  {[
-                   { l: 'Consultants', v: '15%', c: 'bg-primary' },
-                   { l: 'Nurses', v: '65%', c: 'bg-indigo-500' },
-                   { l: 'Students', v: '20%', c: 'bg-teal-400' }
-                 ].map((role, i) => (
-                    <div key={i} className="space-y-2 text-left">
-                       <div className="flex justify-between items-center text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">
-                          <span>{role.l}</span>
-                          <span>{role.v}</span>
+                   { l: 'Staff Registry', p: 'manage-staff', i: Users },
+                   { l: 'Verification Queue', p: 'verification-queue', i: ShieldCheck },
+                   { l: 'System Settings', p: 'settings', i: Database }
+                 ].map((link, i) => (
+                    <button 
+                      key={i}
+                      onClick={() => onNavigate(link.p)}
+                      className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all text-left group/item"
+                    >
+                       <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover/item:text-primary transition-colors border border-slate-100 dark:border-slate-700">
+                             <link.i className="w-5 h-5" />
+                          </div>
+                          <span className="text-sm font-black text-slate-900 dark:text-white">{link.l}</span>
                        </div>
-                       <div className="h-2 bg-slate-50 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div className={`h-full ${role.c} transition-all duration-1000`} style={{ width: role.v }} aria-valuenow={parseInt(role.v)} aria-valuemin="0" aria-valuemax="100" role="progressbar" />
-                       </div>
-                    </div>
+                       <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover/item:text-primary group-hover/item:translate-x-1 transition-all" />
+                    </button>
                  ))}
               </div>
            </div>
