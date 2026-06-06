@@ -5,7 +5,7 @@ import {
   Activity as ActivityIcon, HeartPulse, Stethoscope, ChevronRight,
   Database, ShieldCheck, AlertCircle, HelpCircle, Loader2,
   TrendingUp, BarChart3, PieChart, BookOpen, ClipboardCheck,
-  CheckCircle2, Target, Award
+  CheckCircle2, Target, Award, Shield
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -44,30 +44,7 @@ const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) =>
   </div>
 );
 
-const CapacityChart = ({ data = [65, 82, 45, 90, 70, 55, 85], label = "H", ariaTitle = "System Metric Chart" }) => {
-  return (
-    <div className="h-40 flex items-end justify-between gap-2 px-2" role="img" aria-label={ariaTitle}>
-      {data.map((height, i) => (
-        <div key={i} className="flex-1 group relative">
-          <div 
-            className="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg group-hover:bg-primary/30 dark:group-hover:bg-primary/20 transition-all duration-500 relative overflow-hidden h-full"
-          >
-            <div 
-              className="absolute bottom-0 left-0 w-full bg-primary rounded-t-lg transition-all duration-700 ease-out-expo"
-              style={{ height: `${height}%`, animationDelay: `${i * 100}ms` }}
-            />
-          </div>
-          <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
-            {label}{i+1}
-          </div>
-          <div className="sr-only">Metric for {label}{i+1}: {height}%</div>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-// --- ADMIN / IN-CHARGE DASHBOARD ---
+// --- ADMIN / IN-CHARGE DASHBOARD (SURGICAL CLEANUP: NO INFOGRAPHICS) ---
 
 const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
   const [logs, setLogs] = useState([]);
@@ -122,14 +99,14 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
          <div className="text-left">
             <h2 className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 ml-1">Unit Command Center</h2>
             <div className="flex items-center gap-3">
-               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left leading-none">Management Hub<span className="text-primary text-5xl">.</span></h1>
+               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left leading-none italic">Unit Executive Overview<span className="text-primary text-5xl">.</span></h1>
                <BlueTick className="w-7 h-7" />
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Global oversight of clinical precision and workforce.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Surgical oversight of clinical precision, audit trails, and unit staffing.</p>
          </div>
          <div className="flex items-center gap-3">
             <div className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-black text-slate-600 dark:text-slate-400 flex items-center gap-3 shadow-sm">
-               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Live Monitoring
+               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Data Environment: Live
             </div>
          </div>
       </div>
@@ -141,25 +118,26 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
         <StatCard title="Safety Index" value="99.8%" icon={ShieldCheck} colorClass="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 space-y-6 text-left">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Main Feed: Shift Logs (Expanded to take more space) */}
+        <div className="lg:col-span-8 space-y-6 text-left">
           <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[600px] hover:shadow-2xl transition-all duration-500">
             <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-900/30">
                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
-                  <ActivityIcon className="w-5 h-5 text-primary" /> Unit Action Audit
+                  <ActivityIcon className="w-5 h-5 text-primary" /> Shift Action Ledger
                </h3>
                <button 
                  onClick={() => onNavigate('audit-logs')}
                  className="text-xs font-black text-primary hover:underline transition-all uppercase tracking-widest"
                >
-                 History
+                 View Full Vault
                </button>
             </div>
             <div className="flex-1 overflow-y-auto custom-scrollbar">
               {logsLoading ? (
                 <div className="flex flex-col items-center justify-center py-24">
                   <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Encrypting live data...</p>
+                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Accessing secure logs...</p>
                 </div>
               ) : (
                 <table className="w-full text-left border-collapse" aria-label="Recent system logs">
@@ -176,12 +154,12 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                         <td className="px-8 py-6">
                           <div className="flex flex-col">
                             <span className="text-sm font-black text-slate-800 dark:text-slate-200 tracking-tight leading-none mb-1">{log.action}</span>
-                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight">{log.type}</span>
+                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight">{log.type} Module</span>
                           </div>
                         </td>
                         <td className="px-8 py-6">
                            <div className="flex items-center gap-2">
-                              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{log.user?.name || 'Unknown'}</span>
+                              <span className="text-sm font-bold text-slate-700 dark:text-slate-300">{log.user?.name || 'Staff'}</span>
                               <BlueTick className="w-3.5 h-3.5" />
                            </div>
                         </td>
@@ -197,60 +175,68 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
           </div>
         </div>
 
-        <div className="space-y-6 text-left">
-           {/* Workforce Health */}
-           <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[300px] flex flex-col justify-between" role="region" aria-label="Shift dynamics overview">
+        {/* Sidebar: Admin Controls & Stats (NO INFOGRAPHICS) */}
+        <div className="lg:col-span-4 space-y-6 text-left">
+           {/* Workforce Health - Re-styled as Status Cards */}
+           <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[250px] flex flex-col justify-between" role="region" aria-label="Shift dynamics overview">
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 dark:bg-white/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
               <div className="relative z-10">
                  <div className="flex items-center justify-between mb-8">
                     <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary dark:text-white border border-white/5 backdrop-blur-xl">
                       <Users className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Workforce Performance</span>
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Unit Personnel</span>
                  </div>
                  
-                 <h3 className="text-3xl font-black text-white tracking-tighter mb-4 leading-none text-left">Shift Rota <br />Dynamics<span className="text-primary dark:text-white/50 text-4xl">.</span></h3>
-                 <p className="text-sm text-slate-400 dark:text-white/70 font-medium mb-8">System audit indicates 100% shift coverage for the upcoming 48 hours.</p>
-                 
-                 <div className="space-y-3">
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
-                       <CheckCircle2 className="w-5 h-5 text-primary dark:text-white" />
-                       <span className="text-xs font-bold text-white tracking-wide">All Shifts Staffed</span>
-                    </div>
-                 </div>
+                 <h3 className="text-3xl font-black text-white tracking-tighter mb-4 leading-none text-left">Shift Rota <br />Status<span className="text-primary dark:text-white/50 text-4xl">.</span></h3>
+                 <p className="text-sm text-slate-400 dark:text-white/70 font-medium mb-6">Unit audit indicates 100% clinical coverage across all upcoming shifts.</p>
               </div>
               
               <button 
                 onClick={() => onNavigate('rota')}
-                className="relative z-10 w-full py-5 bg-white text-slate-900 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all active:scale-95 mt-8"
+                className="relative z-10 w-full py-4 bg-white text-slate-900 rounded-[20px] font-black text-[10px] uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all active:scale-95"
               >
-                 Manage Team Schedule
+                 Open Schedule Manager
               </button>
            </div>
 
-           {/* Unit Quick Access */}
+           {/* Admin Quick Access - Pure Data-Driven Links */}
            <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm group hover:shadow-xl transition-all">
-              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Admin Quick Access</h3>
+              <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Management Controls</h3>
               <div className="space-y-3">
                  {[
-                   { l: 'Staff Registry', p: 'manage-staff', i: Users },
-                   { l: 'Verification Queue', p: 'verification-queue', i: ShieldCheck },
-                   { l: 'System Settings', p: 'settings', i: Database }
+                   { l: 'Clinician Registry', p: 'manage-staff', i: Users, d: 'Permissions & Access' },
+                   { l: 'Identity Verification', p: 'verification-queue', i: ShieldCheck, d: `${pendingCount} Pending Approval` },
+                   { l: 'Clinical Standards', p: 'settings', i: Shield, d: 'v16.0 Safety Config' }
                  ].map((link, i) => (
                     <button 
                       key={i}
                       onClick={() => onNavigate(link.p)}
-                      className="w-full flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all text-left group/item"
+                      className="w-full flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 transition-all text-left group/item"
                     >
                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover/item:text-primary transition-colors border border-slate-100 dark:border-slate-700">
+                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover/item:text-primary transition-colors border border-slate-100 dark:border-slate-700 shadow-sm">
                              <link.i className="w-5 h-5" />
                           </div>
-                          <span className="text-sm font-black text-slate-900 dark:text-white">{link.l}</span>
+                          <div className="flex flex-col">
+                             <span className="text-sm font-black text-slate-900 dark:text-white leading-tight">{link.l}</span>
+                             <span className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-0.5">{link.d}</span>
+                          </div>
                        </div>
                        <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover/item:text-primary group-hover/item:translate-x-1 transition-all" />
                     </button>
                  ))}
+              </div>
+           </div>
+
+           {/* System Integrity Badge */}
+           <div className="p-6 bg-emerald-50 dark:bg-emerald-900/10 rounded-[32px] border border-emerald-100 dark:border-emerald-900/30 flex items-center gap-4 shadow-inner">
+              <div className="w-10 h-10 bg-white dark:bg-slate-900 rounded-xl flex items-center justify-center text-emerald-500 border border-emerald-100 dark:border-emerald-800 shadow-sm">
+                 <ShieldCheck className="w-6 h-6" />
+              </div>
+              <div>
+                 <p className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">Protocol Integrity</p>
+                 <p className="text-xs font-black text-emerald-900 dark:text-emerald-200">v16.2 Verified Core</p>
               </div>
            </div>
         </div>
@@ -262,7 +248,6 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
 // --- CLINICIAN (NURSE / MO) DASHBOARD ---
 
 const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
-  const [personalStats, setPersonalStats] = useState({ doses: 84, handovers: 12, precision: 100 });
   const [activeCases, setActiveCases] = useState([]);
 
   useEffect(() => {
@@ -294,14 +279,14 @@ const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-        <StatCard title="My Doses Today" value={personalStats.doses} icon={Droplets} colorClass="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" />
-        <StatCard title="Handovers Pending" value="02" icon={ClipboardCheck} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" />
+        <StatCard title="Total Ward Patients" value={stats.neonates || '24'} icon={ActivityIcon} colorClass="bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400" />
         <StatCard title="Personal Accuracy" value="100%" icon={Target} colorClass="bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400" />
+        <StatCard title="Safety Protocols" value="v4.2" icon={ShieldCheck} colorClass="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
          {/* Shift Action Center */}
-         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden flex flex-col h-full min-h-[450px]" role="region" aria-label="Shift priority actions">
+         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden flex flex-col h-full min-h-[400px]" role="region" aria-label="Shift priority actions">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4" />
             <div className="relative z-10 flex flex-col h-full">
                <div className="flex items-center justify-between mb-12">
@@ -348,7 +333,7 @@ const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
                {activeCases.map((n, i) => (
                   <div key={i} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 group/item hover:border-primary/30 transition-all">
                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover/item:text-primary transition-colors border border-slate-100 dark:border-slate-700">
+                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover/item:text-primary transition-colors border border-slate-100 dark:border-slate-700 shadow-sm">
                            <User className="w-5 h-5" />
                         </div>
                         <div className="text-left">
@@ -380,8 +365,6 @@ const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
 // --- STUDENT / ACADEMY DASHBOARD ---
 
 const StudentDashboard = ({ stats, loading, onNavigate, user }) => {
-  const [academyStats, setAcademyStats] = useState({ mastered: 4, read: 18, total: 25 });
-
   return (
     <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 text-left">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
@@ -389,7 +372,7 @@ const StudentDashboard = ({ stats, loading, onNavigate, user }) => {
             <h2 className="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] mb-3 ml-1">Academy Portal</h2>
             <div className="flex items-center gap-3">
                <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left leading-none">Learning Hub<span className="text-indigo-500 text-5xl">.</span></h1>
-               <div className="w-7 h-7 bg-indigo-500 text-white rounded-lg flex items-center justify-center p-1 border border-indigo-400">
+               <div className="w-7 h-7 bg-indigo-500 text-white rounded-lg flex items-center justify-center p-1 border border-indigo-400 shadow-sm">
                   <GraduationCap className="w-full h-full" />
                </div>
             </div>
@@ -401,51 +384,43 @@ const StudentDashboard = ({ stats, loading, onNavigate, user }) => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
-        <StatCard title="Scenarios Mastered" value={academyStats.mastered} icon={Target} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" />
-        <StatCard title="Protocols Read" value={academyStats.read} icon={BookOpen} colorClass="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" />
-        <StatCard title="Unit Cases" value={stats.neonates || '24'} icon={ActivityIcon} colorClass="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400" />
+        <StatCard title="Ward Cases" value={stats.neonates || '24'} icon={ActivityIcon} colorClass="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400" />
+        <StatCard title="Knowledge Base" value="Accredited" icon={BookOpen} colorClass="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" />
+        <StatCard title="Practice Center" value="Open" icon={Target} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
-         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col group hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
-            <div className="flex items-center justify-between mb-10">
-               <div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
-                     <TrendingUp className="w-5 h-5 text-indigo-500" /> Proficiency Growth
-                  </h3>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Mastery metrics across clinical simulation blocks.</p>
-               </div>
-            </div>
-            
-            <CapacityChart data={[20, 45, 60, 55, 80, 75, 95]} label="Mod" ariaTitle="Student proficiency growth chart" />
-            
-            <div className="mt-auto pt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-slate-50 dark:border-slate-800">
-               {[
-                  { l: 'Clinical Logic', v: '92%', c: 'text-indigo-500' },
-                  { l: 'Dose Math', v: '100%', c: 'text-emerald-500' },
-                  { l: 'Protocols', v: '78%', c: 'text-amber-500' },
-                  { l: 'Ethics', v: '85%', c: 'text-primary' }
-               ].map((m, i) => (
-                  <div key={i}>
-                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">{m.l}</p>
-                     <p className={`text-lg font-black ${m.c}`}>{m.v}</p>
-                  </div>
-               ))}
-            </div>
-         </div>
-
-         <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col items-center justify-center text-center">
-            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-3xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-8 shadow-inner">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 text-left">
+         {/* Learning Gateway */}
+         <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-10 shadow-sm flex flex-col items-center justify-center text-center group hover:shadow-2xl transition-all duration-500">
+            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-3xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-8 shadow-inner border border-indigo-100 dark:border-indigo-800">
                <GraduationCap className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-4 leading-tight">Ready for <br />Practice?</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-10 leading-relaxed">Simulate critical events before they happen at the bedside.</p>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-4 leading-tight">Clinical <br />Simulations</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-10 leading-relaxed max-w-xs">Master emergency and routine protocols before you reach the patient bedside.</p>
             <button 
               onClick={() => onNavigate('scenarios')}
-              className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95"
+              className="w-full max-w-xs py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95 flex items-center justify-center gap-3"
             >
-               Enter Simulator
+               Enter Simulator <ArrowRight className="w-4 h-4" />
             </button>
+         </div>
+
+         {/* Protocol Explorer */}
+         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden flex flex-col justify-center text-center items-center group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 group-hover:scale-110 transition-transform duration-1000" />
+            <div className="relative z-10 w-full flex flex-col items-center">
+               <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-primary mb-8 border border-white/5 backdrop-blur-xl">
+                  <BookOpen className="w-8 h-8" />
+               </div>
+               <h3 className="text-2xl font-black text-white tracking-tight mb-4 leading-tight">Protocol <br />Library</h3>
+               <p className="text-slate-400 font-medium mb-10 leading-relaxed max-w-xs text-sm">Access the definitive unit guidelines for respiratory and clinical care.</p>
+               <button 
+                 onClick={() => onNavigate('knowledge')}
+                 className="w-full max-w-xs py-4 bg-white text-slate-900 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all active:scale-95"
+               >
+                  Open Archive
+               </button>
+            </div>
          </div>
       </div>
     </div>
