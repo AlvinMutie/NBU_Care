@@ -1810,15 +1810,15 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                   {/* TAB 8: ADMIN PORTAL */}
             {activeTab === 'admin' && (() => {
               // Dynamic stats calculations
-              const doctorsCount = allUsers.filter(u => u.role.includes('Pediatrician') || u.role.includes('CO') || u.role.toLowerCase().includes('doctor')).length;
-              const nursesCount = allUsers.filter(u => u.role.includes('Nurse') || u.role.includes('In-Charge')).length;
+              const doctorsCount = allUsers.filter(u => u.role && (u.role.includes('Pediatrician') || u.role.includes('CO') || u.role.toLowerCase().includes('doctor'))).length;
+              const nursesCount = allUsers.filter(u => u.role && (u.role.includes('Nurse') || u.role.includes('In-Charge'))).length;
               const patientsCount = neonates.length;
               const pharmacyCount = 2; // Unique inventory category code or reserve medicines index
 
               // Dynamic lists
               const recentNeonates = neonates.filter(n => 
-                n.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
-                n.hospitalNumber.toLowerCase().includes(adminSearchTerm.toLowerCase())
+                (n.name && n.name.toLowerCase().includes(adminSearchTerm.toLowerCase())) || 
+                (n.hospitalNumber && n.hospitalNumber.toLowerCase().includes(adminSearchTerm.toLowerCase()))
               ).slice(0, 5);
 
               const simulatedAlerts = [
@@ -1898,14 +1898,14 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                         {/* Profile header */}
                         <div className="flex items-center gap-3 pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
                           <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-650 text-white font-extrabold flex items-center justify-center text-md shadow-md shrink-0">
-                            {auth.user.name[0].toUpperCase()}
+                            {auth.user.name ? auth.user.name[0].toUpperCase() : 'U'}
                           </div>
                           <div className="min-w-0 text-left">
                             <h4 className={`text-xs font-black truncate ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
-                              {auth.user.name}
+                              {auth.user.name || 'User'}
                             </h4>
                             <p className="text-[9px] font-bold text-slate-450 uppercase tracking-wider truncate">
-                              {auth.user.role}
+                              {auth.user.role || 'No Role'}
                             </p>
                           </div>
                         </div>
@@ -2530,7 +2530,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                           const matchesSearch = user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
                                                 user.email.toLowerCase().includes(adminSearchTerm.toLowerCase());
                           const matchesRole = adminRoleFilter === 'All' || 
-                                              (adminRoleFilter === 'Doctor' ? (user.role.includes('Pediatrician') || user.role.includes('CO')) : user.role.includes('Nurse'));
+                                              (adminRoleFilter === 'Doctor' ? (user.role && (user.role.includes('Pediatrician') || user.role.includes('CO'))) : (user.role && user.role.includes('Nurse')));
                           return matchesSearch && matchesRole;
                         });
 

@@ -22,7 +22,7 @@ export default function AppLayout({ children, activeTab, setActiveTab }) {
     ];
 
     const adminNavigation = [
-        { id: 'admin', name: 'Admin Portal', icon: ShieldCheck, role: ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin'] },
+        { id: 'admin', name: 'Admin Portal', icon: ShieldCheck, role: ['Hospital Management', 'Nursing In-Charge', 'ICT / IT Support', 'Admin', 'System Admin'] },
     ];
 
     const isAuthorized = (roles) => {
@@ -123,11 +123,11 @@ export default function AppLayout({ children, activeTab, setActiveTab }) {
                     <div className="p-6 border-t border-slate-800/40">
                         <div className="flex items-center gap-3 bg-slate-900/40 p-4 rounded-2xl border border-slate-800/50">
                             <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center font-black text-indigo-400">
-                                {auth.user.name[0]}
+                                {auth.user.name ? auth.user.name[0].toUpperCase() : 'U'}
                             </div>
                             <div className="overflow-hidden">
-                                <p className="text-white text-xs font-black truncate">{auth.user.name}</p>
-                                <p className="text-[10px] font-bold text-slate-500 truncate uppercase">{auth.user.role}</p>
+                                <p className="text-white text-xs font-black truncate">{auth.user.name || 'User'}</p>
+                                <p className="text-[10px] font-bold text-slate-500 truncate uppercase">{auth.user.role || 'No Role'}</p>
                             </div>
                         </div>
                     </div>
