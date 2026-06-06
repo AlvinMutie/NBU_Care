@@ -77,7 +77,7 @@ export default function Neonates({ user, onNavigate }) {
   );
 
   return (
-    <div className="p-4 lg:p-10 bg-slate-50 min-h-screen pb-32">
+    <div className="p-4 lg:p-10 bg-slate-50 dark:bg-slate-950 min-h-screen pb-32 text-left">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
@@ -86,34 +86,34 @@ export default function Neonates({ user, onNavigate }) {
                 <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
                   <Baby className="w-6 h-6" />
                 </div>
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight">Neonate Registry</h1>
+                <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">Neonate Registry</h1>
              </div>
-             <p className="text-slate-500 font-medium">Manage newborn patients and their clinical biodata.</p>
+             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium ml-1">Manage newborn patients and their clinical biodata.</p>
           </div>
 
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="flex items-center gap-3 bg-primary text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all active:scale-95"
+            className="flex items-center justify-center gap-3 bg-primary text-white px-8 py-4 rounded-2xl font-black shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all active:scale-95 w-full md:w-auto"
           >
             <Plus className="w-5 h-5" /> Admit New Neonate
           </button>
         </div>
 
         {/* Search & Filter */}
-        <div className="bg-white p-4 rounded-3xl border border-slate-100 shadow-sm mb-10 flex flex-col md:flex-row gap-4 items-center">
+        <div className="bg-white dark:bg-slate-900 p-4 rounded-[32px] border border-slate-100 dark:border-slate-800 shadow-sm mb-10 flex flex-col md:flex-row gap-4 items-center">
            <div className="relative flex-1 w-full">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
               <input 
                 type="text" 
                 placeholder="Search by name or Hospital ID..." 
-                className="w-full pl-12 pr-4 py-4 bg-slate-50 rounded-2xl border-transparent focus:bg-white focus:border-primary outline-none text-sm font-bold transition-all"
+                className="w-full pl-12 pr-4 py-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border-transparent focus:bg-white dark:focus:bg-slate-950 focus:border-primary outline-none text-sm font-bold transition-all text-slate-900 dark:text-white"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
            </div>
-           <div className="flex items-center gap-2 px-6 py-4 bg-slate-50 rounded-2xl border border-slate-100">
+           <div className="flex items-center gap-2 px-6 py-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 w-full md:w-auto justify-center">
               <Activity className="w-4 h-4 text-emerald-500" />
-              <span className="text-xs font-black text-slate-500 uppercase tracking-widest">{neonates.length} Active Patients</span>
+              <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{neonates.length} Active Patients</span>
            </div>
         </div>
 
@@ -121,7 +121,7 @@ export default function Neonates({ user, onNavigate }) {
         {loading ? (
           <div className="py-40 flex flex-col items-center justify-center">
              <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
-             <p className="text-sm font-black text-slate-400 uppercase tracking-widest">Accessing Medical Records...</p>
+             <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Accessing Medical Records...</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -129,50 +129,50 @@ export default function Neonates({ user, onNavigate }) {
               <div 
                 key={n._id}
                 onClick={() => onNavigate('handovers', { neonateId: n._id })}
-                className="bg-white rounded-[32px] p-6 border border-slate-100 shadow-sm hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden"
+                className="bg-white dark:bg-slate-900 rounded-[32px] p-6 border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-xl transition-all cursor-pointer group relative overflow-hidden"
               >
                 <div className="flex justify-between items-start mb-6">
                    <div className="flex items-center gap-4">
-                      <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
+                      <div className="w-14 h-14 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-slate-400 group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                          <UserIcon className="w-7 h-7" />
                       </div>
                       <div>
-                         <h3 className="text-lg font-black text-slate-900 leading-none mb-1 group-hover:text-primary transition-colors">{n.name}</h3>
-                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{n.hospitalNumber}</span>
+                         <h3 className="text-lg font-black text-slate-900 dark:text-white leading-none mb-1 group-hover:text-primary transition-colors">{n.name}</h3>
+                         <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">{n.hospitalNumber}</span>
                       </div>
                    </div>
                    <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${
-                     n.status === 'Stable' ? 'bg-emerald-100 text-emerald-700' :
-                     n.status === 'Critical' ? 'bg-red-100 text-red-700' :
-                     'bg-amber-100 text-amber-700'
+                     n.status === 'Stable' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' :
+                     n.status === 'Critical' ? 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400' :
+                     'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400'
                    }`}>
                      {n.status}
                    </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-6">
-                   <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-2">
+                   <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-2">
                       <Weight className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-xs font-bold text-slate-700">{n.currentWeight} kg</span>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{n.currentWeight} kg</span>
                    </div>
-                   <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex items-center gap-2">
+                   <div className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 flex items-center gap-2">
                       <Clock className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-xs font-bold text-slate-700">{n.gestationalAge} wks</span>
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{n.gestationalAge} wks</span>
                    </div>
                 </div>
 
-                <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
-                   <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 leading-none">Admission Diagnosis</p>
-                   <p className="text-xs font-bold text-slate-700 truncate">{n.admissionDiagnosis || 'N/A'}</p>
+                <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-700 mb-6">
+                   <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1 leading-none text-left">Admission Diagnosis</p>
+                   <p className="text-xs font-bold text-slate-700 dark:text-slate-300 truncate text-left">{n.admissionDiagnosis || 'N/A'}</p>
                 </div>
 
-                <div className="flex items-center justify-between pt-4 border-t border-slate-50">
+                <div className="flex items-center justify-between pt-4 border-t border-slate-50 dark:border-slate-800">
                    <div className="flex items-center gap-2">
                       <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="text-[10px] font-bold text-slate-500">Adm: {new Date(n.createdAt).toLocaleDateString()}</span>
+                      <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400">Adm: {new Date(n.createdAt).toLocaleDateString()}</span>
                    </div>
                    <div className="flex items-center text-primary font-black text-[10px] uppercase tracking-widest gap-1 group-hover:gap-2 transition-all">
-                      Open Clinical File <ChevronRight className="w-3 h-3" />
+                      Open File <ChevronRight className="w-3 h-3" />
                    </div>
                 </div>
               </div>
@@ -183,11 +183,11 @@ export default function Neonates({ user, onNavigate }) {
         {/* Empty State */}
         {!loading && filteredNeonates.length === 0 && (
           <div className="py-32 flex flex-col items-center justify-center text-center">
-             <div className="w-24 h-24 bg-slate-100 rounded-[40px] flex items-center justify-center text-slate-300 mb-6">
+             <div className="w-24 h-24 bg-slate-100 dark:bg-slate-900 rounded-[40px] flex items-center justify-center text-slate-300 dark:text-slate-700 mb-6 border border-slate-50 dark:border-slate-800">
                 <Search className="w-10 h-10" />
              </div>
-             <h3 className="text-xl font-black text-slate-900 mb-2">No Patients Found</h3>
-             <p className="text-slate-500 font-medium max-w-xs">Try adjusting your search or admit a new neonate to the unit.</p>
+             <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">No Patients Found</h3>
+             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium max-w-xs">Try adjusting your search or admit a new neonate to the unit.</p>
           </div>
         )}
       </div>
@@ -195,55 +195,55 @@ export default function Neonates({ user, onNavigate }) {
       {/* Admission Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-in fade-in duration-300">
-           <div className="bg-white w-full max-w-3xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300">
-              <div className="p-8 border-b border-slate-50 flex items-center justify-between bg-slate-50/50">
-                 <div>
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tight">Patient Admission</h3>
-                    <p className="text-sm text-slate-500 font-medium">Enter clinical biodata for the new neonate.</p>
+           <div className="bg-white dark:bg-slate-900 w-full max-w-3xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 border border-white/10 dark:border-slate-800">
+              <div className="p-6 lg:p-8 border-b border-slate-50 dark:border-slate-800 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/50">
+                 <div className="text-left">
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Patient Admission</h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-1">Clinical Enrollment</p>
                  </div>
-                 <button onClick={() => setIsModalOpen(false)} className="w-12 h-12 bg-white border border-slate-100 rounded-2xl flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors shadow-sm">
-                    <X className="w-6 h-6" />
+                 <button onClick={() => setIsModalOpen(false)} className="w-10 h-10 lg:w-12 lg:h-12 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl flex items-center justify-center text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors shadow-sm">
+                    <X className="w-5 h-5 lg:w-6 lg:h-6" />
                  </button>
               </div>
 
-              <form onSubmit={handleSave} className="p-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
+              <form onSubmit={handleSave} className="p-6 lg:p-8 max-h-[70vh] overflow-y-auto custom-scrollbar text-left">
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Hospital Number</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Hospital Number</label>
                        <input 
                          required
                          type="text"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          placeholder="e.g. NBU-2024-001"
                          value={formData.hospitalNumber}
                          onChange={e => setFormData({...formData, hospitalNumber: e.target.value})}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Full Name</label>
                        <input 
                          required
                          type="text"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          placeholder="e.g. Baby Jane Doe"
                          value={formData.name}
                          onChange={e => setFormData({...formData, name: e.target.value})}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Date of Birth</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Date of Birth</label>
                        <input 
                          required
                          type="date"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          value={formData.dob}
                          onChange={e => setFormData({...formData, dob: e.target.value})}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Gender</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Gender</label>
                        <select 
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white appearance-none cursor-pointer"
                          value={formData.gender}
                          onChange={e => setFormData({...formData, gender: e.target.value})}
                        >
@@ -253,40 +253,40 @@ export default function Neonates({ user, onNavigate }) {
                        </select>
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Birth Weight (kg)</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Birth Weight (kg)</label>
                        <input 
                          required
-                         type="number" step="0.01"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         type="number" step="0.001"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          value={formData.birthWeight}
                          onChange={e => setFormData({...formData, birthWeight: e.target.value})}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Current Weight (kg)</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Current Weight (kg)</label>
                        <input 
                          required
-                         type="number" step="0.01"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         type="number" step="0.001"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          value={formData.currentWeight}
                          onChange={e => setFormData({...formData, currentWeight: e.target.value})}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Gestational Age (weeks)</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Gestational Age (weeks)</label>
                        <input 
                          required
                          type="number"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          value={formData.gestationalAge}
                          onChange={e => setFormData({...formData, gestationalAge: e.target.value})}
                        />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Mother's Phone</label>
+                       <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Mother's Phone</label>
                        <input 
                          type="tel"
-                         className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700"
+                         className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white"
                          placeholder="+254..."
                          value={formData.motherPhone}
                          onChange={e => setFormData({...formData, motherPhone: e.target.value})}
@@ -295,19 +295,19 @@ export default function Neonates({ user, onNavigate }) {
                  </div>
 
                  <div className="space-y-2 mb-6">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Admission Diagnosis</label>
+                    <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Admission Diagnosis</label>
                     <textarea 
-                       className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 h-24 resize-none"
+                       className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white h-24 resize-none"
                        placeholder="Enter primary clinical diagnosis..."
                        value={formData.admissionDiagnosis}
                        onChange={e => setFormData({...formData, admissionDiagnosis: e.target.value})}
                     />
                  </div>
 
-                 <div className="space-y-2 mb-8">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Clinical History</label>
+                 <div className="space-y-2 mb-8 border-t border-slate-50 dark:border-slate-800 pt-6">
+                    <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest ml-1">Clinical History</label>
                     <textarea 
-                       className="w-full p-4 bg-slate-50 rounded-xl border border-slate-100 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 h-32 resize-none"
+                       className="w-full p-4 bg-slate-50 dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-700 outline-none focus:ring-4 focus:ring-primary/5 focus:border-primary text-sm font-bold text-slate-700 dark:text-white h-32 resize-none"
                        placeholder="Enter relevant maternal/birth history..."
                        value={formData.history}
                        onChange={e => setFormData({...formData, history: e.target.value})}

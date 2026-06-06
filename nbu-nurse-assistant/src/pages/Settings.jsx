@@ -6,23 +6,28 @@ import {
   Save, 
   Building2, 
   CheckCircle2,
-  Activity
+  Activity,
+  ShieldAlert,
+  AlertTriangle,
+  Settings as SettingsIcon,
+  ToggleLeft,
+  ToggleRight
 } from 'lucide-react';
 import { api } from '../services/api';
 
 const SettingSection = ({ title, description, children, icon: Icon }) => (
-  <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden mb-6">
+  <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden mb-6 text-left">
     <div className="flex flex-col md:flex-row gap-8 p-8">
       <div className="md:w-1/3">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-center text-primary shadow-sm">
+          <div className="w-10 h-10 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl flex items-center justify-center text-primary shadow-sm">
             <Icon className="w-5 h-5" />
           </div>
-          <h3 className="text-lg font-bold text-slate-900 tracking-tight">{title}</h3>
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight">{title}</h3>
         </div>
-        <p className="text-sm text-slate-500 leading-relaxed">{description}</p>
+        <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{description}</p>
       </div>
-      <div className="md:w-2/3 border-t md:border-t-0 md:border-l border-slate-100 pt-6 md:pt-0 md:pl-8">
+      <div className="md:w-2/3 border-t md:border-t-0 md:border-l border-slate-100 dark:border-slate-700 pt-6 md:pt-0 md:pl-8">
         {children}
       </div>
     </div>
@@ -31,14 +36,14 @@ const SettingSection = ({ title, description, children, icon: Icon }) => (
 
 const InputWrapper = ({ label, children }) => (
   <div className="space-y-1.5">
-    <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{label}</label>
+    <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</label>
     {children}
   </div>
 );
 
 export default function Settings({ user, onUpdateUser, onNavigate }) {
   const [profile, setProfile] = useState({ name: user?.name || '', email: user?.email || '', currentPassword: '', newPassword: '' });
-  const [sysSettings, setSysSettings] = useState({ wardName: '', hospitalName: '', broadcastMessage: '' });
+  const [sysSettings, setSysSettings] = useState({ wardName: '', hospitalName: '', broadcastMessage: '', globalOverrideActive: false });
   const [loading, setLoading] = useState(false);
   const [sysLoading, setSysLoading] = useState(true);
   const [success, setSuccess] = useState('');
@@ -99,21 +104,21 @@ export default function Settings({ user, onUpdateUser, onNavigate }) {
   };
 
   return (
-    <div className="max-w-[1200px] mx-auto w-full p-8 pb-32">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-slate-200 pb-8">
-        <div>
+    <div className="max-w-[1200px] mx-auto w-full p-4 lg:p-8 pb-32">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 border-b border-slate-200 dark:border-slate-700 pb-8 px-2">
+        <div className="text-left">
           <h2 className="text-xs font-bold text-primary uppercase tracking-widest mb-2">My Account</h2>
-          <h1 className="text-3xl font-bold text-slate-900 tracking-tight mb-3">Settings</h1>
-          <p className="text-sm text-slate-500">Update your profile and manage your personal preferences.</p>
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight mb-3">Settings</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Update your profile and manage your personal preferences.</p>
         </div>
         <div className="flex flex-col items-end gap-2">
           {success && (
-            <div className="px-4 py-2 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+            <div className="px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
               <CheckCircle2 className="w-4 h-4" /> {success}
             </div>
           )}
           {error && (
-            <div className="px-4 py-2 bg-rose-50 border border-rose-100 text-rose-700 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
+            <div className="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 border border-rose-100 dark:border-rose-800 text-rose-700 dark:text-rose-400 rounded-lg text-xs font-bold flex items-center gap-2 animate-in fade-in slide-in-from-top-2">
               <Activity className="w-4 h-4" /> {error}
             </div>
           )}
@@ -133,7 +138,7 @@ export default function Settings({ user, onUpdateUser, onNavigate }) {
                 type="text" 
                 value={profile.name} 
                 onChange={e => setProfile({...profile, name: e.target.value})}
-                className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
+                className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white shadow-sm" 
               />
             </InputWrapper>
             <InputWrapper label="Your Email (cannot be changed)">
@@ -141,15 +146,15 @@ export default function Settings({ user, onUpdateUser, onNavigate }) {
                 type="email" 
                 value={profile.email} 
                 disabled
-                className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-400 cursor-not-allowed shadow-sm" 
+                className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-400 dark:text-slate-500 cursor-not-allowed shadow-sm" 
               />
             </InputWrapper>
           </div>
 
-          <div className="pt-4 border-t border-slate-50">
-            <div className="flex items-center gap-2 mb-4">
+          <div className="pt-4 border-t border-slate-50 dark:border-slate-700">
+            <div className="flex items-center gap-2 mb-4 text-left">
               <Lock className="w-4 h-4 text-slate-400" />
-              <h4 className="text-xs font-bold text-slate-900 uppercase tracking-widest">Change Password</h4>
+              <h4 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-widest">Change Password</h4>
             </div>
             <div className="grid sm:grid-cols-2 gap-6">
               <InputWrapper label="Current Password">
@@ -158,7 +163,7 @@ export default function Settings({ user, onUpdateUser, onNavigate }) {
                   value={profile.currentPassword}
                   onChange={e => setProfile({...profile, currentPassword: e.target.value})}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white shadow-sm" 
                 />
               </InputWrapper>
               <InputWrapper label="New Password">
@@ -167,7 +172,7 @@ export default function Settings({ user, onUpdateUser, onNavigate }) {
                   value={profile.newPassword}
                   onChange={e => setProfile({...profile, newPassword: e.target.value})}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
+                  className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white shadow-sm" 
                 />
               </InputWrapper>
             </div>
@@ -185,63 +190,94 @@ export default function Settings({ user, onUpdateUser, onNavigate }) {
 
       {/* Admin Section: Ward Settings */}
       {isAdmin && (
-        <div className="mt-12">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
-            <div>
-              <h3 className="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+        <div className="mt-12 space-y-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6 px-2">
+            <div className="text-left">
+              <h3 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                 <ShieldCheck className="w-6 h-6 text-primary" /> Ward Settings
               </h3>
-              <p className="text-sm text-slate-500 mt-1">Manage the ward name, hospital details, and the notice message shown to the whole team.</p>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage the ward name, hospital details, and the notice message shown to the whole team.</p>
             </div>
-            <div className="bg-amber-50 border border-amber-200 text-amber-700 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest">
+            <div className="bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-800 text-amber-700 dark:text-amber-400 px-3 py-1 rounded-lg text-[10px] font-bold uppercase tracking-widest self-start md:self-end">
               In-Charge Only
             </div>
           </div>
 
           {sysLoading ? (
-            <div className="flex flex-col items-center justify-center py-16 bg-white rounded-2xl border border-slate-200">
+            <div className="flex flex-col items-center justify-center py-16 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
               <Activity className="w-8 h-8 text-primary animate-pulse mb-4" />
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Loading ward settings...</p>
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Loading ward settings...</p>
             </div>
           ) : (
-            <SettingSection 
-              title="Ward Information" 
-              description="Set the name of your ward and a team-wide notice that everyone will see when they log in."
-              icon={Building2}
-            >
-              <form onSubmit={handleSysSubmit} className="space-y-6">
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <InputWrapper label="Hospital Name">
-                    <input 
-                      type="text" 
-                      value={sysSettings.hospitalName} 
-                      onChange={e => setSysSettings({...sysSettings, hospitalName: e.target.value})}
-                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
+            <>
+              <SettingSection 
+                title="Ward Information" 
+                description="Set the name of your ward and a team-wide notice that everyone will see when they log in."
+                icon={Building2}
+              >
+                <form onSubmit={handleSysSubmit} className="space-y-6">
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <InputWrapper label="Hospital Name">
+                      <input 
+                        type="text" 
+                        value={sysSettings.hospitalName} 
+                        onChange={e => setSysSettings({...sysSettings, hospitalName: e.target.value})}
+                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white shadow-sm" 
+                      />
+                    </InputWrapper>
+                    <InputWrapper label="Ward Name">
+                      <input 
+                        type="text" 
+                        value={sysSettings.wardName} 
+                        onChange={e => setSysSettings({...sysSettings, wardName: e.target.value})}
+                        className="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 dark:text-white shadow-sm" 
+                      />
+                    </InputWrapper>
+                  </div>
+                  <InputWrapper label="Team Notice (shown to all staff on login)">
+                    <textarea 
+                      rows="3"
+                      value={sysSettings.broadcastMessage} 
+                      onChange={e => setSysSettings({...sysSettings, broadcastMessage: e.target.value})}
+                      className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none text-slate-900 dark:text-white shadow-sm" 
+                      placeholder="e.g. All staff: please complete the drug count before handover."
                     />
                   </InputWrapper>
-                  <InputWrapper label="Ward Name">
-                    <input 
-                      type="text" 
-                      value={sysSettings.wardName} 
-                      onChange={e => setSysSettings({...sysSettings, wardName: e.target.value})}
-                      className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-slate-900 shadow-sm" 
-                    />
-                  </InputWrapper>
-                </div>
-                <InputWrapper label="Team Notice (shown to all staff on login)">
-                  <textarea 
-                    rows="3"
-                    value={sysSettings.broadcastMessage} 
-                    onChange={e => setSysSettings({...sysSettings, broadcastMessage: e.target.value})}
-                    className="w-full px-4 py-3 bg-white border border-slate-200 rounded-lg text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all resize-none text-slate-900 shadow-sm" 
-                    placeholder="e.g. All staff: please complete the drug count before handover."
-                  />
-                </InputWrapper>
-                <button className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-sm font-bold transition-colors shadow-sm">
-                  {loading ? <Activity className="w-4 h-4 animate-pulse" /> : <Save className="w-4 h-4" />} Save Ward Settings
-                </button>
-              </form>
-            </SettingSection>
+                  <button className="flex items-center justify-center gap-2 px-6 py-2.5 bg-slate-900 dark:bg-primary hover:bg-slate-800 dark:hover:bg-primary-dark text-white rounded-lg text-sm font-bold transition-colors shadow-sm">
+                    {loading ? <Activity className="w-4 h-4 animate-pulse" /> : <Save className="w-4 h-4" />} Save Ward Settings
+                  </button>
+                </form>
+              </SettingSection>
+
+              <SettingSection 
+                title="Clinical Safety Protocol" 
+                description="Enforce stricter validation layers for high-risk clinical actions. Recommended during high-stress periods."
+                icon={ShieldAlert}
+              >
+                 <div className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-700/50">
+                    <div className="flex items-center gap-4">
+                       <div className={`w-12 h-12 rounded-xl flex items-center justify-center transition-colors ${sysSettings.globalOverrideActive ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600' : 'bg-slate-100 dark:bg-slate-800 text-slate-400'}`}>
+                          <AlertTriangle className="w-6 h-6" />
+                       </div>
+                       <div>
+                          <p className="text-sm font-black text-slate-900 dark:text-white tracking-tight">Global Override Mode</p>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Require double-verification for all meds.</p>
+                       </div>
+                    </div>
+                    <button 
+                      onClick={() => setSysSettings({...sysSettings, globalOverrideActive: !sysSettings.globalOverrideActive})}
+                      className="transition-all active:scale-95"
+                    >
+                       {sysSettings.globalOverrideActive ? (
+                         <ToggleRight className="w-12 h-12 text-primary cursor-pointer" />
+                       ) : (
+                         <ToggleLeft className="w-12 h-12 text-slate-300 dark:text-slate-600 cursor-pointer" />
+                       )}
+                    </button>
+                 </div>
+                 <p className="mt-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Note: This setting affects all active sessions across the unit.</p>
+              </SettingSection>
+            </>
           )}
         </div>
       )}

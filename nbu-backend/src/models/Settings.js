@@ -4,6 +4,7 @@ const SettingsSchema = new mongoose.Schema({
   wardName: { type: String, default: 'Neonatal Benefit Unit' },
   hospitalName: { type: String, default: 'NeoDesk General Hospital' },
   broadcastMessage: { type: String, default: 'All clinical protocols updated to v4.2 standards.' },
+  globalOverrideActive: { type: Boolean, default: false },
   updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   updatedAt: { type: Date, default: Date.now }
 });
