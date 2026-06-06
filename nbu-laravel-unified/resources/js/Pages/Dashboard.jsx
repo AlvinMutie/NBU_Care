@@ -9,12 +9,13 @@ import {
   Pill, ClipboardCheck, X, Check, Plus, Calendar, Phone,
   ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart, BarChart2, CheckSquare, TrendingUp,
   Calculator, BookOpen, BadgeCheck, LayoutDashboard, FileCode, ExternalLink, ArrowUpRight,
-  Moon, Sun, Stethoscope, Printer, Download, FileText, MoreVertical, ChevronDown
+  Moon, Sun, Stethoscope, Printer, Download, FileText, MoreVertical, ChevronDown,
+  GraduationCap, Flame
 } from 'lucide-react';
 
 export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [], flashcards = [], scenarios = [] }) {
-  const [activeTab, setActiveTab] = useState('registry'); // 'registry', 'calculator', 'rota', 'academics', 'admin'
-  const [registrySubTab, setRegistrySubTab] = useState('overview'); // 'overview', 'active-patients', 'handovers'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview', 'registry', 'calculator', 'rota', 'academics', 'admin'
+  const [registrySubTab, setRegistrySubTab] = useState('active-patients'); // 'overview', 'active-patients', 'handovers'
   const [calcSubTab, setCalcSubTab] = useState('calculator-workbench'); // 'overview', 'calculator-workbench'
   const [rotaSubTab, setRotaSubTab] = useState('overview'); // 'overview', 'rota-schedule'
   const [academySubTab, setAcademySubTab] = useState('overview'); // 'overview', 'flashcards', 'scenarios'
@@ -1488,7 +1489,7 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
           )}
 
           {/* TAB: INTERACTIVE SCENARIOS */}
-          {activeTab === 'scenarios' && (
+          {activeTab === 'academics' && academySubTab === 'scenarios' && (
             <div className="space-y-6 animate-in fade-in duration-300 text-left">
               
               {!activeScenario ? (
@@ -1707,12 +1708,20 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                   <h3 className="text-xl font-black text-slate-850 dark:text-white tracking-tight">NBU Clinical Training Academy</h3>
                   <p className="text-xs text-gray-500">Interactive patient simulations, ward resuscitation drills, and baby thermal care protocols.</p>
                 </div>
-                <button
-                  onClick={() => setAcademySubTab('flashcards')}
-                  className="flex items-center gap-2 bg-indigo-655 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm shadow-indigo-600/10"
-                >
-                  <BookOpen className="w-4 h-4" /> Open Flashcards
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setAcademySubTab('flashcards')}
+                    className="flex items-center gap-2 bg-indigo-655 hover:bg-indigo-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm shadow-indigo-600/10"
+                  >
+                    <BookOpen className="w-4 h-4" /> Open Flashcards
+                  </button>
+                  <button
+                    onClick={() => setAcademySubTab('scenarios')}
+                    className="flex items-center gap-2 bg-teal-600 hover:bg-teal-500 text-white px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-sm shadow-teal-600/10"
+                  >
+                    <Activity className="w-4 h-4" /> Launch Scenarios
+                  </button>
+                </div>
               </div>
 
               {/* Academy HUD indicators */}
@@ -1769,14 +1778,14 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
                     <div className="flex justify-between items-center pb-2 border-b border-slate-200 dark:border-slate-800">
                       <span className="text-xs font-black uppercase tracking-wider text-slate-855 dark:text-white">🚨 Resuscitation Pathway</span>
                       <span className="px-2 py-0.5 bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-455 text-[9px] font-black rounded uppercase">Critical</span>
-                    </div>
-                    <p className="text-xs font-semibold text-gray-500 leading-normal">Interactive step-by-step guidance on initial newborn airway management, positive pressure ventilation, and cardiac compression protocols.</p>
-                    <button
-                      onClick={() => setAcademySubTab('flashcards')}
-                      className="text-[10px] font-black uppercase tracking-wider text-indigo-650 dark:text-indigo-400 hover:underline flex items-center gap-1"
-                    >
-                      Launch Guide <ChevronRight className="w-3.5 h-3.5" />
-                    </button>
+                      </div>
+                      <p className="text-xs font-semibold text-gray-500 leading-normal">Interactive step-by-step guidance on initial newborn airway management, positive pressure ventilation, and cardiac compression protocols.</p>
+                      <button
+                      onClick={() => setAcademySubTab('scenarios')}
+                      className="text-[10px] font-black uppercase tracking-wider text-teal-600 dark:text-teal-400 hover:underline flex items-center gap-1"
+                      >
+                      Launch Simulation <ChevronRight className="w-3.5 h-3.5" />
+                      </button>
                   </div>
 
                   {/* Module 2 */}
