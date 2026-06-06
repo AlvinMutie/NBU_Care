@@ -8,7 +8,8 @@ import {
   ChevronLeft, Search, Loader2, Scale,
   Pill, ClipboardCheck, X, Check, Plus, Calendar, Phone,
   ArrowRightLeft, Thermometer, Heart, ShieldAlert, Users, Clock, User, BarChart, BarChart2, CheckSquare, TrendingUp,
-  Calculator, BookOpen, BadgeCheck, LayoutDashboard, FileCode, ExternalLink, ArrowUpRight
+  Calculator, BookOpen, BadgeCheck, LayoutDashboard, FileCode, ExternalLink, ArrowUpRight,
+  Moon, Sun, Stethoscope, Printer, Download, FileText, MoreVertical, ChevronDown
 } from 'lucide-react';
 
 export default function Dashboard({ auth, initialNeonates, initialAuditLogs, initialHandovers = [], initialRotas = [], allUsers = [], flashcards = [], scenarios = [] }) {
@@ -17,7 +18,8 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
   const [calcSubTab, setCalcSubTab] = useState('calculator-workbench'); // 'overview', 'calculator-workbench'
   const [rotaSubTab, setRotaSubTab] = useState('overview'); // 'overview', 'rota-schedule'
   const [academySubTab, setAcademySubTab] = useState('overview'); // 'overview', 'flashcards', 'scenarios'
-  const [adminSubTab, setAdminSubTab] = useState('overview'); // 'overview', 'vetting', 'directory'
+  const [adminSubTab, setAdminSubTab] = useState('overview'); // 'overview', 'vetting', 'directory', 'patients', 'settings'
+  const [adminRoleFilter, setAdminRoleFilter] = useState('All'); // 'All', 'Doctor', 'Nurse'
   
   const [flippedCardId, setFlippedCardId] = useState(null);
   const [flashcardCategory, setFlashcardCategory] = useState('All');
@@ -1796,690 +1798,1102 @@ export default function Dashboard({ auth, initialNeonates, initialAuditLogs, ini
             </div>
           )}
 
-            {/* TAB 8: ADMIN PORTAL */}
-            {activeTab === 'admin' && (
-              <div className={`rounded-3xl border transition-all duration-300 overflow-hidden ${
-              isAdminLightMode 
-                ? 'bg-white border-slate-200 text-slate-800 shadow-xl shadow-slate-100/50' 
-                : 'bg-[#0f172a] border-slate-800 text-slate-100 shadow-2xl'
-            }`}>
-              
-              {/* Top Banner with Title, Light Mode Toggle, and HUD */}
-              <div className={`p-8 border-b flex flex-col sm:flex-row sm:items-center justify-between gap-6 transition-all duration-300 text-left ${
-                isAdminLightMode 
-                  ? 'bg-slate-50 border-slate-200' 
-                  : 'bg-slate-900/40 border-slate-800/50'
-              }`}>
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <ShieldCheck className={`w-6 h-6 ${isAdminLightMode ? 'text-indigo-600' : 'text-indigo-400'}`} />
-                    <h3 className={`text-xl font-black tracking-tight ${
-                      isAdminLightMode ? 'text-slate-900' : 'text-white'
-                    }`}>System Administration</h3>
-                  </div>
-                  <p className={`text-xs font-medium ${
-                    isAdminLightMode ? 'text-slate-500' : 'text-slate-400'
-                  }`}>Clinical coverage, nurse vetting, and system audit logs.</p>
-                </div>
-                
-                <div className="flex items-center gap-4">
-                  <button 
-                    onClick={() => setIsAdminLightMode(!isAdminLightMode)}
-                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border ${
-                      isAdminLightMode 
-                        ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200 shadow-sm' 
-                        : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700 shadow-lg shadow-black/20'
-                    }`}
-                  >
-                    {isAdminLightMode ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
-                    {isAdminLightMode ? 'Dark Theme' : 'Light Theme'}
-                  </button>
+                  {/* TAB 8: ADMIN PORTAL */}
+            {activeTab === 'admin' && (() => {
+              // Dynamic stats calculations
+              const doctorsCount = allUsers.filter(u => u.role.includes('Pediatrician') || u.role.includes('CO') || u.role.toLowerCase().includes('doctor')).length;
+              const nursesCount = allUsers.filter(u => u.role.includes('Nurse') || u.role.includes('In-Charge')).length;
+              const patientsCount = neonates.length;
+              const pharmacyCount = 2; // Unique inventory category code or reserve medicines index
 
-                  <div className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider border transition-colors ${
-                    isAdminLightMode 
-                      ? 'bg-emerald-50 border-emerald-100 text-emerald-700' 
-                      : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-                  }`}>
-                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    Security Validated
-                  </div>
-                </div>
-              </div>
+              // Dynamic lists
+              const recentNeonates = neonates.filter(n => 
+                n.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                n.hospitalNumber.toLowerCase().includes(adminSearchTerm.toLowerCase())
+              ).slice(0, 5);
 
-              {/* Main Sidebar Layout Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[650px]">
-                
-                {/* Left Side Navigation Panel */}
-                <aside className={`lg:col-span-3 p-8 border-r flex flex-col justify-between transition-all duration-300 text-left ${
+              const simulatedAlerts = [
+                { title: "Surgeon required R-2", desc: "Just now by Daniel", type: "emergency" },
+                { title: "Specialist required R-22", desc: "59 minutes ago by Dexter", type: "emergency" },
+                { title: "Medical kit required Ward 2", desc: "12 hours ago by Flora", type: "info" },
+                { title: "Critical heart beat R-7", desc: "Today, 11:59 AM by Tim", type: "critical" },
+              ];
+
+              const recentLogsAlerts = auditLogs.filter(log => log.action && (log.action.includes('CRITICAL') || log.action.includes('EMERGENCY') || log.action.includes('Dosage'))).map(log => ({
+                title: log.action.slice(0, 32) + (log.action.length > 32 ? '...' : ''),
+                desc: `${new Date(log.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} by ${log.user_name || 'System'}`,
+                type: "critical"
+              }));
+
+              const displayAlerts = recentLogsAlerts.length > 0 
+                ? [...recentLogsAlerts, ...simulatedAlerts].slice(0, 4) 
+                : simulatedAlerts;
+
+              const simulatedReports = [
+                { title: "Dr John on leave today...", desc: "Just now by Daniel" },
+                { title: "R-22 needs cleaning", desc: "59 minutes ago by Lucy" },
+                { title: "Dr Daniel on leave till tomorrow", desc: "12 hours ago by Daniel" },
+                { title: "R-12 AC not working", desc: "22 hours ago by Flora" },
+                { title: "Hall way 2 cleaning request", desc: "Feb 2, 2023 by Stacy" }
+              ];
+
+              const handoverReports = handovers.map(h => ({
+                title: `${h.neonate_name}: ${h.plan ? h.plan.slice(0, 26) + '...' : 'Handover registered'}`,
+                desc: `${new Date(h.date).toLocaleDateString()} by ${h.nurse_name || 'Staff'}`
+              })).concat(simulatedReports).slice(0, 5);
+
+              // Today's active duty staff mapping
+              const todayStr = new Date().toISOString().split('T')[0];
+              const todayRota = rotas.find(r => r.date === todayStr);
+
+              const activeDutyStaff = [];
+              if (todayRota) {
+                if (todayRota.consultant_name) {
+                  activeDutyStaff.push({ name: `Dr. ${todayRota.consultant_name}`, role: "Consultant Pediatrician", status: "Active" });
+                }
+                if (todayRota.manager_name) {
+                  activeDutyStaff.push({ name: `Sister ${todayRota.manager_name}`, role: "Nursing In-Charge", status: "Active" });
+                }
+                if (todayRota.nurses && todayRota.nurses.length > 0) {
+                  todayRota.nurses.forEach(n => {
+                    activeDutyStaff.push({ name: n.name, role: n.role || "Nurse", status: "Active" });
+                  });
+                }
+              }
+
+              const fallbackStaff = [
+                { name: "Dr. David Craig", role: "Cardiology", status: "Active" },
+                { name: "Dr. Natali Craig", role: "ENT Specialist", status: "Active" },
+                { name: "Natalya Wong", role: "Nurse", status: "Active" },
+                { name: "John Hammer", role: "Nurse", status: "Active" },
+                { name: "Dr. Liza Gomez", role: "Cardiology", status: "Active" }
+              ];
+
+              const currentOnDuty = activeDutyStaff.length > 0 ? activeDutyStaff : fallbackStaff;
+
+              return (
+                <div className={`rounded-[36px] border transition-all duration-300 overflow-hidden text-left p-6 ${
                   isAdminLightMode 
-                    ? 'bg-slate-50/50 border-slate-200' 
-                    : 'bg-slate-900/30 border-slate-800/50'
-                }`}>
-                  <div className="space-y-8">
-                    <div className="space-y-4">
-                      <span className={`text-[10px] font-black uppercase tracking-[0.2em] block ${
-                        isAdminLightMode ? 'text-slate-400' : 'text-slate-500'
-                      }`}>Control Center</span>
-                      
-                      <nav className="flex flex-col gap-2">
-                        <button
-                          onClick={() => setAdminSubTab('overview')}
-                          className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
-                            adminSubTab === 'overview'
-                              ? (isAdminLightMode 
-                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
-                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
-                              : (isAdminLightMode
-                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
-                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
-                          }`}
-                        >
-                          <LayoutDashboard className={`w-4 h-4 transition-transform group-hover:scale-110`} />
-                          Analytics Overview
-                        </button>
-
-                        <button
-                          onClick={() => setAdminSubTab('vetting')}
-                          className={`flex items-center justify-between gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
-                            adminSubTab === 'vetting'
-                              ? (isAdminLightMode 
-                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
-                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
-                              : (isAdminLightMode
-                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
-                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
-                          }`}
-                        >
-                          <span className="flex items-center gap-3">
-                            <ShieldAlert className={`w-4 h-4 transition-transform group-hover:scale-110`} />
-                            Vetting Queue
-                          </span>
-                          {allUsers.filter(u => u.status === 'Pending').length > 0 && (
-                            <span className={`flex h-5 min-w-[20px] px-2 items-center justify-center rounded-lg text-[10px] font-black font-mono leading-none ${
-                              adminSubTab === 'vetting'
-                                ? (isAdminLightMode ? 'bg-indigo-100 text-indigo-700' : 'bg-white text-indigo-600')
-                                : 'bg-amber-500 text-white shadow-lg shadow-amber-500/20 animate-pulse'
-                            }`}>
-                              {allUsers.filter(u => u.status === 'Pending').length}
-                            </span>
-                          )}
-                        </button>
-
-                        <button
-                          onClick={() => setAdminSubTab('directory')}
-                          className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
-                            adminSubTab === 'directory'
-                              ? (isAdminLightMode 
-                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
-                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
-                              : (isAdminLightMode
-                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
-                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
-                          }`}
-                        >
-                          <Users className={`w-4 h-4 transition-transform group-hover:scale-110`} />
-                          Staff Management
-                        </button>
-
-                        <button
-                          onClick={() => setAdminSubTab('audit')}
-                          className={`flex items-center gap-3 px-5 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider transition-all text-left group ${
-                            adminSubTab === 'audit'
-                              ? (isAdminLightMode 
-                                  ? 'bg-white text-indigo-700 border border-indigo-100 shadow-md shadow-indigo-100/30' 
-                                  : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20')
-                              : (isAdminLightMode
-                                  ? 'text-slate-500 hover:bg-white hover:text-slate-900 hover:shadow-sm'
-                                  : 'text-slate-400 hover:bg-slate-800/50 hover:text-white')
-                          }`}
-                        >
-                          <FileCode className={`w-4 h-4 transition-transform group-hover:scale-110`} />
-                          System Audit Logs
-                        </button>
-                      </nav>
-                    </div>
-                  </div>
-
-                  {/* Sidebar Footer info */}
-                  <div className={`mt-10 pt-8 border-t space-y-4 transition-colors ${
-                    isAdminLightMode ? 'border-slate-100' : 'border-slate-800/50'
-                  }`}>
-                    <div className="flex items-center gap-3">
-                      <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-black ${
-                        isAdminLightMode ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-indigo-950 border-indigo-900 text-indigo-400'
-                      }`}>
-                        {auth.user.name[0]}
-                      </div>
-                      <div className="text-left overflow-hidden">
-                        <span className={`block text-[11px] font-black truncate ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
-                          {auth.user.name}
-                        </span>
-                        <span className={`block text-[9px] font-bold uppercase tracking-wider truncate ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                          {auth.user.role}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </aside>
-
-                {/* Right Side Content Panel */}
-                <main className={`lg:col-span-9 p-8 sm:p-10 transition-all duration-300 ${
-                  isAdminLightMode ? 'bg-white' : 'bg-[#0f172a]'
+                    ? 'bg-[#F4F6FC] border-slate-200 text-slate-800 shadow-xl shadow-slate-100/50' 
+                    : 'bg-[#0b0f19] border-slate-800 text-slate-100 shadow-2xl'
                 }`}>
                   
-                  {/* SUBTAB: OVERVIEW */}
-                  {adminSubTab === 'overview' && (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-2 duration-500 text-left">
-                      
-                      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                        <div className="space-y-1">
-                          <h4 className={`text-2xl font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>System Vitality</h4>
-                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>Real-time overview of staff distribution and clinical credentials.</p>
-                        </div>
-                        <div className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-wider border font-mono ${
-                          isAdminLightMode ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-slate-900/50 border-slate-800 text-slate-400'
-                        }`}>
-                          Last Updated: {new Date().toLocaleTimeString()}
-                        </div>
-                      </div>
-
-                      {/* Stat Grid */}
-                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
-                        <div className={`p-8 rounded-[32px] border transition-all duration-300 group hover:-translate-y-1 ${
-                          isAdminLightMode 
-                            ? 'bg-white border-slate-100 shadow-xl shadow-slate-100/40' 
-                            : 'bg-slate-900/40 border-slate-800 shadow-2xl shadow-black/20'
-                        }`}>
-                          <div className="flex flex-col gap-6">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                              isAdminLightMode ? 'bg-indigo-50 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400'
-                            }`}>
-                              <Users className="w-7 h-7" />
-                            </div>
-                            <div className="space-y-1">
-                              <span className="text-4xl font-black tracking-tighter">{allUsers.length}</span>
-                              <span className={`text-[10px] block font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Total Registered Staff</span>
-                            </div>
+                  {/* Outer Grid Panel: Sidebar | Workspace | Widgets */}
+                  <div className="grid grid-cols-1 xl:grid-cols-12 gap-6 items-stretch">
+                    
+                    {/* COLUMN 1: LEFT SIDEBAR (xl:col-span-2) */}
+                    <aside className={`xl:col-span-2 p-5 rounded-[28px] border flex flex-col justify-between transition-all duration-300 ${
+                      isAdminLightMode ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#111827] border-slate-800 shadow-xl'
+                    }`}>
+                      <div className="space-y-6">
+                        {/* Profile header */}
+                        <div className="flex items-center gap-3 pb-4 border-b border-dashed border-slate-200 dark:border-slate-800">
+                          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-650 text-white font-extrabold flex items-center justify-center text-md shadow-md shrink-0">
+                            {auth.user.name[0].toUpperCase()}
                           </div>
-                        </div>
-
-                        <div className={`p-8 rounded-[32px] border transition-all duration-300 group hover:-translate-y-1 ${
-                          isAdminLightMode 
-                            ? 'bg-white border-slate-100 shadow-xl shadow-slate-100/40' 
-                            : 'bg-slate-900/40 border-slate-800 shadow-2xl shadow-black/20'
-                        }`}>
-                          <div className="flex flex-col gap-6">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                              isAdminLightMode ? 'bg-amber-50 text-amber-600' : 'bg-amber-500/10 text-amber-400'
-                            }`}>
-                              <ShieldAlert className="w-7 h-7" />
-                            </div>
-                            <div className="space-y-1">
-                              <span className={`text-4xl font-black tracking-tighter ${allUsers.filter(u => u.status === 'Pending').length > 0 ? (isAdminLightMode ? 'text-amber-600' : 'text-amber-400') : ''}`}>
-                                {allUsers.filter(u => u.status === 'Pending').length}
-                              </span>
-                              <span className={`text-[10px] block font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Awaiting Vetting</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className={`p-8 rounded-[32px] border transition-all duration-300 group hover:-translate-y-1 ${
-                          isAdminLightMode 
-                            ? 'bg-white border-slate-100 shadow-xl shadow-slate-100/40' 
-                            : 'bg-slate-900/40 border-slate-800 shadow-2xl shadow-black/20'
-                        }`}>
-                          <div className="flex flex-col gap-6">
-                            <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-colors ${
-                              isAdminLightMode ? 'bg-emerald-50 text-emerald-600' : 'bg-emerald-500/10 text-emerald-400'
-                            }`}>
-                              <BadgeCheck className="w-7 h-7" />
-                            </div>
-                            <div className="space-y-1">
-                              <span className="text-4xl font-black tracking-tighter text-emerald-600 dark:text-emerald-400">
-                                {allUsers.filter(u => u.status === 'Approved').length}
-                              </span>
-                              <span className={`text-[10px] block font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Verified Clinicians</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Professional Info Panel */}
-                      <div className={`relative p-10 rounded-[40px] border overflow-hidden transition-all duration-500 ${
-                        isAdminLightMode 
-                          ? 'bg-indigo-600 border-indigo-500 shadow-2xl shadow-indigo-200' 
-                          : 'bg-indigo-900/40 border-indigo-500/20'
-                      }`}>
-                        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-10">
-                          <div className="space-y-4">
-                            <h4 className="text-2xl font-black text-white leading-tight tracking-tight">
-                              Credential Integrity Protocols
+                          <div className="min-w-0 text-left">
+                            <h4 className={`text-xs font-black truncate ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                              {auth.user.name}
                             </h4>
-                            <p className="text-sm text-indigo-100 leading-relaxed max-w-2xl font-medium opacity-90">
-                              Access to neonatal medical records is strictly governed by institutional vetting. Every clinical action is tied to a verified ID, ensuring high-fidelity audit trails for all neonatal interventions.
+                            <p className="text-[9px] font-bold text-slate-450 uppercase tracking-wider truncate">
+                              {auth.user.role}
                             </p>
-                            <div className="flex items-center gap-3 pt-2">
-                              <div className="flex -space-x-2">
-                                {[1,2,3,4].map(i => (
-                                  <div key={i} className="w-8 h-8 rounded-full border-2 border-indigo-600 bg-indigo-400 flex items-center justify-center text-[8px] font-black text-white">
-                                    {String.fromCharCode(64 + i)}
-                                  </div>
-                                ))}
-                              </div>
-                              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-200">
-                                4 Admin Users Online
-                              </span>
-                            </div>
                           </div>
-                          <button
-                            onClick={() => setAdminSubTab('vetting')}
-                            className={`px-8 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.1em] transition-all hover:scale-105 active:scale-95 shadow-2xl ${
-                              isAdminLightMode 
-                                ? 'bg-white text-indigo-600 shadow-black/10' 
-                                : 'bg-white text-indigo-900'
-                            }`}
-                          >
-                            Launch Vetting Interface
+                        </div>
+
+                        {/* Favorites / Recently toggle buttons */}
+                        <div className={`flex p-1 rounded-xl transition-all ${
+                          isAdminLightMode ? 'bg-slate-100' : 'bg-slate-900'
+                        }`}>
+                          <button className="flex-1 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider bg-blue-600 text-white shadow-sm transition-all">
+                            Favorites
+                          </button>
+                          <button className={`flex-1 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                            isAdminLightMode ? 'text-slate-400 hover:text-slate-700' : 'text-slate-500 hover:text-slate-300'
+                          }`}>
+                            Recently
                           </button>
                         </div>
-                        {/* Decorative Background Elements */}
-                        <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/5 rounded-full blur-3xl" />
-                        <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-indigo-400/10 rounded-full blur-2xl" />
-                      </div>
-                    </div>
-                  )}
 
-                  {/* SUBTAB: VETTING QUEUE */}
-                  {adminSubTab === 'vetting' && (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-right-2 duration-500 text-left">
-                      <div className="flex items-center justify-between">
+                        {/* Navigation Links */}
                         <div className="space-y-1">
-                          <h4 className={`text-2xl font-black tracking-tight flex items-center gap-3 ${
-                            isAdminLightMode ? 'text-slate-900' : 'text-white'
-                          }`}>
-                            Credential Vetting Queue
-                          </h4>
-                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                            Perform administrative review of medical staff registration requests.
-                          </p>
+                          <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block px-2 mb-2">
+                            Dashboard
+                          </span>
+                          <nav className="space-y-1">
+                            {[
+                              { id: 'overview', name: 'Overview', icon: BarChart2 },
+                              { id: 'vetting', name: 'Vetting Queue', icon: ShieldAlert, badge: allUsers.filter(u => u.status === 'Pending').length },
+                              { id: 'doctors', name: 'Doctors', icon: Stethoscope },
+                              { id: 'directory', name: 'Nurses & Staff', icon: Users },
+                              { id: 'patients', name: 'Patients', icon: Baby },
+                              { id: 'audit', name: 'Audit Logs', icon: FileCode },
+                            ].map(item => {
+                              const isActive = (item.id === 'doctors' || item.id === 'directory')
+                                ? (adminSubTab === 'directory' && (item.id === 'doctors' ? adminRoleFilter === 'Doctor' : adminRoleFilter === 'Nurse'))
+                                : (adminSubTab === item.id);
+
+                              return (
+                                <button
+                                  key={item.id}
+                                  onClick={() => {
+                                    if (item.id === 'doctors') {
+                                      setAdminSubTab('directory');
+                                      setAdminRoleFilter('Doctor');
+                                    } else if (item.id === 'directory') {
+                                      setAdminSubTab('directory');
+                                      setAdminRoleFilter('Nurse');
+                                    } else {
+                                      setAdminSubTab(item.id);
+                                      setAdminRoleFilter('All');
+                                    }
+                                  }}
+                                  className={`w-full flex items-center justify-between gap-2.5 px-3.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all group ${
+                                    isActive
+                                      ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20'
+                                      : (isAdminLightMode 
+                                          ? 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' 
+                                          : 'text-slate-400 hover:bg-slate-900/50 hover:text-white')
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-2.5">
+                                    <item.icon className="w-4 h-4 shrink-0 transition-transform group-hover:scale-105" />
+                                    <span>{item.name}</span>
+                                  </div>
+                                  {item.badge > 0 && (
+                                    <span className={`h-4 min-w-[16px] px-1 rounded flex items-center justify-center text-[9px] font-bold ${
+                                      isActive ? 'bg-white text-blue-600' : 'bg-amber-500 text-white animate-pulse'
+                                    }`}>
+                                      {item.badge}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </nav>
+                        </div>
+
+                        {/* System Options */}
+                        <div className="pt-4 border-t border-dashed border-slate-200 dark:border-slate-800 space-y-1">
+                          <span className="text-[8px] font-black uppercase tracking-[0.2em] text-slate-400 dark:text-slate-600 block px-2 mb-2">
+                            System
+                          </span>
+                          <button
+                            onClick={() => setAdminSubTab('settings')}
+                            className={`w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all ${
+                              adminSubTab === 'settings'
+                                ? 'bg-blue-600 text-white shadow-lg'
+                                : (isAdminLightMode 
+                                    ? 'text-slate-500 hover:bg-slate-50 hover:text-slate-900' 
+                                    : 'text-slate-400 hover:bg-slate-900/50 hover:text-white')
+                            }`}
+                          >
+                            <Settings className="w-4 h-4 shrink-0" />
+                            Settings
+                          </button>
+                          <Link
+                            href={route('logout')}
+                            method="post"
+                            as="button"
+                            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider text-rose-500 hover:bg-rose-500/10 transition-all text-left"
+                          >
+                            <LogOut className="w-4 h-4 shrink-0" />
+                            Log Out
+                          </Link>
                         </div>
                       </div>
 
-                      {allUsers.filter(u => u.status === 'Pending').length === 0 ? (
-                        <div className={`p-20 rounded-[48px] border text-center transition-all duration-500 ${
-                          isAdminLightMode 
-                            ? 'bg-slate-50 border-slate-100 text-slate-400' 
-                            : 'bg-slate-900/20 border-slate-800 text-slate-500'
-                        }`}>
-                          <div className={`w-20 h-20 rounded-[32px] mx-auto mb-8 flex items-center justify-center border-2 transition-transform duration-500 hover:rotate-12 ${
-                            isAdminLightMode ? 'bg-white border-emerald-100 text-emerald-500 shadow-xl shadow-emerald-100/30' : 'bg-slate-800 border-emerald-500/20 text-emerald-400'
-                          }`}>
-                            <Check className="w-10 h-10" />
+                      {/* Theme toggle banner at footer */}
+                      <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+                        <button 
+                          onClick={() => setIsAdminLightMode(!isAdminLightMode)}
+                          className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider transition-all border ${
+                            isAdminLightMode 
+                              ? 'bg-white hover:bg-slate-100 text-slate-800 border-slate-200 shadow-sm' 
+                              : 'bg-slate-800 hover:bg-slate-700 text-white border-slate-700'
+                          }`}
+                        >
+                          {isAdminLightMode ? <Moon className="w-3.5 h-3.5" /> : <Sun className="w-3.5 h-3.5" />}
+                          {isAdminLightMode ? 'Dark Theme' : 'Light Theme'}
+                        </button>
+                      </div>
+                    </aside>
+
+                    {/* COLUMN 2: WORKSPACE PANEL (xl:col-span-7) */}
+                    <main className="xl:col-span-7 space-y-6">
+                      
+                      {/* Header block with search & clock */}
+                      <div className={`p-5 rounded-[24px] border flex flex-col md:flex-row md:items-center justify-between gap-4 transition-all duration-300 ${
+                        isAdminLightMode ? 'bg-white border-slate-200 shadow-sm' : 'bg-[#111827] border-slate-800 shadow-lg'
+                      }`}>
+                        <div>
+                          <div className="flex items-center gap-1.5 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                            <span>Dashboard</span>
+                            <ChevronRight className="w-3 h-3 text-slate-350" />
+                            <span className="text-blue-600 font-black">{adminSubTab}</span>
                           </div>
-                          <h5 className={`text-xl font-black mb-2 ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Queue Fully Audited</h5>
-                          <p className="text-sm font-medium opacity-60">No pending clinician credentials require validation at this time.</p>
+                          <h3 className={`text-md font-black tracking-tight mt-1 ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                            {adminSubTab === 'overview' && 'System Analytics Command'}
+                            {adminSubTab === 'vetting' && 'Credential Vetting Queue'}
+                            {adminSubTab === 'directory' && `${adminRoleFilter} Staff Directory`}
+                            {adminSubTab === 'patients' && 'Neonatal Patients registry'}
+                            {adminSubTab === 'audit' && 'Clinical Audit Trail Ledger'}
+                            {adminSubTab === 'settings' && 'Institutional Settings & Security'}
+                          </h3>
                         </div>
-                      ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          {allUsers.filter(u => u.status === 'Pending').map((user) => (
-                            <div key={user.id} className={`p-8 rounded-[40px] border shadow-sm flex flex-col justify-between gap-8 transition-all duration-300 group hover:-translate-y-1 ${
-                              isAdminLightMode 
-                                ? 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-2xl hover:shadow-indigo-100/50' 
-                                : 'bg-slate-900/40 border-slate-800 hover:border-indigo-500/30'
+
+                        {/* Search, Notifications & clock */}
+                        <div className="flex items-center gap-3 self-end md:self-auto">
+                          <div className="relative group">
+                            <Search className={`w-3.5 h-3.5 absolute left-4.5 top-1/2 -translate-y-1/2 transition-colors ${
+                              isAdminLightMode ? 'text-slate-400 group-focus-within:text-blue-500' : 'text-slate-500 group-focus-within:text-blue-405'
+                            }`} />
+                            <input
+                              type="text"
+                              placeholder="Search Files, Patients..."
+                              value={adminSearchTerm}
+                              onChange={(e) => setAdminSearchTerm(e.target.value)}
+                              className={`pl-10 pr-4 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-wider outline-none border transition-all w-48 focus:w-60 ${
+                                isAdminLightMode 
+                                  ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-blue-400' 
+                                  : 'bg-slate-900 border-slate-800 text-white focus:bg-slate-950 focus:border-blue-500'
+                              }`}
+                            />
+                          </div>
+
+                          <button className={`p-2.5 rounded-xl border transition-all ${
+                            isAdminLightMode ? 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100' : 'bg-slate-900 border-slate-800 text-slate-450 hover:bg-slate-800'
+                          }`}>
+                            <Clock className="w-4 h-4" />
+                          </button>
+                          
+                          <button className={`p-2.5 rounded-xl border transition-all relative ${
+                            isAdminLightMode ? 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100' : 'bg-slate-900 border-slate-800 text-slate-450 hover:bg-slate-800'
+                          }`}>
+                            <Bell className="w-4 h-4" />
+                            <span className="absolute top-2.5 right-2.5 w-1.5 h-1.5 bg-rose-500 rounded-full" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* SUBTAB CONTENT: OVERVIEW DASHBOARD */}
+                      {adminSubTab === 'overview' && (
+                        <div className="space-y-6 animate-in fade-in duration-300">
+                          {/* Year / Month / Week buttons row */}
+                          <div className="flex justify-between items-center">
+                            <div className={`flex p-1 rounded-xl shadow-sm ${isAdminLightMode ? 'bg-white' : 'bg-[#111827]'}`}>
+                              {['Year', 'Month', 'Week'].map((t) => (
+                                <button 
+                                  key={t}
+                                  className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider transition-all ${
+                                    t === 'Month' 
+                                      ? 'bg-blue-600 text-white shadow-sm' 
+                                      : (isAdminLightMode ? 'text-slate-400 hover:text-slate-700' : 'text-slate-500 hover:text-slate-350')
+                                  }`}
+                                >
+                                  {t}
+                                </button>
+                              ))}
+                            </div>
+
+                            <button className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all ${
+                              isAdminLightMode ? 'bg-white border-slate-200 text-slate-700 shadow-sm' : 'bg-[#111827] border-slate-800 text-slate-350'
                             }`}>
-                              <div className="flex gap-6">
-                                <div className={`w-16 h-16 rounded-[24px] flex items-center justify-center shrink-0 text-xl font-black font-mono border-2 transition-transform group-hover:scale-110 ${
-                                  isAdminLightMode 
-                                    ? 'bg-indigo-50 border-indigo-100 text-indigo-600 shadow-inner' 
-                                    : 'bg-indigo-950/40 border-indigo-500/20 text-indigo-400'
-                                }`}>
-                                  {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                              Select Date
+                              <ChevronDown className="w-3.5 h-3.5 text-blue-500" />
+                            </button>
+                          </div>
+
+                          {/* Stat Cards & Total Patients Bar Chart */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                            
+                            {/* Stats Cards Column */}
+                            <div className="md:col-span-5 grid grid-cols-2 gap-4">
+                              {/* Doctors Card */}
+                              <div className="bg-[#FEF8CD] p-5 rounded-[24px] border border-yellow-200/50 shadow-sm flex flex-col justify-between text-left h-[130px]">
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-yellow-800">Doctors</span>
+                                  <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 text-[8px] font-black tracking-wider flex items-center gap-0.5">
+                                    +11.01%
+                                  </span>
                                 </div>
-                                <div className="space-y-2 text-left pt-1">
-                                  <h5 className={`font-black text-lg tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{user.name}</h5>
-                                  <div className="flex flex-wrap gap-2">
-                                    <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border ${
-                                      isAdminLightMode 
-                                        ? 'bg-slate-100 border-slate-200 text-slate-500' 
-                                        : 'bg-slate-800 border-slate-700 text-slate-400'
-                                    }`}>
-                                      {user.role}
-                                    </span>
-                                    <span className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider border font-mono ${
-                                      isAdminLightMode 
-                                        ? 'bg-indigo-50 border-indigo-100 text-indigo-600' 
-                                        : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400'
-                                    }`}>
-                                      {user.email}
-                                    </span>
+                                <div>
+                                  <h4 className="text-3xl font-black text-yellow-950 tracking-tight">{doctorsCount}</h4>
+                                  <p className="text-[9px] font-bold text-yellow-700 mt-0.5">5 Doctors on Vacation</p>
+                                </div>
+                              </div>
+
+                              {/* Nurses & Staff Card */}
+                              <div className={`p-5 rounded-[24px] border shadow-sm flex flex-col justify-between text-left h-[130px] transition-all duration-300 ${
+                                isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-800/80'
+                              }`}>
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Nurses & Staff</span>
+                                  <span className="px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-600 text-[8px] font-black tracking-wider flex items-center gap-0.5">
+                                    -0.01%
+                                  </span>
+                                </div>
+                                <div>
+                                  <h4 className={`text-3xl font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{nursesCount}</h4>
+                                  <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">5 Newly joined</p>
+                                </div>
+                              </div>
+
+                              {/* Patients Card */}
+                              <div className={`p-5 rounded-[24px] border shadow-sm flex flex-col justify-between text-left h-[130px] transition-all duration-300 ${
+                                isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-800/80'
+                              }`}>
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-500">Patients</span>
+                                  <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 text-[8px] font-black tracking-wider flex items-center gap-0.5">
+                                    +15.03%
+                                  </span>
+                                </div>
+                                <div>
+                                  <h4 className={`text-3xl font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{patientsCount}</h4>
+                                  <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 mt-0.5">22 New patients</p>
+                                </div>
+                              </div>
+
+                              {/* Pharmacy Card */}
+                              <div className="bg-[#FEF8CD] p-5 rounded-[24px] border border-yellow-200/50 shadow-sm flex flex-col justify-between text-left h-[130px]">
+                                <div className="flex justify-between items-start">
+                                  <span className="text-[10px] font-black uppercase tracking-wider text-yellow-800">Pharmacy</span>
+                                  <span className="px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-700 text-[8px] font-black tracking-wider flex items-center gap-0.5">
+                                    +6.08%
+                                  </span>
+                                </div>
+                                <div>
+                                  <h4 className="text-3xl font-black text-yellow-950 tracking-tight">{pharmacyCount}</h4>
+                                  <p className="text-[9px] font-bold text-yellow-700 mt-0.5">45k Medicine on reserve</p>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Total Patients Stacked Bar Chart */}
+                            <div className={`md:col-span-7 p-6 rounded-[28px] border shadow-sm flex flex-col justify-between text-left transition-all duration-300 ${
+                              isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-800/80'
+                            }`}>
+                              <div className="flex items-center justify-between pb-3">
+                                <div className="flex items-baseline gap-2">
+                                  <h4 className={`text-xs font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Total Patients</h4>
+                                  <span className="px-1.5 py-0.2 bg-emerald-150 dark:bg-emerald-950 text-emerald-600 text-[8px] font-black rounded-full">+6.08%</span>
+                                </div>
+                                <button className="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">
+                                  View All &gt;
+                                </button>
+                              </div>
+
+                              <div className="flex-1 flex items-center justify-center pt-2">
+                                <svg className="w-full h-40" viewBox="0 0 360 180">
+                                  {/* Y grids */}
+                                  <line x1="30" y1="20" x2="350" y2="20" stroke="#f1f5f9" className="dark:stroke-slate-800/50" strokeWidth="1" />
+                                  <line x1="30" y1="60" x2="350" y2="60" stroke="#f1f5f9" className="dark:stroke-slate-800/50" strokeWidth="1" />
+                                  <line x1="30" y1="100" x2="350" y2="100" stroke="#f1f5f9" className="dark:stroke-slate-800/50" strokeWidth="1" />
+                                  <line x1="30" y1="140" x2="350" y2="140" stroke="#f1f5f9" className="dark:stroke-slate-800/50" strokeWidth="1" />
+                                  
+                                  <text x="15" y="24" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-500">300</text>
+                                  <text x="15" y="64" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-500">200</text>
+                                  <text x="15" y="104" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-500">100</text>
+                                  <text x="20" y="144" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-500">0</text>
+
+                                  {/* Jan */}
+                                  <g className="cursor-pointer hover:opacity-85 transition-opacity">
+                                    <rect x="50" y="100" width="14" height="40" rx="2" fill="#2563eb" />
+                                    <rect x="50" y="80" width="14" height="20" fill="#60a5fa" />
+                                    <rect x="50" y="65" width="14" height="15" rx="2" fill="#facc15" />
+                                  </g>
+                                  <text x="57" y="160" textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-550">Jan</text>
+
+                                  {/* Feb */}
+                                  <g className="cursor-pointer hover:opacity-85 transition-opacity">
+                                    <rect x="100" y="110" width="14" height="30" rx="2" fill="#2563eb" />
+                                    <rect x="100" y="95" width="14" height="15" fill="#60a5fa" />
+                                    <rect x="100" y="85" width="14" height="10" rx="2" fill="#facc15" />
+                                  </g>
+                                  <text x="107" y="160" textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-550">Feb</text>
+
+                                  {/* Mar */}
+                                  <g className="cursor-pointer hover:opacity-85 transition-opacity">
+                                    <rect x="150" y="90" width="14" height="50" rx="2" fill="#2563eb" />
+                                    <rect x="150" y="70" width="14" height="20" fill="#60a5fa" />
+                                    <rect x="150" y="55" width="14" height="15" rx="2" fill="#facc15" />
+                                  </g>
+                                  <text x="157" y="160" textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-550">Mar</text>
+
+                                  {/* Apr */}
+                                  <g className="cursor-pointer hover:opacity-85 transition-opacity">
+                                    <rect x="200" y="105" width="14" height="35" rx="2" fill="#2563eb" />
+                                    <rect x="200" y="85" width="14" height="20" fill="#60a5fa" />
+                                    <rect x="200" y="75" width="14" height="10" rx="2" fill="#facc15" />
+                                  </g>
+                                  <text x="207" y="160" textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-550">Apr</text>
+
+                                  {/* May */}
+                                  <g className="cursor-pointer hover:opacity-85 transition-opacity">
+                                    <rect x="250" y="115" width="14" height="25" rx="2" fill="#2563eb" />
+                                    <rect x="250" y="100" width="14" height="15" fill="#60a5fa" />
+                                    <rect x="250" y="90" width="14" height="10" rx="2" fill="#facc15" />
+                                  </g>
+                                  <text x="257" y="160" textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-550">May</text>
+
+                                  {/* Jun */}
+                                  <g className="cursor-pointer hover:opacity-85 transition-opacity">
+                                    <rect x="300" y="85" width="14" height="55" rx="2" fill="#2563eb" />
+                                    <rect x="300" y="65" width="14" height="20" fill="#60a5fa" />
+                                    <rect x="300" y="50" width="14" height="15" rx="2" fill="#facc15" />
+                                  </g>
+                                  <text x="307" y="160" textAnchor="middle" className="text-[8px] font-bold fill-slate-400 dark:fill-slate-550">Jun</text>
+                                </svg>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Grid Row 2: Earnings double line graph & birth / death donut */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                            {/* Total Earnings line chart card */}
+                            <div className={`md:col-span-8 p-6 rounded-[28px] border shadow-sm flex flex-col justify-between text-left transition-all duration-300 ${
+                              isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-800/80'
+                            }`}>
+                              <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                                <div className="flex items-baseline gap-2">
+                                  <h4 className={`text-xs font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Total Earnings</h4>
+                                  <span className="px-1.5 py-0.2 bg-emerald-150 dark:bg-emerald-950 text-emerald-600 text-[8px] font-black rounded-full">+15.03%</span>
+                                </div>
+
+                                <div className="flex items-center gap-3 text-[8px] font-black uppercase tracking-wider text-slate-400 dark:text-slate-550">
+                                  <span className="flex items-center gap-1">
+                                    <span className="w-2 h-2 rounded-full bg-blue-600 block" /> Current: $8,211
+                                  </span>
+                                  <span className="flex items-center gap-1">
+                                    <span className="w-2 h-2 rounded-full bg-yellow-500 block" /> Previous: $6,768
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="flex-1 flex items-center justify-center pt-2">
+                                <svg className="w-full h-44" viewBox="0 0 450 180">
+                                  <line x1="30" y1="20" x2="430" y2="20" stroke="#f1f5f9" className="dark:stroke-slate-800/55" strokeWidth="1" />
+                                  <line x1="30" y1="60" x2="430" y2="60" stroke="#f1f5f9" className="dark:stroke-slate-800/55" strokeWidth="1" />
+                                  <line x1="30" y1="100" x2="430" y2="100" stroke="#f1f5f9" className="dark:stroke-slate-800/55" strokeWidth="1" />
+                                  <line x1="30" y1="140" x2="430" y2="140" stroke="#f1f5f9" className="dark:stroke-slate-800/55" strokeWidth="1" />
+
+                                  <text x="10" y="24" className="text-[7px] font-black fill-slate-400 dark:fill-slate-500">$3000</text>
+                                  <text x="10" y="64" className="text-[7px] font-black fill-slate-400 dark:fill-slate-500">$2000</text>
+                                  <text x="10" y="104" className="text-[7px] font-black fill-slate-400 dark:fill-slate-500">$1000</text>
+                                  <text x="15" y="144" className="text-[7px] font-black fill-slate-400 dark:fill-slate-500">$0</text>
+
+                                  {/* Yellow Line */}
+                                  <path 
+                                    d="M 40 120 C 100 130, 160 145, 220 115 C 280 90, 340 130, 420 110" 
+                                    fill="none" 
+                                    stroke="#eab308" 
+                                    strokeWidth="2" 
+                                    strokeLinecap="round" 
+                                  />
+
+                                  {/* Blue Line */}
+                                  <path 
+                                    d="M 40 100 C 100 90, 160 115, 220 85 C 280 65, 340 100, 420 75" 
+                                    fill="none" 
+                                    stroke="#2563eb" 
+                                    strokeWidth="3.5" 
+                                    strokeLinecap="round" 
+                                  />
+
+                                  {/* Target Line */}
+                                  <line x1="220" y1="20" x2="220" y2="140" stroke="#cbd5e1" className="dark:stroke-slate-700" strokeWidth="1" strokeDasharray="3" />
+                                  <circle cx="220" cy="85" r="4.5" fill="#2563eb" stroke="#ffffff" strokeWidth="1.5" />
+
+                                  {/* Interactive Tooltip Callout */}
+                                  <g transform="translate(180, 20)">
+                                    <rect x="0" y="0" width="80" height="28" rx="6" fill="#1e293b" />
+                                    <text x="40" y="11" textAnchor="middle" className="text-[8px] font-black fill-white">$2,300</text>
+                                    <text x="40" y="21" textAnchor="middle" className="text-[7px] font-semibold fill-slate-400">Jan 10, 22:00</text>
+                                  </g>
+
+                                  {/* X Months */}
+                                  <text x="40" y="160" textAnchor="middle" className="text-[7px] font-black fill-slate-400">Oct 2023</text>
+                                  <text x="116" y="160" textAnchor="middle" className="text-[7px] font-black fill-slate-400">Nov 2023</text>
+                                  <text x="192" y="160" textAnchor="middle" className="text-[7px] font-black fill-slate-400">Dec 2023</text>
+                                  <text x="268" y="160" textAnchor="middle" className="text-[7px] font-black fill-slate-400">Jan 2024</text>
+                                  <text x="344" y="160" textAnchor="middle" className="text-[7px] font-black fill-slate-400">Feb 2024</text>
+                                  <text x="420" y="160" textAnchor="end" className="text-[7px] font-black fill-slate-400">Mar 2024</text>
+                                </svg>
+                              </div>
+                            </div>
+
+                            {/* Donut analytical chart */}
+                            <div className={`md:col-span-4 p-6 rounded-[28px] border shadow-sm flex flex-col justify-between text-left transition-all duration-300 ${
+                              isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-800/80'
+                            }`}>
+                              <div>
+                                <h4 className={`text-xs font-black leading-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                                  Hospital Birth & Death Analytics
+                                </h4>
+                              </div>
+
+                              <div className="flex justify-center my-3 relative items-center">
+                                <svg className="w-28 h-28 transform -rotate-90" viewBox="0 0 100 100">
+                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" className="dark:stroke-slate-800" />
+                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#2563eb" strokeWidth="8" strokeDasharray="251.3" strokeDashoffset="53" strokeLinecap="round" />
+                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#eab308" strokeWidth="8" strokeDasharray="251.3" strokeDashoffset="125" strokeLinecap="round" />
+                                  <circle cx="50" cy="50" r="40" fill="none" stroke="#ef4444" strokeWidth="8" strokeDasharray="251.3" strokeDashoffset="200" strokeLinecap="round" />
+                                </svg>
+                                <div className="absolute text-center">
+                                  <span className={`text-lg font-black block leading-none ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>27.99%</span>
+                                </div>
+                              </div>
+
+                              <div className="space-y-1.5 text-[9px] font-bold text-slate-500 dark:text-slate-400">
+                                <div className="flex items-center justify-between">
+                                  <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-blue-600 block" /> Birth case
+                                  </span>
+                                  <span className={`font-black ${isAdminLightMode ? 'text-slate-800' : 'text-white'}`}>78.99%</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-yellow-500 block" /> Accident case
+                                  </span>
+                                  <span className={`font-black ${isAdminLightMode ? 'text-slate-800' : 'text-white'}`}>56.99%</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-red-500 block" /> Death case
+                                  </span>
+                                  <span className={`font-black ${isAdminLightMode ? 'text-slate-800' : 'text-white'}`}>27.99%</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Patients Registration Table */}
+                          <div className={`p-6 rounded-[28px] border shadow-sm text-left transition-all duration-300 ${
+                            isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-800/80'
+                          }`}>
+                            <h4 className={`text-xs font-black mb-4 ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                              Patients Registration
+                            </h4>
+                            
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left border-collapse min-w-[580px]">
+                                <thead>
+                                  <tr className="border-b border-slate-100 dark:border-slate-800 text-[8px] text-slate-400 font-black uppercase tracking-wider">
+                                    <th className="pb-3">Name</th>
+                                    <th className="pb-3">Status</th>
+                                    <th className="pb-3">Date & Time</th>
+                                    <th className="pb-3">Age</th>
+                                    <th className="pb-3">Appointed For</th>
+                                    <th className="pb-3 text-center">Report</th>
+                                    <th className="pb-3 text-right">Action</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-50 dark:divide-slate-850/40 text-xs font-semibold text-slate-700 dark:text-slate-350">
+                                  {recentNeonates.map((n) => (
+                                    <tr key={n.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/30 transition-all duration-200">
+                                      <td className={`py-4 font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{n.name}</td>
+                                      <td className="py-4">
+                                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider ${
+                                          n.status === 'Critical' 
+                                            ? 'bg-rose-500/10 text-rose-500' 
+                                            : 'bg-blue-600/10 text-blue-600'
+                                        }`}>
+                                          {n.status === 'Critical' ? 'Critical' : 'Admitted'}
+                                        </span>
+                                      </td>
+                                      <td className="py-4 font-mono text-[9.5px] text-slate-400">
+                                        {new Date(n.created_at || n.createdAt).toLocaleString(undefined, {month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute:'2-digit'})}
+                                      </td>
+                                      <td className="py-4">{n.gestational_age || n.gestationalAge || 38} wks</td>
+                                      <td className="py-4 truncate max-w-[150px]">{n.admission_diagnosis || n.admissionDiagnosis || 'Observation'}</td>
+                                      <td className="py-4">
+                                        <div className="flex justify-center">
+                                          <FileText className="w-4 h-4 text-rose-500 cursor-pointer hover:scale-110 transition-transform" />
+                                        </div>
+                                      </td>
+                                      <td className="py-4">
+                                        <div className="flex items-center justify-end gap-2.5 text-slate-400">
+                                          <Printer className="w-3.5 h-3.5 cursor-pointer hover:text-blue-600 transition-colors" />
+                                          <Download className="w-3.5 h-3.5 cursor-pointer hover:text-blue-600 transition-colors" />
+                                          <Link href={route('neonates.profile', n.id)}>
+                                            <ArrowUpRight className="w-3.5 h-3.5 text-blue-500 cursor-pointer hover:scale-110 transition-all" />
+                                          </Link>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {recentNeonates.length === 0 && (
+                                    <tr>
+                                      <td colSpan="7" className="py-8 text-center text-slate-400 uppercase tracking-widest text-[9px]">
+                                        No recent patient admissions found.
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SUBTAB CONTENT: VETTING QUEUE */}
+                      {adminSubTab === 'vetting' && (
+                        <div className="space-y-6 animate-in fade-in duration-300">
+                          <div className="flex items-center justify-between">
+                            <h4 className={`text-sm font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Pending Registrations</h4>
+                          </div>
+
+                          {allUsers.filter(u => u.status === 'Pending').length === 0 ? (
+                            <div className={`p-16 rounded-[28px] border text-center transition-all ${
+                              isAdminLightMode ? 'bg-white border-slate-200/50 text-slate-450' : 'bg-[#111827] border-slate-805 text-slate-500'
+                            }`}>
+                              <ShieldCheck className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
+                              <h5 className={`font-black text-sm mb-1 ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Queue Fully Approved</h5>
+                              <p className="text-xs">No pending credentials require review.</p>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                              {allUsers.filter(u => u.status === 'Pending').map((user) => (
+                                <div key={user.id} className={`p-6 rounded-[28px] border shadow-sm flex flex-col justify-between gap-6 transition-all group hover:-translate-y-0.5 ${
+                                  isAdminLightMode 
+                                    ? 'bg-white border-slate-200/50 hover:border-blue-200 hover:shadow-lg' 
+                                    : 'bg-[#111827] border-slate-800 hover:border-blue-900'
+                                }`}>
+                                  <div className="flex gap-4">
+                                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-500 to-indigo-650 text-white font-extrabold flex items-center justify-center text-md shadow-inner shrink-0">
+                                      {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                    </div>
+                                    <div className="min-w-0 text-left pt-0.5">
+                                      <h5 className={`font-black text-sm truncate ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{user.name}</h5>
+                                      <div className="flex flex-wrap gap-1.5 mt-1.5">
+                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${
+                                          isAdminLightMode ? 'bg-slate-100 border-slate-200 text-slate-500' : 'bg-slate-900 border-slate-800 text-slate-450'
+                                        }`}>
+                                          {user.role}
+                                        </span>
+                                        <span className="text-[9px] font-semibold text-blue-500 truncate">{user.email}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+
+                                  <div className={`grid grid-cols-2 gap-3 p-4 rounded-2xl border ${
+                                    isAdminLightMode ? 'bg-slate-50 border-slate-100' : 'bg-slate-950/60 border-slate-900/60'
+                                  } text-xs text-left`}>
+                                    <div>
+                                      <span className="block text-[8px] font-black text-slate-400 uppercase tracking-widest">ID Number</span>
+                                      <span className={`font-bold ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{user.id_number || 'N/A'}</span>
+                                    </div>
+                                    <div>
+                                      <span className="block text-[8px] font-black text-slate-400 uppercase tracking-widest">Contact Phone</span>
+                                      <span className={`font-bold ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{user.phone || 'N/A'}</span>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-3">
+                                    <button
+                                      onClick={() => router.post(`/admin/users/${user.id}/approve`)}
+                                      className="flex-1 py-3 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md active:scale-95"
+                                    >
+                                      Approve
+                                    </button>
+                                    <button
+                                      onClick={() => router.post(`/admin/users/${user.id}/reject`)}
+                                      className={`px-4 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all border active:scale-95 ${
+                                        isAdminLightMode 
+                                          ? 'bg-white hover:bg-rose-50 border-slate-200 text-slate-400 hover:text-rose-650' 
+                                          : 'bg-slate-900 hover:bg-rose-950/20 border-slate-800 text-slate-500 hover:text-rose-400'
+                                      }`}
+                                    >
+                                      Reject
+                                    </button>
                                   </div>
                                 </div>
-                              </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )}
 
-                              <div className={`grid grid-cols-2 gap-4 p-5 rounded-3xl border transition-colors ${
-                                isAdminLightMode 
-                                  ? 'bg-slate-50 border-slate-100' 
-                                  : 'bg-slate-950/50 border-slate-800/50'
+                      {/* SUBTAB CONTENT: STAFF DIRECTORY */}
+                      {adminSubTab === 'directory' && (() => {
+                        const filteredStaff = allUsers.filter(user => {
+                          const matchesSearch = user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
+                                                user.email.toLowerCase().includes(adminSearchTerm.toLowerCase());
+                          const matchesRole = adminRoleFilter === 'All' || 
+                                              (adminRoleFilter === 'Doctor' ? (user.role.includes('Pediatrician') || user.role.includes('CO')) : user.role.includes('Nurse'));
+                          return matchesSearch && matchesRole;
+                        });
+
+                        return (
+                          <div className="space-y-6 animate-in fade-in duration-300 text-left">
+                            <div className="flex items-center justify-between">
+                              <h4 className={`text-sm font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                                {adminRoleFilter} Staff Directory ({filteredStaff.length})
+                              </h4>
+                            </div>
+
+                            <div className={`rounded-[28px] border overflow-hidden transition-all duration-300 ${
+                              isAdminLightMode ? 'bg-white border-slate-200/50 shadow-sm' : 'bg-[#111827] border-slate-800 shadow-lg'
+                            }`}>
+                              <div className="overflow-x-auto">
+                                <table className="w-full text-left border-collapse min-w-[700px]">
+                                  <thead>
+                                    <tr className={`text-[8px] font-black uppercase tracking-widest border-b ${
+                                      isAdminLightMode ? 'bg-slate-50 text-slate-400 border-slate-100' : 'bg-slate-950/40 text-slate-500 border-slate-900'
+                                    }`}>
+                                      <th className="px-6 py-4">Professional Details</th>
+                                      <th className="px-6 py-4 text-center">Designated Role</th>
+                                      <th className="px-6 py-4 text-center">Status</th>
+                                      <th className="px-6 py-4 text-right">Actions</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody className={`divide-y ${isAdminLightMode ? 'divide-slate-100' : 'divide-slate-900'}`}>
+                                    {filteredStaff.map((user) => (
+                                      <tr key={user.id} className={`group transition-all ${
+                                        isAdminLightMode ? 'hover:bg-slate-50/50' : 'hover:bg-slate-900/50'
+                                      }`}>
+                                        <td className="px-6 py-4">
+                                          <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-indigo-655 text-white font-extrabold flex items-center justify-center text-xs shrink-0 shadow-sm">
+                                              {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                                            </div>
+                                            <div>
+                                              <div className="flex items-center gap-1.5">
+                                                <span className={`text-xs font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{user.name}</span>
+                                                {user.status === 'Approved' && <BadgeCheck className="w-3.5 h-3.5 text-blue-500 fill-blue-500/10" />}
+                                              </div>
+                                              <span className="text-[9px] font-mono text-slate-450 block mt-0.5">{user.email}</span>
+                                            </div>
+                                          </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                          <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase border ${
+                                            isAdminLightMode ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-slate-905 border-slate-800 text-slate-400'
+                                          }`}>
+                                            {user.role}
+                                          </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-center">
+                                          <div className="flex justify-center">
+                                            <span className={`px-2 py-0.5 rounded-full text-[8px] font-black uppercase flex items-center gap-1 ${
+                                              user.status === 'Approved' 
+                                                ? 'bg-emerald-500/10 text-emerald-500' 
+                                                : (user.status === 'Pending' ? 'bg-amber-500/10 text-amber-500' : 'bg-rose-500/10 text-rose-500')
+                                            }`}>
+                                              <span className={`w-1 h-1 rounded-full ${user.status === 'Approved' ? 'bg-emerald-500' : (user.status === 'Pending' ? 'bg-amber-500' : 'bg-rose-500')}`} />
+                                              {user.status || 'Offline'}
+                                            </span>
+                                          </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-right">
+                                          <select
+                                            defaultValue={user.role}
+                                            onChange={(e) => {
+                                              router.post(`/admin/users/${user.id}/update-role`, {
+                                                role: e.target.value
+                                              });
+                                            }}
+                                            className={`px-3 py-1.5 rounded-xl outline-none text-[9px] font-black uppercase border transition-all cursor-pointer ${
+                                              isAdminLightMode 
+                                                ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white focus:border-blue-400' 
+                                                : 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-950 focus:border-blue-500'
+                                            }`}
+                                          >
+                                            <option value="Nursing In-Charge">Nursing In-Charge</option>
+                                            <option value="Nurse">Nurse</option>
+                                            <option value="Consultant Pediatrician">Consultant Pediatrician</option>
+                                            <option value="CO Pediatrics / MO">CO Pediatrics / MO</option>
+                                            <option value="Student">Student</option>
+                                            <option value="ICT / IT Support">ICT / IT Support</option>
+                                            <option value="Hospital Management">Hospital Management</option>
+                                          </select>
+                                        </td>
+                                      </tr>
+                                    ))}
+                                    {filteredStaff.length === 0 && (
+                                      <tr>
+                                        <td colSpan="4" className="py-12 text-center text-slate-400 uppercase tracking-widest text-[9px]">
+                                          No matching staff members found.
+                                        </td>
+                                      </tr>
+                                    )}
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* SUBTAB CONTENT: AUDIT LOGS */}
+                      {adminSubTab === 'audit' && (
+                        <div className="space-y-6 animate-in fade-in duration-300 text-left">
+                          <div className="flex items-center justify-between">
+                            <h4 className={`text-sm font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Clinical Logs Ledger</h4>
+                            <button className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all ${
+                              isAdminLightMode ? 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-450 hover:bg-slate-800'
+                            }`}>
+                              Export Ledger (.CSV)
+                            </button>
+                          </div>
+
+                          <div className={`rounded-[28px] border overflow-hidden transition-all duration-300 ${
+                            isAdminLightMode ? 'bg-white border-slate-200/50 shadow-sm' : 'bg-[#111827] border-slate-800 shadow-lg'
+                          }`}>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left border-collapse min-w-[650px]">
+                                <thead>
+                                  <tr className={`text-[8px] font-black uppercase tracking-widest border-b ${
+                                    isAdminLightMode ? 'bg-slate-50 text-slate-400 border-slate-100' : 'bg-slate-950/40 text-slate-500 border-slate-900'
+                                  }`}>
+                                    <th className="px-6 py-4">Timestamp</th>
+                                    <th className="px-6 py-4">Clinician Actor</th>
+                                    <th className="px-6 py-4">Action Event Description</th>
+                                    <th className="px-6 py-4 text-right">Origin IP</th>
+                                  </tr>
+                                </thead>
+                                <tbody className={`divide-y text-xs font-semibold ${
+                                  isAdminLightMode ? 'divide-slate-100 text-slate-700' : 'divide-slate-900 text-slate-350'
+                                }`}>
+                                  {auditLogs.map((log) => (
+                                    <tr key={log.id} className={`transition-colors ${
+                                      isAdminLightMode ? 'hover:bg-slate-50/50' : 'hover:bg-slate-900/50'
+                                    }`}>
+                                      <td className="px-6 py-4 font-mono text-[9px] text-slate-450 whitespace-nowrap">
+                                        {new Date(log.created_at).toLocaleString()}
+                                      </td>
+                                      <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center font-black text-[9px] border ${
+                                            isAdminLightMode ? 'bg-slate-100 border-slate-200 text-slate-500' : 'bg-slate-800 border-slate-700 text-slate-400'
+                                          }`}>
+                                            {log.user_name ? log.user_name[0] : 'S'}
+                                          </div>
+                                          <span className={`font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
+                                            {log.user_name || 'System Auto'}
+                                          </span>
+                                        </div>
+                                      </td>
+                                      <td className="px-6 py-4">
+                                        <div className="flex items-center gap-2">
+                                          <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border ${
+                                            log.action && (log.action.includes('error') || log.action.includes('failed') || log.action.includes('REJECTED'))
+                                              ? 'bg-rose-500/10 border-rose-500/20 text-rose-500'
+                                              : (isAdminLightMode ? 'bg-blue-50 border-blue-100 text-blue-600' : 'bg-blue-900/10 border-blue-900/20 text-blue-400')
+                                          }`}>
+                                            {log.type || 'Action'}
+                                          </span>
+                                          <span className="font-medium opacity-90 truncate max-w-[200px]" title={log.action}>{log.action}</span>
+                                        </div>
+                                      </td>
+                                      <td className="px-6 py-4 text-right font-mono text-[9px] text-slate-400 opacity-60">
+                                        {log.ip_address || '127.0.0.1'}
+                                      </td>
+                                    </tr>
+                                  ))}
+                                  {auditLogs.length === 0 && (
+                                    <tr>
+                                      <td colSpan="4" className="py-12 text-center text-slate-400 uppercase tracking-widest text-[9px]">
+                                        No audit entries registered in database.
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SUBTAB CONTENT: PATIENTS DATABASE LEDGER */}
+                      {adminSubTab === 'patients' && (
+                        <div className="space-y-6 animate-in fade-in duration-300 text-left">
+                          <div className="flex items-center justify-between">
+                            <h4 className={`text-sm font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Active Patients registry ({neonates.length})</h4>
+                          </div>
+
+                          <div className={`rounded-[28px] border overflow-hidden transition-all duration-300 ${
+                            isAdminLightMode ? 'bg-white border-slate-200/50 shadow-sm' : 'bg-[#111827] border-slate-800 shadow-lg'
+                          }`}>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-left border-collapse min-w-[700px]">
+                                <thead>
+                                  <tr className={`text-[8px] font-black uppercase tracking-widest border-b ${
+                                    isAdminLightMode ? 'bg-slate-50 text-slate-400 border-slate-100' : 'bg-slate-950/40 text-slate-500 border-slate-900'
+                                  }`}>
+                                    <th className="px-6 py-4">Hospital ID</th>
+                                    <th className="px-6 py-4">Newborn Baby Name</th>
+                                    <th className="px-6 py-4 text-center">Admission Date</th>
+                                    <th className="px-6 py-4 text-center">Gender</th>
+                                    <th className="px-6 py-4 text-center">Birth Weight</th>
+                                    <th className="px-6 py-4 text-right">Administrative Action</th>
+                                  </tr>
+                                </thead>
+                                <tbody className={`divide-y ${isAdminLightMode ? 'divide-slate-100 text-slate-700' : 'divide-slate-900 text-slate-350'}`}>
+                                  {neonates.filter(n => n.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || n.hospitalNumber.toLowerCase().includes(adminSearchTerm.toLowerCase())).map((n) => (
+                                    <tr key={n.id} className={`transition-colors ${
+                                      isAdminLightMode ? 'hover:bg-slate-50/50' : 'hover:bg-slate-900/50'
+                                    }`}>
+                                      <td className="px-6 py-4 font-mono text-xs font-black tracking-tight text-blue-600">{n.hospitalNumber || n.hospital_number}</td>
+                                      <td className={`px-6 py-4 font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{n.name}</td>
+                                      <td className="px-6 py-4 text-center font-mono text-[9.5px]">
+                                        {new Date(n.created_at || n.createdAt).toLocaleDateString(undefined, {year: 'numeric', month: 'short', day: 'numeric'})}
+                                      </td>
+                                      <td className="px-6 py-4 text-center">{n.gender}</td>
+                                      <td className="px-6 py-4 text-center font-bold">{n.birthWeight || n.birth_weight} kg</td>
+                                      <td className="px-6 py-4 text-right">
+                                        <Link 
+                                          href={route('neonates.profile', n.id)}
+                                          className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg text-[9px] font-black uppercase tracking-wider hover:bg-blue-500 shadow-sm transition-all"
+                                        >
+                                          View Profile <ArrowUpRight className="w-3.5 h-3.5" />
+                                        </Link>
+                                      </td>
+                                    </tr>
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* SUBTAB CONTENT: SETTINGS PANEL */}
+                      {adminSubTab === 'settings' && (
+                        <div className="space-y-6 animate-in fade-in duration-300 text-left">
+                          <h4 className={`text-sm font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Administrative Configuration</h4>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {[
+                              { title: "Vetting Protocols", desc: "Configure medical credential requirements, ID vetting rules, and automatic approval criteria.", status: "Active (Strict)" },
+                              { title: "Ledger Audit Schedules", desc: "Configure automatic clinical trail backups, ledger encryption keys, and security validation routines.", status: "Every 24h" },
+                              { title: "Clinical Formularies", desc: "Update drug default safety thresholds, calculators equations, and emergency dosage rules.", status: "WHO 2026 Ready" },
+                              { title: "Emergency Alerts Routing", desc: "Configure push notifications channels and critical alerts targets for ward staff on shifts.", status: "SMS & Socket" },
+                            ].map((s, idx) => (
+                              <div key={idx} className={`p-6 rounded-[24px] border flex flex-col justify-between gap-4 transition-all ${
+                                isAdminLightMode ? 'bg-white border-slate-200/50 shadow-sm' : 'bg-[#111827] border-slate-805 shadow-md'
                               }`}>
-                                <div className="space-y-1">
-                                  <span className={`block text-[8px] font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Employee ID</span>
-                                  <span className={`text-[11px] font-black font-mono ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{user.id_number || 'UNASSIGNED'}</span>
+                                <div className="space-y-2">
+                                  <div className="flex justify-between items-center">
+                                    <h5 className={`font-black text-xs ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>{s.title}</h5>
+                                    <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-500 rounded text-[8px] font-black uppercase">{s.status}</span>
+                                  </div>
+                                  <p className="text-[11px] text-slate-450 dark:text-slate-500 leading-relaxed">{s.desc}</p>
                                 </div>
-                                <div className="space-y-1">
-                                  <span className={`block text-[8px] font-black uppercase tracking-[0.15em] ${isAdminLightMode ? 'text-slate-400' : 'text-slate-500'}`}>Contact Vector</span>
-                                  <span className={`text-[11px] font-black font-mono ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>{user.phone || 'NO RECORD'}</span>
-                                </div>
+                                <button className={`py-2 rounded-xl text-[9px] font-black uppercase tracking-wider border transition-all ${
+                                  isAdminLightMode ? 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-white hover:border-slate-300' : 'bg-slate-900 border-slate-800 text-slate-350 hover:bg-slate-950'
+                                }`}>
+                                  Configure Parameters
+                                </button>
                               </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
 
-                              <div className="flex items-center gap-4">
-                                <button
-                                  onClick={() => router.post(`/admin/users/${user.id}/approve`)}
-                                  className={`flex-1 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] transition-all shadow-lg active:scale-95 ${
-                                    isAdminLightMode 
-                                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-100' 
-                                      : 'bg-emerald-500 hover:bg-emerald-400 text-slate-900 shadow-emerald-500/10'
-                                  }`}
-                                >
-                                  Grant Authorization
-                                </button>
-                                <button
-                                  onClick={() => router.post(`/admin/users/${user.id}/reject`)}
-                                  className={`px-6 py-5 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] transition-all border active:scale-95 ${
-                                    isAdminLightMode 
-                                      ? 'bg-white hover:bg-rose-50 border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-100' 
-                                      : 'bg-slate-900 hover:bg-rose-500/10 border-slate-800 text-slate-500 hover:text-rose-400 hover:border-rose-500/20'
-                                  }`}
-                                >
-                                  Refuse
-                                </button>
+                    </main>
+
+                    {/* COLUMN 3: RIGHT SIDEBAR WIDGETS (xl:col-span-3) */}
+                    <aside className="xl:col-span-3 space-y-6">
+                      
+                      {/* Emergency Alerts Box */}
+                      <div className={`p-5 rounded-[28px] border shadow-sm text-left flex flex-col transition-all duration-300 ${
+                        isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-805'
+                      }`}>
+                        <div className="flex items-center justify-between pb-3 border-b border-dashed border-slate-200 dark:border-slate-800">
+                          <h4 className={`text-xs font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Emergency Alerts</h4>
+                          <button className="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">
+                            View All
+                          </button>
+                        </div>
+                        <div className="space-y-3.5 mt-4">
+                          {displayAlerts.map((alert, idx) => (
+                            <div key={idx} className="flex gap-3 items-start group">
+                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white font-extrabold ${
+                                alert.type === 'emergency' 
+                                  ? 'bg-gradient-to-tr from-rose-500 to-red-650 shadow-sm' 
+                                  : (alert.type === 'critical' ? 'bg-gradient-to-tr from-amber-500 to-orange-600' : 'bg-gradient-to-tr from-blue-500 to-indigo-600')
+                              }`}>
+                                <AlertTriangle className="w-4 h-4 shrink-0" />
+                              </div>
+                              <div className="min-w-0 text-left pt-0.5">
+                                <h5 className={`text-[10px] font-black truncate leading-tight group-hover:text-blue-500 transition-colors ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>
+                                  {alert.title}
+                                </h5>
+                                <span className="text-[8px] font-bold text-slate-400 block mt-0.5 uppercase tracking-wider">{alert.desc}</span>
                               </div>
                             </div>
                           ))}
                         </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* SUBTAB: STAFF DIRECTORY */}
-                  {adminSubTab === 'directory' && (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-left-2 duration-500 text-left">
-                      
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                        <div className="space-y-1">
-                          <h4 className={`text-2xl font-black tracking-tight ${
-                            isAdminLightMode ? 'text-slate-900' : 'text-white'
-                          }`}>Global Staff Directory</h4>
-                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                            Audit clinical roles and modify database access permissions.
-                          </p>
-                        </div>
-                        
-                        <div className="relative w-full sm:w-80 group">
-                          <Search className={`w-4 h-4 absolute left-4 top-1/2 -translate-y-1/2 transition-colors ${
-                            isAdminLightMode ? 'text-slate-400 group-focus-within:text-indigo-500' : 'text-slate-500 group-focus-within:text-indigo-400'
-                          }`} />
-                          <input
-                            type="text"
-                            placeholder="Filter by name or identity..."
-                            value={adminSearchTerm}
-                            onChange={(e) => setAdminSearchTerm(e.target.value)}
-                            className={`w-full pl-11 pr-4 py-4 rounded-2xl text-[11px] font-black uppercase tracking-wider outline-none border transition-all ${
-                              isAdminLightMode 
-                                ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-indigo-400 focus:shadow-xl focus:shadow-indigo-100/40' 
-                                : 'bg-slate-900 border-slate-800 text-white focus:bg-slate-950 focus:border-indigo-500'
-                            }`}
-                          />
-                          {adminSearchTerm && (
-                            <button 
-                              onClick={() => setAdminSearchTerm('')} 
-                              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors"
-                            >
-                              <X className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
                       </div>
 
-                      {/* Directory Container */}
-                      <div className={`rounded-[40px] border overflow-hidden transition-all duration-300 ${
-                        isAdminLightMode 
-                          ? 'bg-white border-slate-100 shadow-2xl shadow-slate-100/50' 
-                          : 'bg-slate-900/30 border-slate-800 shadow-2xl shadow-black/20'
+                      {/* Hospital Report Box */}
+                      <div className={`p-5 rounded-[28px] border shadow-sm text-left flex flex-col transition-all duration-300 ${
+                        isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-805'
                       }`}>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left border-collapse min-w-[800px]">
-                            <thead>
-                              <tr className={`text-[10px] font-black uppercase tracking-[0.2em] border-b transition-colors ${
-                                isAdminLightMode 
-                                  ? 'bg-slate-50/50 border-slate-100 text-slate-400' 
-                                  : 'bg-slate-950/40 border-slate-800 text-slate-500'
-                              }`}>
-                                <th className="px-8 py-6">Medical Professional</th>
-                                <th className="px-8 py-6 text-center">Ward Role</th>
-                                <th className="px-8 py-6 text-center">Security Clearance</th>
-                                <th className="px-8 py-6 text-right">Administrative Action</th>
-                              </tr>
-                            </thead>
-                            <tbody className={`divide-y transition-colors ${
-                              isAdminLightMode ? 'divide-slate-50' : 'divide-slate-800/40'
-                            }`}>
-                              {allUsers.filter(user => 
-                                user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
-                                user.email.toLowerCase().includes(adminSearchTerm.toLowerCase())
-                              ).length === 0 ? (
-                                <tr>
-                                  <td colSpan="4" className="py-20 text-center">
-                                    <div className="flex flex-col items-center gap-4 opacity-40">
-                                      <Search className="w-10 h-10" />
-                                      <span className="text-xs font-black uppercase tracking-widest">Zero matches found</span>
-                                    </div>
-                                  </td>
-                                </tr>
-                              ) : (
-                                allUsers.filter(user => 
-                                  user.name.toLowerCase().includes(adminSearchTerm.toLowerCase()) || 
-                                  user.email.toLowerCase().includes(adminSearchTerm.toLowerCase())
-                                ).map((user) => (
-                                  <tr key={user.id} className={`group transition-all duration-200 ${
-                                    isAdminLightMode 
-                                      ? 'hover:bg-indigo-50/30' 
-                                      : 'hover:bg-indigo-500/5'
-                                  }`}>
-                                    <td className="px-8 py-6">
-                                      <div className="flex items-center gap-4">
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center font-black font-mono shrink-0 border-2 transition-transform group-hover:scale-110 ${
-                                          isAdminLightMode 
-                                            ? 'bg-white border-slate-100 text-slate-400 group-hover:border-indigo-200 group-hover:text-indigo-600' 
-                                            : 'bg-slate-950 border-slate-800 text-slate-600 group-hover:border-indigo-500/30 group-hover:text-indigo-400'
-                                        }`}>
-                                          {user.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                                        </div>
-                                        <div>
-                                          <div className="flex items-center gap-2">
-                                            <span className={`text-sm font-black tracking-tight ${
-                                              isAdminLightMode ? 'text-slate-900' : 'text-white'
-                                            }`}>{user.name}</span>
-                                            {user.status === 'Approved' && (
-                                              <BadgeCheck className="w-4 h-4 text-indigo-500 fill-indigo-500/10" />
-                                            )}
-                                          </div>
-                                          <span className={`text-[10px] font-black font-mono block mt-1 uppercase tracking-wider ${
-                                            isAdminLightMode ? 'text-slate-400' : 'text-slate-500'
-                                          }`}>{user.email}</span>
-                                        </div>
-                                      </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                      <div className="flex justify-center">
-                                        <span className={`px-3 py-1.5 rounded-xl border text-[9px] font-black uppercase tracking-[0.1em] transition-colors ${
-                                          isAdminLightMode 
-                                            ? 'bg-white border-slate-100 text-slate-500 group-hover:border-indigo-100 group-hover:text-indigo-600' 
-                                            : 'bg-slate-950 border-slate-800 text-slate-400 group-hover:border-indigo-500/20 group-hover:text-indigo-400'
-                                        }`}>
-                                          {user.role}
-                                        </span>
-                                      </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                      <div className="flex flex-col items-center gap-1.5">
-                                        {user.status === 'Approved' ? (
-                                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                                            isAdminLightMode ? 'bg-emerald-50 text-emerald-700' : 'bg-emerald-500/10 text-emerald-400'
-                                          }`}>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                            Active Clearance
-                                          </div>
-                                        ) : user.status === 'Pending' ? (
-                                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                                            isAdminLightMode ? 'bg-amber-50 text-amber-700' : 'bg-amber-500/10 text-amber-400'
-                                          }`}>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
-                                            Access Locked
-                                          </div>
-                                        ) : (
-                                          <div className={`flex items-center gap-2 px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${
-                                            isAdminLightMode ? 'bg-rose-50 text-rose-700' : 'bg-rose-500/10 text-rose-400'
-                                          }`}>
-                                            <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-                                            Authorization Revoked
-                                          </div>
-                                        )}
-                                      </div>
-                                    </td>
-                                    <td className="px-8 py-6 text-right">
-                                      <div className="flex items-center justify-end gap-3">
-                                        <select
-                                          defaultValue={user.role}
-                                          onChange={(e) => {
-                                            router.post(`/admin/users/${user.id}/update-role`, {
-                                              role: e.target.value
-                                            });
-                                          }}
-                                          className={`px-4 py-2.5 rounded-xl outline-none text-[10px] font-black uppercase tracking-wider border transition-all appearance-none cursor-pointer pr-10 relative bg-no-repeat bg-[right_1rem_center] bg-[length:1em_1em] ${
-                                            isAdminLightMode 
-                                              ? 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-white hover:border-indigo-300 focus:border-indigo-500' 
-                                              : 'bg-slate-900 border-slate-800 text-slate-200 hover:bg-slate-950 hover:border-indigo-700 focus:border-indigo-500'
-                                          }`}
-                                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236366f1' stroke-width='3'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19.5 8.25l-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E")` }}
-                                        >
-                                          <option value="Nursing In-Charge">Nursing In-Charge</option>
-                                          <option value="Nurse">Nurse</option>
-                                          <option value="Consultant Pediatrician">Consultant Pediatrician</option>
-                                          <option value="CO Pediatrics / MO">CO Pediatrics / MO</option>
-                                          <option value="Student">Student</option>
-                                          <option value="ICT / IT Support">ICT / IT Support</option>
-                                          <option value="Hospital Management">Hospital Management</option>
-                                        </select>
-                                      </div>
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
+                        <div className="flex items-center justify-between pb-3 border-b border-dashed border-slate-200 dark:border-slate-800">
+                          <h4 className={`text-xs font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>Hospital Report</h4>
+                          <button className="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">
+                            View All
+                          </button>
+                        </div>
+                        <div className="space-y-3.5 mt-4">
+                          {handoverReports.map((report, idx) => (
+                            <div key={idx} className="flex gap-3 items-center group">
+                              <div className="w-2.5 h-2.5 rounded-full shrink-0 bg-blue-500 outline outline-4 outline-blue-500/10 group-hover:scale-110 transition-transform" />
+                              <div className="min-w-0 text-left">
+                                <h5 className={`text-[10px] font-bold truncate leading-tight group-hover:text-blue-500 transition-colors ${isAdminLightMode ? 'text-slate-700' : 'text-slate-350'}`}>
+                                  {report.title}
+                                </h5>
+                                <span className="text-[8px] font-medium text-slate-400 block mt-0.5 tracking-wider">{report.desc}</span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                  {/* SUBTAB: AUDIT LOGS */}
-                  {adminSubTab === 'audit' && (
-                    <div className="space-y-10 animate-in fade-in slide-in-from-top-2 duration-500 text-left">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <h4 className={`text-2xl font-black tracking-tight flex items-center gap-3 ${
-                            isAdminLightMode ? 'text-slate-900' : 'text-white'
-                          }`}>
-                            Clinical Ledger Audit
-                          </h4>
-                          <p className={`text-xs font-medium ${isAdminLightMode ? 'text-slate-500' : 'text-slate-400'}`}>
-                            Comprehensive immutable log of every clinical action, login, and system event.
-                          </p>
-                        </div>
-                        <button 
-                          className={`px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-wider border transition-all ${
-                            isAdminLightMode ? 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50' : 'bg-slate-900 border-slate-800 text-slate-400 hover:bg-slate-800'
-                          }`}
-                        >
-                          Export Ledger (.CSV)
-                        </button>
-                      </div>
-
-                      <div className={`rounded-[40px] border overflow-hidden transition-all duration-300 ${
-                        isAdminLightMode 
-                          ? 'bg-white border-slate-100 shadow-2xl shadow-slate-100/50' 
-                          : 'bg-slate-900/30 border-slate-800 shadow-2xl shadow-black/20'
+                      {/* On Duty Staff Box */}
+                      <div className={`p-5 rounded-[28px] border shadow-sm text-left flex flex-col transition-all duration-300 ${
+                        isAdminLightMode ? 'bg-white border-slate-200/50' : 'bg-[#111827] border-slate-805'
                       }`}>
-                        <div className="overflow-x-auto">
-                          <table className="w-full text-left border-collapse">
-                            <thead>
-                              <tr className={`text-[10px] font-black uppercase tracking-[0.2em] border-b ${
-                                isAdminLightMode ? 'bg-slate-50/50 text-slate-400 border-slate-100' : 'bg-slate-950/40 text-slate-500 border-slate-800'
-                              }`}>
-                                <th className="px-8 py-6">Timestamp</th>
-                                <th className="px-8 py-6">Actor</th>
-                                <th className="px-8 py-6">Clinical Action / System Event</th>
-                                <th className="px-8 py-6 text-right">Origin IP</th>
-                              </tr>
-                            </thead>
-                            <tbody className={`divide-y text-xs font-semibold ${
-                              isAdminLightMode ? 'divide-slate-50 text-slate-700' : 'divide-slate-800/40 text-slate-300'
-                            }`}>
-                              {auditLogs.length === 0 ? (
-                                <tr>
-                                  <td colSpan="4" className="py-20 text-center text-slate-400 font-black uppercase tracking-widest text-[10px]">
-                                    No ledger entries recorded in this session
-                                  </td>
-                                </tr>
-                              ) : (
-                                auditLogs.map((log) => (
-                                  <tr key={log.id} className={`transition-colors ${
-                                    isAdminLightMode ? 'hover:bg-slate-50/50' : 'hover:bg-indigo-500/5'
-                                  }`}>
-                                    <td className="px-8 py-6 font-mono text-[10px] font-black uppercase tracking-wider whitespace-nowrap opacity-60">
-                                      {new Date(log.created_at).toLocaleString()}
-                                    </td>
-                                    <td className="px-8 py-6">
-                                      <div className="flex items-center gap-3">
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-black text-[9px] border ${
-                                          isAdminLightMode ? 'bg-slate-100 border-slate-200 text-slate-500' : 'bg-slate-800 border-slate-700 text-slate-400'
-                                        }`}>
-                                          {log.user ? log.user.name[0] : 'S'}
-                                        </div>
-                                        <span className={`font-black tracking-tight ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>
-                                          {log.user ? log.user.name : 'System'}
-                                        </span>
-                                      </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                      <div className="flex items-center gap-3">
-                                        <span className={`px-2 py-0.5 rounded text-[8px] font-black uppercase tracking-[0.1em] border ${
-                                          log.action.includes('error') || log.action.includes('failed')
-                                            ? 'bg-rose-500/10 border-rose-500/20 text-rose-500'
-                                            : (isAdminLightMode ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-indigo-500/10 border-indigo-500/20 text-indigo-400')
-                                        }`}>
-                                          {log.action.split(' ')[0]}
-                                        </span>
-                                        <span className="font-medium opacity-80">{log.action}</span>
-                                      </div>
-                                    </td>
-                                    <td className="px-8 py-6 text-right font-mono text-[10px] font-black opacity-40">
-                                      {log.ip_address || '127.0.0.1'}
-                                    </td>
-                                  </tr>
-                                ))
-                              )}
-                            </tbody>
-                          </table>
+                        <div className="flex items-center justify-between pb-3 border-b border-dashed border-slate-200 dark:border-slate-800">
+                          <h4 className={`text-xs font-black ${isAdminLightMode ? 'text-slate-900' : 'text-white'}`}>On Duty Staff</h4>
+                          <button className="text-[9px] font-black uppercase tracking-wider text-blue-600 hover:underline">
+                            View All
+                          </button>
+                        </div>
+                        <div className="space-y-4 mt-4">
+                          {currentOnDuty.map((staff, idx) => (
+                            <div key={idx} className="flex items-center justify-between group">
+                              <div className="flex items-center gap-3 min-w-0">
+                                <div className="relative shrink-0">
+                                  <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-500 to-indigo-700 text-white font-extrabold flex items-center justify-center text-[10px] shadow-sm">
+                                    {staff.name.replace('Dr. ', '').replace('Sister ', '')[0]}
+                                  </div>
+                                  <span className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white dark:border-[#111827]" />
+                                </div>
+                                <div className="text-left min-w-0">
+                                  <h5 className={`text-[10px] font-black truncate leading-tight ${isAdminLightMode ? 'text-slate-800' : 'text-slate-200'}`}>
+                                    {staff.name}
+                                  </h5>
+                                  <span className="text-[8px] font-bold text-slate-400 block tracking-wider uppercase mt-0.5">{staff.role}</span>
+                                </div>
+                              </div>
+                              <button className={`p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg text-slate-400 hover:text-slate-600 transition-all`}>
+                                <MoreVertical className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                </main>
-              </div>
-            </div>
-          )}
+                    </aside>
+
+                  </div>
+                </div>
+              );
+            })()}
 
       {/* Patient Admission Modal Dialog */}
       {isModalOpen && (
