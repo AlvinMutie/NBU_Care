@@ -4,7 +4,8 @@ import {
   Users, ShieldAlert, GraduationCap, Clock, FileText,
   Activity as ActivityIcon, HeartPulse, Stethoscope, ChevronRight,
   Database, ShieldCheck, AlertCircle, HelpCircle, Loader2,
-  TrendingUp, BarChart3, PieChart, BookOpen
+  TrendingUp, BarChart3, PieChart, BookOpen, ClipboardCheck,
+  CheckCircle2, Target, Award
 } from 'lucide-react';
 import { api } from '../services/api';
 
@@ -17,8 +18,8 @@ const BlueTick = ({ className = "w-4 h-4" }) => (
 );
 
 const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) => (
-  <div className="bg-white dark:bg-slate-800 rounded-3xl border border-slate-100 dark:border-slate-700 p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden text-left">
-     <div className="hidden lg:block absolute -right-4 -top-4 w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-full group-hover:scale-150 transition-transform duration-700" />
+  <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden text-left">
+     <div className="hidden lg:block absolute -right-4 -top-4 w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full group-hover:scale-150 transition-transform duration-700" />
      <div className="relative z-10">
        <div className="flex items-center justify-between mb-6">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colorClass} transition-transform group-hover:scale-110 shadow-inner`}>
@@ -43,13 +44,10 @@ const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) =>
   </div>
 );
 
-// --- SIMPLE INFOGRAPHIC COMPONENTS ---
-
-const CapacityChart = () => {
-  const bars = [65, 82, 45, 90, 70, 55, 85];
+const CapacityChart = ({ data = [65, 82, 45, 90, 70, 55, 85], label = "H" }) => {
   return (
     <div className="h-40 flex items-end justify-between gap-2 px-2">
-      {bars.map((height, i) => (
+      {data.map((height, i) => (
         <div key={i} className="flex-1 group relative">
           <div 
             className="w-full bg-primary/10 dark:bg-primary/5 rounded-t-lg group-hover:bg-primary/30 dark:group-hover:bg-primary/20 transition-all duration-500 relative overflow-hidden h-full"
@@ -60,7 +58,7 @@ const CapacityChart = () => {
             />
           </div>
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
-            H{i+1}
+            {label}{i+1}
           </div>
         </div>
       ))}
@@ -68,7 +66,7 @@ const CapacityChart = () => {
   );
 };
 
-// --- MAIN DASHBOARD ---
+// --- ADMIN / IN-CHARGE DASHBOARD ---
 
 const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
   const [logs, setLogs] = useState([]);
@@ -97,7 +95,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       {/* Verification Alert */}
       {pendingCount > 0 && (
         <div 
@@ -108,8 +106,8 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
               <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center text-amber-500 shadow-xl shadow-amber-200/50 dark:shadow-none group-hover:scale-110 transition-transform">
                  <ShieldAlert className="w-8 h-8" />
               </div>
-              <div>
-                 <h4 className="text-lg font-black text-amber-900 dark:text-amber-200 tracking-tight">Access Requests Pending</h4>
+              <div className="text-left">
+                 <h4 className="text-lg font-black text-amber-900 dark:text-amber-200 tracking-tight leading-none mb-1">Access Requests Pending</h4>
                  <p className="text-sm text-amber-700 dark:text-amber-400 font-bold opacity-80">{pendingCount} staff members are waiting for your verification.</p>
               </div>
            </div>
@@ -119,58 +117,55 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2 px-2">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-2">
          <div className="text-left">
-            <h2 className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 ml-1">In-Charge Overview</h2>
+            <h2 className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 ml-1">Unit Command Center</h2>
             <div className="flex items-center gap-3">
-               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left">Unit Dashboard<span className="text-primary text-5xl">.</span></h1>
+               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left leading-none">Management Hub<span className="text-primary text-5xl">.</span></h1>
                <BlueTick className="w-7 h-7" />
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Monitoring clinical precision and team workflow.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Global oversight of clinical precision and workforce.</p>
          </div>
          <div className="flex items-center gap-3">
-            <div className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-600 dark:text-slate-400 flex items-center gap-3 shadow-sm">
-               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Shift Morning
+            <div className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-black text-slate-600 dark:text-slate-400 flex items-center gap-3 shadow-sm">
+               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Live Monitoring
             </div>
-            <button className="p-3 bg-slate-900 dark:bg-primary text-white rounded-2xl shadow-xl hover:bg-slate-800 dark:hover:bg-primary-dark transition-all active:scale-95">
-               <Database className="w-5 h-5" />
-            </button>
          </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Staff" value={loading ? '...' : stats.users} icon={Users} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" trend="12" />
-        <StatCard title="Live Cases" value={neonateCount || '24'} icon={ActivityIcon} colorClass="bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400" highlight />
-        <StatCard title="Doses Given" value="142" icon={Droplets} colorClass="bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400" />
-        <StatCard title="Safety Score" value="100%" icon={ShieldCheck} colorClass="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light" />
+        <StatCard title="Total Clinicians" value={loading ? '...' : stats.users} icon={Users} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" trend="12" />
+        <StatCard title="Ward Occupancy" value={neonateCount || '24'} icon={ActivityIcon} colorClass="bg-teal-50 dark:bg-teal-900/30 text-teal-600 dark:text-teal-400" highlight />
+        <StatCard title="Doses Verified" value="1,242" icon={Droplets} colorClass="bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400" />
+        <StatCard title="Safety Index" value="99.8%" icon={ShieldCheck} colorClass="bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary-light" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-6 text-left">
           {/* Main Infographic Section */}
-          <div className="bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-700 p-8 shadow-sm group hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
+          <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm group hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
              <div className="flex items-center justify-between mb-10">
                 <div>
                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
-                      <TrendingUp className="w-5 h-5 text-primary" /> Shift Capacity Throughput
+                      <TrendingUp className="w-5 h-5 text-primary" /> Admission Velocity
                    </h3>
-                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Real-time occupancy across critical care bays.</p>
+                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Average admissions per day over the last 7 days.</p>
                 </div>
                 <div className="flex gap-2">
-                   <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-slate-900 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 dark:border-slate-700">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Occupied
+                   <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 dark:bg-slate-800 rounded-lg text-[10px] font-black text-slate-400 uppercase tracking-widest border border-slate-100 dark:border-slate-800">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" /> Active
                    </div>
                 </div>
              </div>
              
-             <CapacityChart />
+             <CapacityChart data={[40, 55, 30, 80, 60, 45, 90]} label="D" />
              
-             <div className="mt-12 pt-8 border-t border-slate-50 dark:border-slate-700/50 grid grid-cols-2 md:grid-cols-4 gap-6">
+             <div className="mt-12 pt-8 border-t border-slate-50 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
-                  { l: 'Max Efficiency', v: '94%', i: Zap, c: 'text-amber-500' },
-                  { l: 'Avg Latency', v: '4m', i: Clock, c: 'text-primary' },
-                  { l: 'Unit Density', v: 'High', i: BarChart3, c: 'text-indigo-500' },
-                  { l: 'Safety Margin', v: '±2%', i: ShieldCheck, c: 'text-emerald-500' }
+                  { l: 'Max Load', v: '100%', i: Zap, c: 'text-amber-500' },
+                  { l: 'Avg Stay', v: '12d', i: Clock, c: 'text-primary' },
+                  { l: 'Beds Avail', v: '04', i: BarChart3, c: 'text-indigo-500' },
+                  { l: 'Error Margin', v: '0%', i: ShieldCheck, c: 'text-emerald-500' }
                 ].map((item, i) => (
                   <div key={i} className="space-y-1">
                      <p className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-2">
@@ -182,10 +177,10 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
              </div>
           </div>
 
-          <div className="bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-700 shadow-sm overflow-hidden flex flex-col h-[500px] hover:shadow-2xl transition-all duration-500">
-            <div className="p-8 border-b border-slate-50 dark:border-slate-700 flex items-center justify-between bg-slate-50/30 dark:bg-slate-900/30">
+          <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-sm overflow-hidden flex flex-col h-[500px] hover:shadow-2xl transition-all duration-500">
+            <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-900/30">
                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
-                  <ActivityIcon className="w-5 h-5 text-primary" /> Live Shift Logs
+                  <ActivityIcon className="w-5 h-5 text-primary" /> Unit Action Audit
                </h3>
                <button 
                  onClick={() => onNavigate('audit-logs')}
@@ -200,29 +195,21 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                   <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
                   <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Encrypting live data...</p>
                 </div>
-              ) : logs.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-24 px-10 text-center">
-                  <div className="w-20 h-20 bg-slate-50 dark:bg-slate-900 rounded-[32px] flex items-center justify-center text-slate-200 dark:text-slate-700 mb-6 border border-slate-100 dark:border-slate-700">
-                    <Database className="w-10 h-10" />
-                  </div>
-                  <h4 className="text-xl font-black text-slate-900 dark:text-white mb-2">No activity recorded</h4>
-                  <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs font-medium">Calculations and clinical actions from this shift will appear here in real-time.</p>
-                </div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="border-b border-slate-50 dark:border-slate-700 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] bg-slate-50/50 dark:bg-slate-900/50 sticky top-0 z-10">
+                    <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] bg-slate-50/50 dark:bg-slate-900/50 sticky top-0 z-10">
                       <th className="px-8 py-5">Action</th>
                       <th className="px-8 py-5">Clinician</th>
                       <th className="px-8 py-5 text-right">Time</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-slate-50 dark:divide-slate-700/50">
+                  <tbody className="divide-y divide-slate-50 dark:divide-slate-800/50">
                     {logs.map((log, i) => (
-                      <tr key={i} className="group hover:bg-slate-50 dark:hover:bg-slate-900/50 transition-all cursor-pointer">
+                      <tr key={i} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer">
                         <td className="px-8 py-6">
                           <div className="flex flex-col">
-                            <span className="text-sm font-black text-slate-800 dark:text-slate-200 tracking-tight">{log.action}</span>
+                            <span className="text-sm font-black text-slate-800 dark:text-slate-200 tracking-tight leading-none mb-1">{log.action}</span>
                             <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-tight">{log.type}</span>
                           </div>
                         </td>
@@ -245,42 +232,42 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
         </div>
 
         <div className="space-y-6 text-left">
-           {/* Quick Actions / Unit Status */}
+           {/* Workforce Health */}
            <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[400px] flex flex-col justify-between">
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 dark:bg-white/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
               <div className="relative z-10">
                  <div className="flex items-center justify-between mb-8">
                     <div className="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-primary dark:text-white border border-white/5 backdrop-blur-xl">
-                      <ShieldCheck className="w-6 h-6" />
+                      <Users className="w-6 h-6" />
                     </div>
-                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Ward Safety Protocol</span>
+                    <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.3em]">Workforce Performance</span>
                  </div>
                  
-                 <h3 className="text-3xl font-black text-white tracking-tighter mb-4 leading-none">Global Override <br />Status<span className="text-primary dark:text-white/50 text-4xl">.</span></h3>
-                 <p className="text-sm text-slate-400 dark:text-white/70 font-medium mb-8">Standard v16.0 deployment active. Advanced safety validation layers are currently operational.</p>
+                 <h3 className="text-3xl font-black text-white tracking-tighter mb-4 leading-none text-left">Shift Rota <br />Dynamics<span className="text-primary dark:text-white/50 text-4xl">.</span></h3>
+                 <p className="text-sm text-slate-400 dark:text-white/70 font-medium mb-8">System audit indicates 100% shift coverage for the upcoming 48 hours.</p>
                  
                  <div className="space-y-3">
                     <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
                        <CheckCircle2 className="w-5 h-5 text-primary dark:text-white" />
-                       <span className="text-xs font-bold text-white tracking-wide">Validation Engine Active</span>
+                       <span className="text-xs font-bold text-white tracking-wide">All Shifts Staffed</span>
                     </div>
-                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5 opacity-50">
-                       <AlertCircle className="w-5 h-5 text-white" />
-                       <span className="text-xs font-bold text-white tracking-wide">Stricter Controls (OFF)</span>
+                    <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/5">
+                       <ShieldCheck className="w-5 h-5 text-emerald-400" />
+                       <span className="text-xs font-bold text-white tracking-wide">Manager-on-Duty Verified</span>
                     </div>
                  </div>
               </div>
               
               <button 
-                onClick={() => onNavigate('settings')}
+                onClick={() => onNavigate('rota')}
                 className="relative z-10 w-full py-5 bg-white text-slate-900 rounded-[24px] font-black text-xs uppercase tracking-widest shadow-xl hover:scale-[1.02] transition-all active:scale-95 mt-8"
               >
-                 Manage Protocols
+                 Manage Team Schedule
               </button>
            </div>
 
-           {/* Performance Distribution */}
-           <div className="bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-700 p-8 shadow-sm">
+           {/* Role Distribution Infographic */}
+           <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
               <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Role Distribution</h3>
               <div className="space-y-6">
                  {[
@@ -288,25 +275,16 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                    { l: 'Nurses', v: '65%', c: 'bg-indigo-500' },
                    { l: 'Students', v: '20%', c: 'bg-teal-400' }
                  ].map((role, i) => (
-                    <div key={i} className="space-y-2">
+                    <div key={i} className="space-y-2 text-left">
                        <div className="flex justify-between items-center text-[10px] font-black text-slate-600 dark:text-slate-400 uppercase tracking-widest">
                           <span>{role.l}</span>
                           <span>{role.v}</span>
                        </div>
-                       <div className="h-2 bg-slate-50 dark:bg-slate-900 rounded-full overflow-hidden">
+                       <div className="h-2 bg-slate-50 dark:bg-slate-800 rounded-full overflow-hidden">
                           <div className={`h-full ${role.c} transition-all duration-1000`} style={{ width: role.v }} />
                        </div>
                     </div>
                  ))}
-              </div>
-              <div className="mt-10 flex items-center gap-4 p-4 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100 dark:border-indigo-800">
-                 <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm">
-                    <Users className="w-5 h-5" />
-                 </div>
-                 <div>
-                    <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest">Active Workforce</p>
-                    <p className="text-sm font-black text-indigo-900 dark:text-indigo-200 tracking-tight">{stats.users} Clinicians</p>
-                 </div>
               </div>
            </div>
         </div>
@@ -315,87 +293,193 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
   );
 };
 
-// --- STAFF / CLINICIAN DASHBOARD ---
+// --- CLINICIAN (NURSE / MO) DASHBOARD ---
 
-const StaffDashboard = ({ stats, loading, onNavigate, user }) => {
+const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
+  const [personalStats, setPersonalStats] = useState({ doses: 84, handovers: 12, precision: 100 });
+  const [activeCases, setActiveCases] = useState([]);
+
+  useEffect(() => {
+     const fetchClinicianData = async () => {
+        try {
+           const res = await api.getNeonates();
+           if (res.success) setActiveCases(res.neonates.slice(0, 3));
+        } catch (e) {}
+     };
+     fetchClinicianData();
+  }, []);
+
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-8 duration-1000 text-left">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
-         <div>
-            <h2 className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 ml-1">Clinical Workspace</h2>
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 text-left">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+         <div className="text-left">
+            <h2 className="text-xs font-black text-primary uppercase tracking-[0.3em] mb-3 ml-1">Bedside Intelligence</h2>
             <div className="flex items-center gap-3">
-               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter">Welcome, {user.name.split(' ')[0]}<span className="text-primary text-5xl">.</span></h1>
+               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left leading-none">Welcome, {user.name.split(' ')[0]}<span className="text-primary text-5xl">.</span></h1>
                <BlueTick className="w-7 h-7" />
             </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Ready for your shift? Here's the unit status.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Ready for your shift? Ensuring clinical continuity today.</p>
          </div>
          <div className="flex items-center gap-3">
-            <div className="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl text-xs font-black text-slate-600 dark:text-slate-400 flex items-center gap-3 shadow-sm">
-               <div className="w-2 h-2 rounded-full bg-primary animate-pulse" /> Active Session
+            <div className="px-5 py-2.5 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl text-xs font-black text-slate-600 dark:text-slate-400 flex items-center gap-3 shadow-sm">
+               <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Active Shift: Morning
             </div>
          </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {[
-          { t: 'Medication Safety', d: 'Validated calculations for doses and maintenance fluids.', i: Calculator, p: 'calculators', c: 'bg-emerald-500' },
-          { t: 'Ward Registry', d: 'Manage active patient cases and clinical profiles.', i: Users, p: 'neonates', c: 'bg-indigo-600' },
-          { t: 'Knowledge Hub', d: 'WHO protocols and unit clinical procedures.', i: BookOpen, p: 'knowledge', c: 'bg-primary' }
-        ].map((tool, i) => (
-          <div 
-            key={i}
-            onClick={() => onNavigate(tool.p)}
-            className="group bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-700 p-8 shadow-sm hover:shadow-2xl transition-all cursor-pointer relative overflow-hidden"
-          >
-             <div className="absolute top-0 right-0 w-32 h-32 bg-slate-50 dark:bg-slate-900 rounded-full -translate-y-1/2 translate-x-1/2 group-hover:scale-150 transition-transform duration-700" />
-             <div className={`w-14 h-14 rounded-2xl ${tool.c} text-white flex items-center justify-center mb-10 shadow-lg group-hover:scale-110 transition-transform`}>
-                <tool.i className="w-7 h-7" />
-             </div>
-             <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight mb-2">{tool.t}</h3>
-             <p className="text-sm text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{tool.d}</p>
-             <div className="mt-8 flex items-center text-[10px] font-black text-primary uppercase tracking-widest gap-2 group-hover:gap-3 transition-all">
-                Access Tool <ArrowRight className="w-4 h-4" />
-             </div>
-          </div>
-        ))}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <StatCard title="My Doses Today" value={personalStats.doses} icon={Droplets} colorClass="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" />
+        <StatCard title="Handovers Pending" value="02" icon={ClipboardCheck} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" />
+        <StatCard title="Personal Accuracy" value="100%" icon={Target} colorClass="bg-rose-50 dark:bg-rose-900/30 text-rose-500 dark:text-rose-400" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full bg-primary/5 -z-0" />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+         {/* Shift Action Center */}
+         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden flex flex-col h-full min-h-[450px]">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4" />
             <div className="relative z-10 flex flex-col h-full">
-               <h3 className="text-2xl font-black text-white tracking-tight mb-6 flex items-center gap-3">
-                  <Clock className="w-6 h-6 text-primary" /> Shift Continuity
-               </h3>
-               <p className="text-slate-400 font-medium mb-12">Coordination is clinical safety. Ensure your handovers are updated before shift end.</p>
-               <div className="mt-auto flex flex-col sm:flex-row gap-4">
+               <div className="flex items-center justify-between mb-12">
+                  <h3 className="text-2xl font-black text-white tracking-tight flex items-center gap-3">
+                     <Clock className="w-6 h-6 text-primary" /> Shift Continuity
+                  </h3>
+                  <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em]">07:00 - 14:00 Block</span>
+               </div>
+               
+               <p className="text-slate-400 font-medium mb-12 text-lg leading-relaxed">Coordination is the ultimate clinical safety. Ensure all handovers and vitals are documented before shift termination.</p>
+               
+               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-auto">
                   <button 
                     onClick={() => onNavigate('handovers')}
                     className="px-8 py-5 bg-primary text-white rounded-3xl font-black text-xs uppercase tracking-widest shadow-xl shadow-primary/20 hover:scale-[1.02] transition-all"
                   >
-                    Start Handover
+                    Launch Handover
                   </button>
                   <button 
-                    onClick={() => onNavigate('rota')}
+                    onClick={() => onNavigate('calculators')}
                     className="px-8 py-5 bg-white/5 border border-white/10 text-white rounded-3xl font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all"
                   >
-                    View Duty Rota
+                    Open Drug Pipeline
                   </button>
                </div>
             </div>
          </div>
 
-         <div className="bg-white dark:bg-slate-800 rounded-[40px] border border-slate-100 dark:border-slate-700 p-10 shadow-sm flex flex-col justify-center items-center text-center">
-            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-[32px] flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6 shadow-inner">
+         {/* Patient Context Snippet */}
+         <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col group hover:shadow-2xl transition-all duration-500">
+            <div className="flex items-center justify-between mb-10">
+               <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3 text-left">
+                     <ActivityIcon className="w-5 h-5 text-primary" /> Active Ward Context
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 text-left">Quick access to current unit patients.</p>
+               </div>
+               <button onClick={() => onNavigate('neonates')} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-primary hover:bg-primary/10 transition-colors">
+                  <ChevronRight className="w-5 h-5" />
+               </button>
+            </div>
+            
+            <div className="space-y-4 flex-grow">
+               {activeCases.map((n, i) => (
+                  <div key={i} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800 rounded-2xl border border-slate-100 dark:border-slate-800 group/item hover:border-primary/30 transition-all">
+                     <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover/item:text-primary transition-colors border border-slate-100 dark:border-slate-700">
+                           <User className="w-5 h-5" />
+                        </div>
+                        <div className="text-left">
+                           <p className="text-sm font-black text-slate-900 dark:text-white leading-tight">{n.name}</p>
+                           <p className="text-[9px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">{n.hospitalNumber}</p>
+                        </div>
+                     </div>
+                     <span className={`px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest ${n.status === 'Stable' ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600' : 'bg-rose-100 dark:bg-rose-900/30 text-rose-600'}`}>
+                        {n.status}
+                     </span>
+                  </div>
+               ))}
+               {activeCases.length === 0 && <p className="text-slate-400 italic text-center py-10">Accessing ward registry...</p>}
+            </div>
+            
+            <div className="mt-8 pt-8 border-t border-slate-50 dark:border-slate-800 flex items-center justify-between">
+               <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-primary" />
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em]">Validated Registry</span>
+               </div>
+               <button onClick={() => onNavigate('neonates')} className="text-[9px] font-black text-primary uppercase tracking-widest hover:underline">Full Directory</button>
+            </div>
+         </div>
+      </div>
+    </div>
+  );
+};
+
+// --- STUDENT / ACADEMY DASHBOARD ---
+
+const StudentDashboard = ({ stats, loading, onNavigate, user }) => {
+  const [academyStats, setAcademyStats] = useState({ mastered: 4, read: 18, total: 25 });
+
+  return (
+    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-6 duration-1000 text-left">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 px-2">
+         <div className="text-left">
+            <h2 className="text-xs font-black text-indigo-500 uppercase tracking-[0.3em] mb-3 ml-1">Academy Portal</h2>
+            <div className="flex items-center gap-3">
+               <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter text-left leading-none">Learning Hub<span className="text-indigo-500 text-5xl">.</span></h1>
+               <div className="w-7 h-7 bg-indigo-500 text-white rounded-lg flex items-center justify-center p-1 border border-indigo-400">
+                  <GraduationCap className="w-full h-full" />
+               </div>
+            </div>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-2 font-medium">Sharpen your clinical intuition with simulated excellence.</p>
+         </div>
+         <div className="px-6 py-3 bg-white dark:bg-slate-900 border border-indigo-100 dark:border-indigo-900 rounded-2xl text-xs font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-3 shadow-sm shadow-indigo-100/50 dark:shadow-none">
+            <Award className="w-4 h-4" /> Academic Level: Advanced
+         </div>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <StatCard title="Scenarios Mastered" value={academyStats.mastered} icon={Target} colorClass="bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400" />
+        <StatCard title="Protocols Read" value={academyStats.read} icon={BookOpen} colorClass="bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" />
+        <StatCard title="Unit Cases" value={stats.neonates || '24'} icon={ActivityIcon} colorClass="bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 text-left">
+         <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col group hover:shadow-2xl transition-all duration-500 overflow-hidden relative">
+            <div className="flex items-center justify-between mb-10">
+               <div>
+                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3">
+                     <TrendingUp className="w-5 h-5 text-indigo-500" /> Proficiency Growth
+                  </h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1">Mastery metrics across clinical simulation blocks.</p>
+               </div>
+            </div>
+            
+            <CapacityChart data={[20, 45, 60, 55, 80, 75, 95]} label="Mod" />
+            
+            <div className="mt-auto pt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-slate-50 dark:border-slate-800">
+               {[
+                  { l: 'Clinical Logic', v: '92%', c: 'text-indigo-500' },
+                  { l: 'Dose Math', v: '100%', c: 'text-emerald-500' },
+                  { l: 'Protocols', v: '78%', c: 'text-amber-500' },
+                  { l: 'Ethics', v: '85%', c: 'text-primary' }
+               ].map((m, i) => (
+                  <div key={i}>
+                     <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">{m.l}</p>
+                     <p className={`text-lg font-black ${m.c}`}>{m.v}</p>
+                  </div>
+               ))}
+            </div>
+         </div>
+
+         <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col items-center justify-center text-center">
+            <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-900/30 rounded-3xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-8 shadow-inner">
                <GraduationCap className="w-10 h-10" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-3">Clinical Academy</h3>
-            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium max-w-xs mb-8">Sharpen your clinical skills with interactive scenarios and ward flashcards.</p>
-            <div className="flex gap-3">
-               <button onClick={() => onNavigate('scenarios')} className="text-xs font-black text-primary uppercase tracking-widest hover:underline">Scenarios</button>
-               <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700 my-auto" />
-               <button onClick={() => onNavigate('flashcards')} className="text-xs font-black text-primary uppercase tracking-widest hover:underline">Flashcards</button>
-            </div>
+            <h3 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight mb-4 leading-tight">Ready for <br />Practice?</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 font-medium mb-10 leading-relaxed">Simulate critical events before they happen at the bedside.</p>
+            <button 
+              onClick={() => onNavigate('scenarios')}
+              className="w-full py-4 bg-indigo-600 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-600/20 hover:bg-indigo-700 transition-all active:scale-95"
+            >
+               Enter Simulator
+            </button>
          </div>
       </div>
     </div>
@@ -420,14 +504,17 @@ export default function Dashboard({ user, onNavigate }) {
     fetchStats();
   }, []);
 
-  const isAdmin = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician';
+  const isAdmin = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || user.role === 'ICT / IT Support';
+  const isStudent = user.role === 'Student';
 
   return (
     <div className="min-h-screen">
       {isAdmin ? (
         <AdminDashboard stats={stats} loading={loading} onNavigate={onNavigate} user={user} />
+      ) : isStudent ? (
+        <StudentDashboard stats={stats} loading={loading} onNavigate={onNavigate} user={user} />
       ) : (
-        <StaffDashboard stats={stats} loading={loading} onNavigate={onNavigate} user={user} />
+        <ClinicianDashboard stats={stats} loading={loading} onNavigate={onNavigate} user={user} />
       )}
     </div>
   );
