@@ -54,9 +54,12 @@ export default function MainLayout({ children, currentPath, onNavigate, user, on
           </div>
         )}
 
-        <Header user={user} onLogout={onLogout} />
+        {/* Desktop Header: Hidden on mobile to avoid overlap */}
+        <div className="hidden lg:block">
+           <Header user={user} onLogout={onLogout} />
+        </div>
         
-        {/* Mobile Header (Surgical Fix: Ensure it doesn't overlap) */}
+        {/* Mobile Header: Visible only on mobile */}
         <div className="lg:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 shadow-sm z-50 shrink-0">
            <div className="flex items-center gap-4">
               <button 
@@ -85,7 +88,7 @@ export default function MainLayout({ children, currentPath, onNavigate, user, on
           
           <div className="w-full max-w-[1600px] mx-auto p-4 md:p-8 lg:p-12 animate-in fade-in slide-in-from-bottom-5 duration-700 pb-32 lg:pb-12">
             
-            {/* Ward Broadcast Message - Integrated inside main scroll for better mobile UX */}
+            {/* Ward Broadcast Message */}
             {wardNotice && currentPath === 'dashboard' && (
               <div className="mb-8 p-5 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-3xl flex items-start gap-4 animate-in fade-in slide-in-from-left-4 duration-700">
                  <div className="w-10 h-10 bg-white dark:bg-slate-800 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-sm shrink-0">

@@ -18,12 +18,12 @@ const BlueTick = ({ className = "w-4 h-4" }) => (
 );
 
 const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) => (
-  <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden text-left">
+  <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-100 dark:border-slate-800 p-6 shadow-sm hover:shadow-xl transition-all group relative overflow-hidden text-left" role="region" aria-label={`${title} statistic`}>
      <div className="hidden lg:block absolute -right-4 -top-4 w-20 h-20 bg-slate-50 dark:bg-slate-800/50 rounded-full group-hover:scale-150 transition-transform duration-700" />
      <div className="relative z-10">
        <div className="flex items-center justify-between mb-6">
           <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${colorClass} transition-transform group-hover:scale-110 shadow-inner`}>
-             <Icon className="w-6 h-6" />
+             <Icon className="w-6 h-6" aria-hidden="true" />
           </div>
           {highlight && (
             <div className="flex items-center gap-1.5 px-3 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-emerald-100 dark:border-emerald-800 shadow-sm">
@@ -44,9 +44,9 @@ const StatCard = ({ title, value, icon: Icon, colorClass, highlight, trend }) =>
   </div>
 );
 
-const CapacityChart = ({ data = [65, 82, 45, 90, 70, 55, 85], label = "H" }) => {
+const CapacityChart = ({ data = [65, 82, 45, 90, 70, 55, 85], label = "H", ariaTitle = "System Metric Chart" }) => {
   return (
-    <div className="h-40 flex items-end justify-between gap-2 px-2">
+    <div className="h-40 flex items-end justify-between gap-2 px-2" role="img" aria-label={ariaTitle}>
       {data.map((height, i) => (
         <div key={i} className="flex-1 group relative">
           <div 
@@ -60,6 +60,8 @@ const CapacityChart = ({ data = [65, 82, 45, 90, 70, 55, 85], label = "H" }) => 
           <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[8px] font-bold text-slate-400 uppercase tracking-tighter">
             {label}{i+1}
           </div>
+          {/* Tooltip or Screen Reader description */}
+          <div className="sr-only">Metric for {label}{i+1}: {height}%</div>
         </div>
       ))}
     </div>
@@ -158,7 +160,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                 </div>
              </div>
              
-             <CapacityChart data={[40, 55, 30, 80, 60, 45, 90]} label="D" />
+             <CapacityChart data={[40, 55, 30, 80, 60, 45, 90]} label="D" ariaTitle="Clinical Admission Velocity Chart" />
              
              <div className="mt-12 pt-8 border-t border-slate-50 dark:border-slate-800 grid grid-cols-2 md:grid-cols-4 gap-6">
                 {[
@@ -196,7 +198,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                   <p className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">Encrypting live data...</p>
                 </div>
               ) : (
-                <table className="w-full text-left border-collapse">
+                <table className="w-full text-left border-collapse" aria-label="Recent system logs">
                   <thead>
                     <tr className="border-b border-slate-100 dark:border-slate-800 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em] bg-slate-50/50 dark:bg-slate-900/50 sticky top-0 z-10">
                       <th className="px-8 py-5">Action</th>
@@ -233,7 +235,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
 
         <div className="space-y-6 text-left">
            {/* Workforce Health */}
-           <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[400px] flex flex-col justify-between">
+           <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-8 shadow-2xl relative overflow-hidden group min-h-[400px] flex flex-col justify-between" role="region" aria-label="Shift dynamics overview">
               <div className="absolute top-0 right-0 w-48 h-48 bg-primary/20 dark:bg-white/10 rounded-full blur-[60px] -translate-y-1/2 translate-x-1/4 group-hover:scale-150 transition-transform duration-1000" />
               <div className="relative z-10">
                  <div className="flex items-center justify-between mb-8">
@@ -267,7 +269,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
            </div>
 
            {/* Role Distribution Infographic */}
-           <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm">
+           <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm" role="region" aria-label="Clinician role distribution chart">
               <h3 className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.3em] mb-8">Role Distribution</h3>
               <div className="space-y-6">
                  {[
@@ -281,7 +283,7 @@ const AdminDashboard = ({ stats, loading, onNavigate, user }) => {
                           <span>{role.v}</span>
                        </div>
                        <div className="h-2 bg-slate-50 dark:bg-slate-800 rounded-full overflow-hidden">
-                          <div className={`h-full ${role.c} transition-all duration-1000`} style={{ width: role.v }} />
+                          <div className={`h-full ${role.c} transition-all duration-1000`} style={{ width: role.v }} aria-valuenow={parseInt(role.v)} aria-valuemin="0" aria-valuemax="100" role="progressbar" />
                        </div>
                     </div>
                  ))}
@@ -335,7 +337,7 @@ const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
          {/* Shift Action Center */}
-         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden flex flex-col h-full min-h-[450px]">
+         <div className="bg-slate-900 dark:bg-slate-800 rounded-[40px] p-10 shadow-2xl relative overflow-hidden flex flex-col h-full min-h-[450px]" role="region" aria-label="Shift priority actions">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4" />
             <div className="relative z-10 flex flex-col h-full">
                <div className="flex items-center justify-between mb-12">
@@ -365,7 +367,7 @@ const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
          </div>
 
          {/* Patient Context Snippet */}
-         <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col group hover:shadow-2xl transition-all duration-500">
+         <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm flex flex-col group hover:shadow-2xl transition-all duration-500" role="region" aria-label="Active ward patient context">
             <div className="flex items-center justify-between mb-10">
                <div>
                   <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest flex items-center gap-3 text-left">
@@ -373,7 +375,7 @@ const ClinicianDashboard = ({ stats, loading, onNavigate, user }) => {
                   </h3>
                   <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-1 text-left">Quick access to current unit patients.</p>
                </div>
-               <button onClick={() => onNavigate('neonates')} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-primary hover:bg-primary/10 transition-colors">
+               <button onClick={() => onNavigate('neonates')} className="p-3 bg-slate-50 dark:bg-slate-800 rounded-2xl text-primary hover:bg-primary/10 transition-colors" aria-label="View all patients">
                   <ChevronRight className="w-5 h-5" />
                </button>
             </div>
@@ -451,7 +453,7 @@ const StudentDashboard = ({ stats, loading, onNavigate, user }) => {
                </div>
             </div>
             
-            <CapacityChart data={[20, 45, 60, 55, 80, 75, 95]} label="Mod" />
+            <CapacityChart data={[20, 45, 60, 55, 80, 75, 95]} label="Mod" ariaTitle="Student proficiency growth chart" />
             
             <div className="mt-auto pt-10 grid grid-cols-2 sm:grid-cols-4 gap-6 border-t border-slate-50 dark:border-slate-800">
                {[

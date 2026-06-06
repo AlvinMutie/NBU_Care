@@ -43,10 +43,10 @@ export default function Login({ onLogin, onBack, onRegister }) {
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-slate-50 font-sans">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-slate-50 dark:bg-slate-950 font-sans transition-colors duration-500">
       
       {/* Left Design Panel */}
-      <div className="hidden lg:flex flex-1 bg-slate-900 flex-col items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex flex-1 bg-slate-900 dark:bg-slate-950 flex-col items-center justify-center p-12 relative overflow-hidden border-r border-white/5">
          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px]" />
          <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px]" />
          
@@ -77,8 +77,6 @@ export default function Login({ onLogin, onBack, onRegister }) {
                       onClick={() => {
                         setEmail(acc.email);
                         setPassword(acc.pass);
-                        // Optional: auto-submit? Let's just fill for now to be safe, or auto-submit.
-                        // I'll auto-submit after a tiny delay.
                         setTimeout(() => {
                           const form = document.querySelector('form');
                           if (form) form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
@@ -100,38 +98,38 @@ export default function Login({ onLogin, onBack, onRegister }) {
       </div>
 
       {/* Right Form Panel */}
-      <div className="flex-1 flex flex-col p-6 lg:p-12 items-center justify-center relative bg-white lg:rounded-l-[60px] shadow-2xl z-20">
+      <div className="flex-1 flex flex-col p-6 md:p-12 items-center justify-center relative bg-white dark:bg-slate-900 lg:rounded-l-[60px] shadow-2xl z-20 text-left">
          <button 
            onClick={onBack}
-           className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-slate-900 font-black text-sm transition-all group"
+           className="absolute top-8 left-8 flex items-center gap-2 text-slate-400 hover:text-slate-900 dark:hover:text-white font-black text-sm transition-all group"
          >
            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
          </button>
 
          <div className="max-w-md w-full">
             <div className="text-left mb-12">
-              <h1 className="text-4xl font-black text-slate-900 tracking-tight mb-3">Welcome Back</h1>
-              <p className="text-slate-500 font-medium">Please sign in to begin your shift.</p>
+              <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">Welcome Back</h1>
+              <p className="text-slate-500 dark:text-slate-400 font-medium">Please sign in to begin your shift.</p>
             </div>
 
             <form className="space-y-8" onSubmit={handleSubmit}>
               {error && (
-                <div className={`p-5 rounded-[24px] flex items-center gap-4 animate-in fade-in slide-in-from-top-4 ${error.includes('pending') ? 'bg-amber-50 border border-amber-100 text-amber-700' : 'bg-rose-50 border border-rose-100 text-rose-600'}`}>
+                <div className={`p-5 rounded-[24px] flex items-center gap-4 animate-in fade-in slide-in-from-top-4 ${error.includes('pending') ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-800 text-amber-700 dark:text-amber-400' : 'bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 text-rose-600 dark:text-rose-400'}`}>
                    <AlertCircle className="w-6 h-6 flex-shrink-0" />
                    <p className="text-sm font-bold leading-tight">{error}</p>
                 </div>
               )}
 
               <div className="space-y-3">
-                <label className="text-xs font-black text-slate-500 uppercase tracking-widest ml-1">Hospital Email</label>
+                <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">Hospital Email</label>
                 <div className="relative group">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-primary transition-colors" />
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 outline-none transition-all text-sm bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 font-medium"
+                    className="w-full pl-12 pr-4 py-4 rounded-2xl border border-slate-100 dark:border-slate-800 outline-none transition-all text-sm bg-slate-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 dark:text-white font-black"
                     placeholder="name@hospital.org"
                   />
                 </div>
@@ -139,23 +137,23 @@ export default function Login({ onLogin, onBack, onRegister }) {
 
               <div className="space-y-3">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-xs font-black text-slate-500 uppercase tracking-widest">Password</label>
+                  <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">Password</label>
                   <button type="button" className="text-[10px] font-black text-primary hover:text-primary-dark transition-colors uppercase tracking-wider">Forgot Access?</button>
                 </div>
                 <div className="relative group">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-primary transition-colors" />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 dark:text-slate-600 group-focus-within:text-primary transition-colors" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-14 py-4 rounded-2xl border border-slate-100 outline-none transition-all text-sm bg-slate-50 focus:bg-white focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 font-medium"
+                    className="w-full pl-12 pr-14 py-4 rounded-2xl border border-slate-100 dark:border-slate-800 outline-none transition-all text-sm bg-slate-50 dark:bg-slate-950 focus:bg-white dark:focus:bg-slate-900 focus:ring-4 focus:ring-primary/5 focus:border-primary text-slate-900 dark:text-white font-black"
                     placeholder="••••••••"
                   />
                   <button 
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
@@ -165,7 +163,7 @@ export default function Login({ onLogin, onBack, onRegister }) {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-slate-900 hover:bg-slate-800 disabled:opacity-50 text-white py-5 rounded-[24px] font-black text-sm shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 mt-4 active:scale-[0.98]"
+                className="w-full bg-slate-900 dark:bg-primary hover:bg-slate-800 dark:hover:bg-primary-dark disabled:opacity-50 text-white py-5 rounded-[24px] font-black text-sm shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 mt-4 active:scale-[0.98]"
               >
                 {isLoading ? (
                   <>
@@ -182,7 +180,7 @@ export default function Login({ onLogin, onBack, onRegister }) {
             </form>
             
             <div className="mt-16 text-center">
-               <p className="text-slate-400 text-sm font-medium">
+               <p className="text-slate-400 dark:text-slate-500 text-sm font-medium">
                  New to the unit?{' '}
                  <button onClick={onRegister} className="text-primary font-black hover:underline transition-all">Request access here</button>
                </p>
