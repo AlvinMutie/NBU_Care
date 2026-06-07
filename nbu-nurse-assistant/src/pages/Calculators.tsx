@@ -39,37 +39,37 @@ const Calculators: React.FC = () => {
       {/* Structural Page Header */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="space-y-2">
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Medication Pipeline</h2>
+          <h2 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">Medication Pipeline</h2>
           <p className="text-slate-500 font-medium max-w-lg leading-relaxed">
             High-precision, weight-based drug calculation engine with multi-layer clinical validation.
           </p>
         </div>
-        <div className="flex items-center space-x-3 bg-white border border-slate-200 p-2 px-4 rounded-xl shadow-sm">
+        <div className="flex items-center space-x-3 bg-[var(--card-bg)] border border-[var(--border-main)] p-2 px-4 rounded-xl shadow-sm">
            <ShieldCheck className="text-emerald-600" size={18} />
            <span className="text-[11px] font-bold text-slate-400 uppercase tracking-widest leading-none">Security Override: Active</span>
         </div>
       </div>
 
       {/* Modern Professional Stepper */}
-      <div className="bg-white border border-slate-200 p-10 rounded-[2.5rem] shadow-sm relative overflow-hidden">
-        <div className="absolute top-0 left-0 w-full h-1 bg-slate-50" />
+      <div className="bg-[var(--card-bg)] border border-[var(--border-main)] p-10 rounded-[2.5rem] shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-1 bg-[var(--bg-main)]" />
         <div className="flex items-center justify-between relative z-10">
           {steps.map((step, idx) => (
             <React.Fragment key={step.id}>
               <div className="flex flex-col items-center flex-1">
                 <div className={`
                   w-14 h-14 rounded-2xl flex items-center justify-center font-bold text-base transition-all duration-700
-                  ${currentStep >= step.id ? 'bg-slate-900 text-white shadow-xl shadow-slate-200' : 'bg-slate-50 text-slate-300 border border-slate-100'}
+                  ${currentStep >= step.id ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-xl shadow-slate-200 dark:shadow-none' : 'bg-[var(--bg-main)] text-slate-300 border border-[var(--border-main)]'}
                 `}>
                   {currentStep > step.id ? <CheckCircle2 size={24} className="text-emerald-400" /> : step.id}
                 </div>
-                <span className={`text-[10px] mt-4 font-bold uppercase tracking-[0.2em] ${currentStep >= step.id ? 'text-slate-900' : 'text-slate-400'}`}>
+                <span className={`text-[10px] mt-4 font-bold uppercase tracking-[0.2em] ${currentStep >= step.id ? 'text-[var(--text-main)]' : 'text-slate-400'}`}>
                   <span className="hidden sm:inline">{step.name}</span>
                   <span className="sm:hidden">{step.short}</span>
                 </span>
               </div>
               {idx < steps.length - 1 && (
-                <div className="flex-1 h-px bg-slate-100 mt-[-20px]" />
+                <div className="flex-1 h-px bg-[var(--border-main)] mt-[-20px]" />
               )}
             </React.Fragment>
           ))}
@@ -79,9 +79,9 @@ const Calculators: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Core Calculation Interface */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white border border-slate-200 p-8 sm:p-12 rounded-[3rem] min-h-[500px] flex flex-col justify-between shadow-sm relative overflow-hidden group">
+          <div className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 sm:p-12 rounded-[3rem] min-h-[500px] flex flex-col justify-between shadow-sm relative overflow-hidden group">
              {/* Subtle accent */}
-             <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-slate-50 rounded-full blur-[100px] pointer-events-none" />
+             <div className="absolute -right-20 -bottom-20 w-80 h-80 bg-[var(--bg-main)] rounded-full blur-[100px] pointer-events-none" />
 
              <AnimatePresence mode="wait">
                 {currentStep === 1 && (
@@ -93,7 +93,7 @@ const Calculators: React.FC = () => {
                     className="space-y-10"
                   >
                     <div className="space-y-1">
-                       <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Select Patient Context</h3>
+                       <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Select Patient Context</h3>
                        <p className="text-slate-500 font-medium">Foundation weight data is pulled automatically from the registry.</p>
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -101,24 +101,24 @@ const Calculators: React.FC = () => {
                         <button 
                           key={p.id} 
                           onClick={() => { setSelectedPatient(p); nextStep(); }}
-                          className={`p-6 rounded-[2rem] border transition-all text-left flex items-center justify-between group/btn ${selectedPatient?.id === p.id ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-100 hover:border-emerald-200'}`}
+                          className={`p-6 rounded-[2rem] border transition-all text-left flex items-center justify-between group/btn ${selectedPatient?.id === p.id ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' : 'bg-[var(--bg-main)] border-[var(--border-main)] hover:border-emerald-200'}`}
                         >
                           <div className="space-y-4">
                               <div className="flex items-center space-x-3">
-                                 <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-xs font-bold text-slate-400 border border-slate-100">
+                                 <div className="w-8 h-8 rounded-lg bg-[var(--card-bg)] flex items-center justify-center text-xs font-bold text-slate-400 border border-[var(--border-main)]">
                                     {p.name.split(' ').map(n => n[0]).join('')}
                                  </div>
-                                 <p className="font-bold text-slate-900 group-hover/btn:text-emerald-700 transition-colors">{p.name}</p>
+                                 <p className="font-bold text-[var(--text-main)] group-hover/btn:text-emerald-700 transition-colors">{p.name}</p>
                               </div>
                               <div className="flex items-center space-x-4">
                                  <div className="space-y-0.5">
                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Weight</p>
-                                    <p className="text-xs font-black text-slate-900 font-mono">{p.weight}</p>
+                                    <p className="text-xs font-black text-[var(--text-main)] font-mono">{p.weight}</p>
                                  </div>
-                                 <div className="w-px h-6 bg-slate-200" />
+                                 <div className="w-px h-6 bg-[var(--border-main)]" />
                                  <div className="space-y-0.5">
                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">GA</p>
-                                    <p className="text-xs font-black text-slate-900 font-mono">{p.ga}</p>
+                                    <p className="text-xs font-black text-[var(--text-main)] font-mono">{p.ga}</p>
                                  </div>
                               </div>
                           </div>
@@ -126,7 +126,7 @@ const Calculators: React.FC = () => {
                         </button>
                       ))}
                     </div>
-                    <div className="p-6 bg-rose-50 border border-rose-100 rounded-3xl flex items-start space-x-4 text-rose-700">
+                    <div className="p-6 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-3xl flex items-start space-x-4 text-rose-700 dark:text-rose-300">
                       <AlertCircle className="shrink-0 mt-0.5" size={20} />
                       <div className="space-y-1">
                         <p className="text-xs font-bold uppercase tracking-widest">Clinical Restriction</p>
@@ -147,26 +147,26 @@ const Calculators: React.FC = () => {
                     className="space-y-10"
                   >
                     <div className="space-y-1">
-                       <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Medication Formulary</h3>
+                       <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Medication Formulary</h3>
                        <p className="text-slate-500 font-medium">Standardized dosing ranges as per WHO/NICU protocol.</p>
                     </div>
                     <div className="relative">
                        <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={20} />
-                       <input type="text" placeholder="Search drug registry (e.g. Gentamicin, Dopamine)..." className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-5 pl-14 pr-6 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300" />
+                       <input type="text" placeholder="Search drug registry (e.g. Gentamicin, Dopamine)..." className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-5 pl-14 pr-6 text-sm font-bold text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 transition-all placeholder:text-slate-300" />
                     </div>
                     <div className="grid grid-cols-1 gap-3">
                        {medications.map(drug => (
                          <button 
                            key={drug.name} 
                            onClick={() => { setSelectedDrug(drug); nextStep(); }}
-                           className="p-5 rounded-2xl bg-white border border-slate-100 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all text-left flex items-center justify-between group"
+                           className="p-5 rounded-2xl bg-[var(--card-bg)] border border-[var(--border-main)] hover:border-emerald-300 hover:bg-emerald-50/30 transition-all text-left flex items-center justify-between group"
                          >
                             <div className="flex items-center space-x-5">
-                               <div className="w-12 h-12 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
+                               <div className="w-12 h-12 rounded-xl bg-[var(--bg-main)] border border-[var(--border-main)] text-slate-400 flex items-center justify-center group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                                   <Pill size={24} />
                                </div>
                                <div>
-                                  <p className="text-lg font-bold text-slate-900 group-hover:text-emerald-800 transition-colors">{drug.name}</p>
+                                  <p className="text-lg font-bold text-[var(--text-main)] group-hover:text-emerald-800 transition-colors">{drug.name}</p>
                                   <p className="text-[10px] text-slate-400 uppercase tracking-widest font-black">Stock Conc: {drug.concentration}</p>
                                </div>
                             </div>
@@ -186,7 +186,7 @@ const Calculators: React.FC = () => {
                     className="space-y-12"
                   >
                     <div className="space-y-1 text-center">
-                       <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Prescription Intensity</h3>
+                       <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Prescription Intensity</h3>
                        <p className="text-slate-500 font-medium italic">Target rate for {selectedDrug?.name}</p>
                     </div>
 
@@ -194,7 +194,7 @@ const Calculators: React.FC = () => {
                        <div className="flex items-baseline space-x-6">
                           <input 
                             type="number" 
-                            className="bg-transparent border-b-2 border-slate-200 text-[100px] font-black text-center w-64 outline-none text-slate-900 focus:border-emerald-600 transition-all"
+                            className="bg-transparent border-b-2 border-[var(--border-main)] text-[100px] font-black text-center w-64 outline-none text-[var(--text-main)] focus:border-emerald-600 transition-all"
                             placeholder="0.0"
                             value={dose}
                             onChange={(e) => setDose(e.target.value)}
@@ -211,7 +211,7 @@ const Calculators: React.FC = () => {
                     <div className="flex justify-center">
                        <button 
                         onClick={nextStep}
-                        className="bg-slate-900 text-white px-16 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-slate-200 active:scale-95 transition-all"
+                        className="bg-slate-900 dark:bg-emerald-600 text-white px-16 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-slate-200 dark:shadow-none active:scale-95 transition-all"
                         disabled={!dose}
                        >
                          Validate Therapeutic Rate
@@ -222,20 +222,20 @@ const Calculators: React.FC = () => {
 
                 {currentStep > 3 && (
                   <div className="flex flex-col items-center justify-center text-slate-300 italic py-32 space-y-8 text-center">
-                    <div className="w-20 h-20 rounded-[2rem] border-2 border-slate-50 border-t-emerald-600 animate-spin" />
+                    <div className="w-20 h-20 rounded-[2rem] border-2 border-[var(--bg-main)] border-t-emerald-600 animate-spin" />
                     <div className="space-y-2">
-                       <p className="text-xl font-bold text-slate-900">Formulating Precision Result...</p>
+                       <p className="text-xl font-bold text-[var(--text-main)]">Formulating Precision Result...</p>
                        <p className="text-sm font-medium text-slate-400">Executing weight-concentration mapping for {selectedPatient?.name}</p>
                     </div>
                   </div>
                 )}
              </AnimatePresence>
 
-             <div className="flex justify-between items-center mt-12 pt-8 border-t border-slate-50 relative z-10">
+             <div className="flex justify-between items-center mt-12 pt-8 border-t border-[var(--border-main)] relative z-10">
                 <button 
                   disabled={currentStep === 1}
                   onClick={prevStep}
-                  className="flex items-center space-x-2 text-slate-400 hover:text-slate-900 disabled:opacity-0 transition-all font-bold text-[11px] uppercase tracking-[0.2em]"
+                  className="flex items-center space-x-2 text-slate-400 hover:text-[var(--text-main)] disabled:opacity-0 transition-all font-bold text-[11px] uppercase tracking-[0.2em]"
                 >
                   <ChevronLeft size={18} />
                   <span>Previous Stage</span>
@@ -250,15 +250,15 @@ const Calculators: React.FC = () => {
 
         {/* Clinical Sidecar: Dynamic Context Summary */}
         <div className="lg:col-span-4 space-y-8">
-          <div className={`bg-white border border-slate-200 p-8 rounded-[2.5rem] shadow-sm transition-all duration-700 ${selectedPatient ? 'opacity-100 translate-y-0' : 'opacity-50 translate-y-4 pointer-events-none'}`}>
-            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-slate-50">Pipeline Context</h4>
+          <div className={`bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm transition-all duration-700 ${selectedPatient ? 'opacity-100 translate-y-0' : 'opacity-50 translate-y-4 pointer-events-none'}`}>
+            <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] mb-8 pb-4 border-b border-[var(--border-main)]">Pipeline Context</h4>
             <div className="space-y-6">
                <div className="flex flex-col space-y-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
                      <User size={12} />
                      <span>Active Neonate</span>
                   </span>
-                  <span className="text-base font-bold text-slate-900">{selectedPatient?.name || 'Unspecified'}</span>
+                  <span className="text-base font-bold text-[var(--text-main)]">{selectedPatient?.name || 'Unspecified'}</span>
                </div>
                <div className="grid grid-cols-2 gap-6">
                   <div className="flex flex-col space-y-2">
@@ -273,16 +273,16 @@ const Calculators: React.FC = () => {
                         <Clock size={12} />
                         <span>Hours Post</span>
                      </span>
-                     <span className="text-sm font-black text-slate-900 font-mono">{selectedPatient?.age || '---'}</span>
+                     <span className="text-sm font-black text-[var(--text-main)] font-mono">{selectedPatient?.age || '---'}</span>
                   </div>
                </div>
-               <div className="h-px bg-slate-50" />
+               <div className="h-px bg-[var(--border-main)]" />
                <div className="flex flex-col space-y-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
                      <Pill size={12} />
                      <span>Selected Agent</span>
                   </span>
-                  <span className="text-base font-bold text-slate-900">{selectedDrug?.name || 'Unspecified'}</span>
+                  <span className="text-base font-bold text-[var(--text-main)]">{selectedDrug?.name || 'Unspecified'}</span>
                </div>
                <div className="flex flex-col space-y-2">
                   <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
@@ -294,7 +294,7 @@ const Calculators: React.FC = () => {
             </div>
           </div>
 
-          <div className={`bg-emerald-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 transition-all duration-1000 ${currentStep >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
+          <div className={`bg-emerald-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 dark:shadow-none transition-all duration-1000 ${currentStep >= 4 ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
              <div className="flex items-center space-x-2 text-emerald-200 mb-10">
                 <ShieldCheck size={24} />
                 <span className="text-xs font-black uppercase tracking-[0.2em]">Safety Output</span>
@@ -314,7 +314,7 @@ const Calculators: React.FC = () => {
       </div>
 
       {/* Forensic Legal Footer */}
-      <footer className="pt-12 border-t border-slate-100 flex flex-col sm:flex-row justify-between items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
+      <footer className="pt-12 border-t border-[var(--border-main)] flex flex-col sm:flex-row justify-between items-center gap-6 text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">
          <div className="flex items-center space-x-3">
             <FileText size={14} className="text-slate-300" />
             <span>Protocol Library Version: 16.0.42 (Released June 2026)</span>

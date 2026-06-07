@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, Sparkles, PhoneCall, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 
 const AIChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
   const [messages, setMessages] = useState([
     { role: 'bot', text: 'NeoDesk Institutional Assistant active. I can assist with clinical protocols (v16.42), medication math, or unit transitions. How can I help you today?' }
   ]);
@@ -17,6 +19,35 @@ const AIChatbot: React.FC = () => {
     }
   }, [messages, isTyping]);
 
+  const getContextualResponse = (query: string) => {
+    const q = query.toLowerCase();
+    const path = location.pathname;
+
+    if (q.includes('vitals') || q.includes('heart rate') || q.includes('spo2')) {
+      return "I'm pulling current unit vital aggregates. The average SpO2 is 96.2% and Heart Rate is 142 bpm. Would you like to see individual patient alerts for this shift?";
+    }
+    
+    if (q.includes('dose') || q.includes('calculation') || q.includes('medication')) {
+      if (path.includes('calculators')) {
+        return "You're in the Medication Pipeline. Ensure you've selected the correct patient context. Standard therapeutic range for high-alert agents like Gentamicin is 5.0 - 7.0 mg/kg. Shall I double-check the dilution protocol?";
+      }
+      return "For medication calculations, please use the Medication Pipeline portal. I can help guide you through weight-based dosing once you're there.";
+    }
+
+    if (q.includes('handover') || q.includes('shift')) {
+      if (path.includes('handovers')) {
+        return "The Ledger Timeline shows the Morning shift handover is completed. 2 alerts were flagged. Do you need me to summarize the lead commentary for the upcoming Night shift?";
+      }
+      return "Clinical transitions are managed in the Shift Handovers section. Ensure all patient progress inventory data is validated before authentication.";
+    }
+
+    if (q.includes('protocol') || q.includes('cpap') || q.includes('ventilation')) {
+      return "The current CPAP Protocol is v16.42 (updated June 2026). Key change: Titration steps now require 15-minute observation intervals. Would you like to view the full PDF in the Clinical Academy?";
+    }
+
+    return `Consulting NeoDesk v16.42 Knowledge Core... Regarding your query: "${query.substring(0, 30)}", the institutional protocol recommends cross-verifying with the secondary clinician lead. I am currently monitoring ward activity on the ${path.replace('/', '') || 'landing'} page.`;
+  };
+
   const handleSend = () => {
     if (!input.trim() || isTyping) return;
     const userMessage = input.trim();
@@ -29,9 +60,9 @@ const AIChatbot: React.FC = () => {
       setIsTyping(false);
       setMessages(prev => [...prev, { 
         role: 'bot', 
-        text: `Consulting NeoDesk v16.42 Core... For your query regarding "${userMessage.substring(0, 20)}...", the institutional protocol recommends cross-verifying with the secondary clinician lead. Would you like me to pull the specific CPAP titration chart or dosing range for this patient context?` 
+        text: getContextualResponse(userMessage)
       }]);
-    }, 1500);
+    }, 1200);
   };
 
   return (

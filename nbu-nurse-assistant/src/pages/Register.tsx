@@ -32,11 +32,11 @@ const Register: React.FC = () => {
   const isStep2Complete = formData.role && formData.hospitalId && profileImage;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center p-6 relative overflow-hidden font-sans text-[var(--text-main)]">
       <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
       
       <div className="w-full max-w-xl relative z-10">
-        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 sm:p-12 shadow-2xl space-y-10 animate-in fade-in zoom-in-95 duration-700">
+        <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 sm:p-12 shadow-2xl space-y-10 animate-in fade-in zoom-in-95 duration-700">
           
           <div className="flex justify-between items-center">
             <Link 
@@ -54,13 +54,13 @@ const Register: React.FC = () => {
                 <ShieldCheck className="text-white" size={24} />
               </div>
               <div>
-                <h1 className="text-xl font-black text-slate-900 tracking-tight leading-none">NeoDesk</h1>
+                <h1 className="text-xl font-black text-[var(--text-main)] tracking-tight leading-none">NeoDesk</h1>
                 <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Clinical Registry</p>
               </div>
             </Link>
             <div className="flex items-center space-x-2">
                {[1, 2].map(i => (
-                 <div key={i} className={`h-1.5 w-10 rounded-full transition-all duration-500 ${step >= i ? 'bg-emerald-600' : 'bg-slate-100'}`} />
+                 <div key={i} className={`h-1.5 w-10 rounded-full transition-all duration-500 ${step >= i ? 'bg-emerald-600' : 'bg-[var(--bg-main)]'}`} />
                ))}
             </div>
           </div>
@@ -76,7 +76,7 @@ const Register: React.FC = () => {
                   className="space-y-6"
                 >
                   <div className="space-y-1">
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Identity & Security</h2>
+                    <h2 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Identity & Security</h2>
                     <p className="text-slate-500 font-medium">Create your institutional access credentials.</p>
                   </div>
 
@@ -90,7 +90,7 @@ const Register: React.FC = () => {
                           value={formData.fullName}
                           onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                           placeholder="As per Hospital ID"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                          className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
                         />
                       </div>
                     </div>
@@ -104,7 +104,7 @@ const Register: React.FC = () => {
                           value={formData.email}
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
                           placeholder="name@hospital.go.ke"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                          className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
                         />
                       </div>
                     </div>
@@ -118,7 +118,7 @@ const Register: React.FC = () => {
                           value={formData.password}
                           onChange={(e) => setFormData({...formData, password: e.target.value})}
                           placeholder="Minimum 8 characters"
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-12 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                          className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-12 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
                         />
                         <button 
                           type="button" 
@@ -135,7 +135,7 @@ const Register: React.FC = () => {
                     type="button"
                     disabled={!isStep1Complete}
                     onClick={() => setStep(2)}
-                    className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold flex items-center justify-center space-x-2 group hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-slate-200"
+                    className="w-full bg-slate-900 dark:bg-slate-800 text-white py-5 rounded-2xl font-bold flex items-center justify-center space-x-2 group hover:bg-black dark:hover:bg-emerald-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-slate-200 dark:shadow-none"
                   >
                     <span>Continue to Credentials</span>
                     <ChevronRight size={20} className="group-hover:translate-x-1 transition-transform" />
@@ -150,7 +150,7 @@ const Register: React.FC = () => {
                   className="space-y-8"
                 >
                   <div className="space-y-1">
-                    <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Professional Validation</h2>
+                    <h2 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Professional Validation</h2>
                     <p className="text-slate-500 font-medium">Verify your clinical role and identity.</p>
                   </div>
 
@@ -160,7 +160,7 @@ const Register: React.FC = () => {
                         <select 
                           value={formData.role}
                           onChange={(e) => setFormData({...formData, role: e.target.value})}
-                          className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 px-5 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold appearance-none cursor-pointer"
+                          className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold appearance-none cursor-pointer"
                         >
                           <option value="" disabled selected>Select Role</option>
                           {roles.map(role => <option key={role} value={role}>{role}</option>)}
@@ -175,7 +175,7 @@ const Register: React.FC = () => {
                             value={formData.hospitalId}
                             onChange={(e) => setFormData({...formData, hospitalId: e.target.value})}
                             placeholder="HOSP-2026-X"
-                            className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                            className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
                           />
                         </div>
                      </div>
@@ -185,7 +185,7 @@ const Register: React.FC = () => {
                      <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Passport Verification (Mandatory)</label>
                      <div 
                         onClick={handleImageUpload}
-                        className={`w-full h-40 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center space-y-3 transition-all cursor-pointer group ${profileImage ? 'border-emerald-500 bg-emerald-50' : 'border-slate-200 hover:border-emerald-400 hover:bg-slate-50'}`}
+                        className={`w-full h-40 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center space-y-3 transition-all cursor-pointer group ${profileImage ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : 'border-[var(--border-main)] hover:border-emerald-400 hover:bg-[var(--bg-main)]'}`}
                       >
                         {profileImage ? (
                            <div className="flex flex-col items-center space-y-2">
@@ -211,14 +211,14 @@ const Register: React.FC = () => {
                     <button 
                       type="button"
                       onClick={() => setStep(1)}
-                      className="flex-1 py-5 border border-slate-200 rounded-2xl font-bold text-slate-500 hover:bg-slate-50 transition-all uppercase text-[11px] tracking-widest"
+                      className="flex-1 py-5 border border-[var(--border-main)] rounded-2xl font-bold text-slate-500 hover:bg-[var(--bg-main)] transition-all uppercase text-[11px] tracking-widest"
                     >
                       Back
                     </button>
                     <button 
                       type="button"
                       disabled={!isStep2Complete}
-                      className="flex-[2] bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-emerald-100 transition-all hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed uppercase text-[11px] tracking-widest"
+                      className="flex-[2] bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-emerald-100 dark:shadow-none transition-all hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed uppercase text-[11px] tracking-widest"
                     >
                       Submit Registration
                     </button>
@@ -228,7 +228,7 @@ const Register: React.FC = () => {
             </AnimatePresence>
           </form>
 
-          <div className="pt-8 border-t border-slate-100 text-center">
+          <div className="pt-8 border-t border-[var(--border-main)] text-center">
             <p className="text-xs text-slate-400 font-medium">
               Already have clinical access? <Link to="/login" className="text-emerald-600 font-black hover:text-emerald-700 ml-1 underline decoration-emerald-200 underline-offset-4">Authenticate Now</Link>
             </p>
