@@ -93,10 +93,6 @@ const Landing: React.FC = () => {
           animate="visible"
         >
           <div className="lg:w-3/5 space-y-8">
-            <motion.div variants={itemVariants} className="inline-flex items-center space-x-2 px-3 py-1 rounded-md bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400">
-              <Sparkles size={14} className="fill-current" />
-              <span className="text-[11px] font-bold uppercase tracking-[0.1em]">Clinical Intelligence v16.0</span>
-            </motion.div>
             
             <motion.h1 variants={itemVariants} className="text-6xl lg:text-[84px] font-bold tracking-tight leading-[0.9] text-[var(--text-main)] drop-shadow-sm">
               The Gold Standard in <br />
