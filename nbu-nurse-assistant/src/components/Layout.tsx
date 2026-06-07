@@ -63,7 +63,7 @@ const Layout: React.FC = () => {
 
       {/* Sidebar - Premium Management Style */}
       <aside className={`
-        fixed inset-y-0 left-0 z-[70] w-80 bg-[var(--bg-sidebar)] border-r border-[var(--border-main)] 
+        fixed inset-y-0 left-0 z-[70] w-72 bg-[var(--bg-sidebar)] border-r border-[var(--border-main)] 
         transform transition-all duration-500 ease-[0.22,1,0.36,1] lg:translate-x-0 lg:static lg:block
         ${isSidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}
       `}>
@@ -182,8 +182,8 @@ const Layout: React.FC = () => {
         </header>
 
         {/* Dynamic Page Content Scroll View */}
-        <div className="flex-1 overflow-y-auto p-6 sm:p-10 lg:p-14 pb-32 lg:pb-14 scroll-smooth custom-scrollbar bg-[var(--bg-main)] transition-colors duration-300">
-          <div className="max-w-7xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-8 lg:p-10 pb-32 lg:pb-14 scroll-smooth custom-scrollbar bg-[var(--bg-main)] transition-colors duration-300">
+          <div className="max-w-[1440px] mx-auto">
             <Outlet />
           </div>
         </div>
