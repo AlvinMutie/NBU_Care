@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, Lock, Mail, ArrowRight } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight, ChevronLeft } from 'lucide-react';
 
 const Login: React.FC = () => {
   return (
@@ -11,6 +11,16 @@ const Login: React.FC = () => {
       <div className="w-full max-w-md relative z-10">
         <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 sm:p-14 shadow-2xl space-y-12 animate-in fade-in zoom-in-95 duration-700">
           
+          <div className="flex justify-between items-start">
+            <Link 
+              to="/" 
+              className="inline-flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors group"
+            >
+              <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
+
           <div className="text-center space-y-3">
             <Link to="/" className="inline-flex items-center space-x-2.5 mb-4 group">
               <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

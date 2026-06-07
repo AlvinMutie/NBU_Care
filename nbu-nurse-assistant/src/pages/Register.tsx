@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck, User, Mail, Lock, IdCard, Camera, ChevronRight, Eye, EyeOff, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, User, Mail, Lock, IdCard, Camera, ChevronRight, Eye, EyeOff, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Register: React.FC = () => {
@@ -38,6 +38,16 @@ const Register: React.FC = () => {
       <div className="w-full max-w-xl relative z-10">
         <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 sm:p-12 shadow-2xl space-y-10 animate-in fade-in zoom-in-95 duration-700">
           
+          <div className="flex justify-between items-center">
+            <Link 
+              to="/" 
+              className="inline-flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors group"
+            >
+              <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
+              <span>Back to Home</span>
+            </Link>
+          </div>
+
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center space-x-3 group">
               <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">

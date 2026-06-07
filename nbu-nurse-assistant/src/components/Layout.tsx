@@ -127,7 +127,7 @@ const Layout: React.FC = () => {
                className="flex items-center space-x-4 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/10 transition-all w-full px-5 py-3 rounded-2xl font-bold text-sm group"
              >
                <LogOut size={18} className="group-hover:rotate-180 transition-transform duration-500" />
-               <span>Terminate Session</span>
+               <span>Logout</span>
              </button>
            </div>
         </div>
