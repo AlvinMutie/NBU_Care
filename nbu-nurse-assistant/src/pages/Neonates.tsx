@@ -1,22 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { 
   Search, UserPlus, Filter, MoreVertical, 
   Calendar, Weight, Activity, ArrowRight, Heart, Droplets
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 const Neonates: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [neonates, setNeonates] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const neonates = [
-    { id: 1, name: 'Baby Mary Jane', hospital_number: 'NBU-001', dob: '2026-06-05', weight: 1.250, status: 'Critical', gender: 'Female' },
-    { id: 2, name: 'Baby John Doe', hospital_number: 'NBU-002', dob: '2026-06-04', weight: 2.100, status: 'Serious', gender: 'Male' },
-    { id: 3, name: 'Baby Sarah Connor', hospital_number: 'NBU-003', dob: '2026-06-06', weight: 1.850, status: 'Stable', gender: 'Female' },
-  ];
+  useEffect(() => {
+    fetchNeonates();
+  }, []);
+
+  const fetchNeonates = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/neonates');
+      setNeonates(response.data.data);
+    } catch (err) {
+      setError('Failed to synchronize ward registry.');
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredNeonates = neonates.filter(n => 
+    n.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    n.hospital_number.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4 text-slate-400">
+        <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin" />
+        <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Accessing Ward Census...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-6 text-center">
+        <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-2xl flex items-center justify-center">
+          <Activity size={32} />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-[var(--text-main)]">Registry Sync Failed</h3>
+          <p className="text-slate-500 max-w-xs mx-auto mt-1 font-medium">{error}</p>
+        </div>
+        <button onClick={fetchNeonates} className="px-8 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-xl active:scale-95 transition-all">Retry Connection</button>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700 pb-28">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
       {/* Structural Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
@@ -49,7 +93,7 @@ const Neonates: React.FC = () => {
 
       {/* Professional Patient Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {neonates.map((neonate) => (
+        {filteredNeonates.map((neonate) => (
           <motion.div 
             key={neonate.id}
             whileHover={{ y: -5 }}
@@ -58,14 +102,14 @@ const Neonates: React.FC = () => {
             <div className="space-y-6">
                <div className="flex justify-between items-start">
                   <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-xl font-bold border-2 ${neonate.gender === 'Female' ? 'bg-rose-50 dark:bg-rose-900/20 border-rose-100 dark:border-rose-800 text-rose-600' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-100 dark:border-blue-800 text-blue-600'}`}>
-                    {neonate.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                    {neonate.name.split(' ').map((n: any) => n[0]).join('').slice(0, 2)}
                   </div>
                   <span className={`px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${
                     neonate.status === 'Critical' ? 'bg-rose-500 text-white shadow-lg shadow-rose-100 border-rose-600' :
                     neonate.status === 'Serious' ? 'bg-amber-400 text-white shadow-lg shadow-amber-100 border-amber-500' :
                     'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'
                   }`}>
-                    {neonate.status}
+                    {neonate.status || 'Stable'}
                   </span>
                </div>
 
@@ -87,7 +131,7 @@ const Neonates: React.FC = () => {
                         <Weight size={12} />
                         <span className="text-[9px] font-black uppercase tracking-widest">Adm Weight</span>
                      </div>
-                     <p className="text-xs font-bold text-[var(--text-main)] font-mono">{neonate.weight.toFixed(3)} kg</p>
+                     <p className="text-xs font-bold text-[var(--text-main)] font-mono">{(neonate.birth_weight || neonate.weight).toFixed(3)} kg</p>
                   </div>
                </div>
 
@@ -109,7 +153,7 @@ const Neonates: React.FC = () => {
 
             <div className="pt-8 flex items-center justify-between">
                <Link 
-                  to={`/neonates/${neonate.hospital_number}`}
+                  to={`/neonates/${neonate.id}`}
                   className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 group-hover:text-emerald-600 transition-all"
                >
                   <span>View Full Profile</span>

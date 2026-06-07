@@ -1,18 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Clock, ArrowRight, Plus, Activity, Heart, 
   Thermometer, Droplets, User, Baby, ShieldCheck, 
   ChevronRight, Beaker, Info, ClipboardList
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../services/api';
 
 const Handovers: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activeShiftFilter, setActiveShiftFilter] = useState('All');
+  const [handovers, setHandovers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const history = [
-    { id: 1, time: '07:30 AM', date: '2026-06-07', type: 'Morning', outgoing: 'Patrick Kamau', incoming: 'Teresa Njoroge', status: 'Completed', alerts: 2 },
-    { id: 2, time: '07:30 PM', date: '2026-06-06', type: 'Night', outgoing: 'Cynthia Wekesa', incoming: 'Patrick Kamau', status: 'Completed', alerts: 0 },
+  useEffect(() => {
+    fetchHandovers();
+  }, []);
+
+  const fetchHandovers = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/handovers');
+      setHandovers(response.data.data);
+    } catch (err) {
+      console.error('Failed to fetch handovers:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const history = handovers.length > 0 ? handovers : [
+    { id: 1, time: '07:30 AM', date: '2026-06-08', type: 'Morning', outgoing: 'John Doe', incoming: 'Teresa Njoroge', alerts: 2 },
+    { id: 2, time: '03:30 PM', date: '2026-06-07', type: 'Afternoon', outgoing: 'Teresa Njoroge', incoming: 'Patrick Kamau', alerts: 0 },
   ];
 
   const shiftData = {
@@ -22,8 +41,17 @@ const Handovers: React.FC = () => {
     manager: 'Teresa Njoroge',
   };
 
+  if (loading && handovers.length === 0) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Syncing shift continuity...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-10 animate-in fade-in duration-700 pb-28">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
       {/* Structural Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
@@ -57,13 +85,13 @@ const Handovers: React.FC = () => {
                   <div className="h-8 w-px bg-[var(--border-main)]" />
                   <div>
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1 text-right">In-Charge</p>
-                     <p className="text-sm font-bold text-[var(--text-main)]">Teresa Njoroge</p>
+                     <p className="text-sm font-bold">{shiftData.manager}</p>
                   </div>
                </div>
             </div>
             
             <div className="flex flex-wrap gap-2">
-               {['Morning', 'Afternoon', 'Night'].map(shift => (
+               {['Morning', 'Afternoon', 'Night', 'All'].map(shift => (
                  <button 
                     key={shift}
                     onClick={() => setActiveShiftFilter(shift)}
@@ -86,10 +114,10 @@ const Handovers: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 pt-4">
-        {/* Transition Timeline History */}
+        {/* Transition History */}
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xl font-bold text-[var(--text-main)] tracking-tight">Ledger Timeline</h3>
+            <h3 className="text-xl font-bold tracking-tight">Ledger Timeline</h3>
             <div className="flex items-center space-x-2 text-slate-400 hover:text-[var(--text-main)] transition-colors cursor-pointer">
                <ClipboardList size={16} />
                <span className="text-xs font-bold uppercase tracking-widest">Full Export</span>
@@ -97,28 +125,28 @@ const Handovers: React.FC = () => {
           </div>
           
           <div className="space-y-4">
-             {history.map(item => (
+             {history.filter(i => activeShiftFilter === 'All' || i.type === activeShiftFilter).map(item => (
                <div key={item.id} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] flex items-center justify-between group hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer">
                   <div className="flex items-center space-x-6">
                     <div className="w-16 h-16 rounded-[1.5rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex flex-col items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/20 group-hover:border-emerald-100 dark:group-hover:border-emerald-800 transition-all duration-500">
-                       <span className="text-[9px] font-black text-slate-400 group-hover:text-emerald-500 uppercase tracking-widest">{item.time.split(' ')[1]}</span>
-                       <span className="text-lg font-black text-[var(--text-main)] group-hover:text-emerald-700">{item.time.split(' ')[0]}</span>
+                       <span className="text-[9px] font-black text-slate-400 group-hover:text-emerald-500 uppercase tracking-widest">{item.time?.split(' ')[1] || ''}</span>
+                       <span className="text-lg font-black group-hover:text-emerald-700">{item.time?.split(' ')[0] || item.type}</span>
                     </div>
                     <div>
-                      <div className="flex items-center space-x-3 text-base font-bold text-[var(--text-main)]">
-                        <span>{item.outgoing}</span>
+                      <div className="flex items-center space-x-3 text-base font-bold">
+                        <span>{item.outgoing || item.clinician_name}</span>
                         <ArrowRight size={14} className="text-slate-300" />
-                        <span>{item.incoming}</span>
+                        <span>{item.incoming || 'Next Team'}</span>
                       </div>
                       <div className="flex items-center space-x-3 mt-1.5">
                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-[var(--bg-main)] px-2 py-0.5 rounded-md">{item.type} Shift</span>
                          <div className="w-1 h-1 rounded-full bg-slate-200" />
-                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.date}</span>
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.date || new Date(item.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
                   <div className="flex items-center space-x-6">
-                    {item.alerts > 0 && (
+                    {(item.alerts > 0) && (
                        <div className="flex items-center space-x-1.5 text-rose-500 px-3 py-1.5 bg-rose-50 dark:bg-rose-900/20 rounded-xl border border-rose-100 dark:border-rose-800">
                           <Activity size={14} strokeWidth={3} />
                           <span className="text-xs font-black">{item.alerts} Alerts</span>
@@ -131,7 +159,7 @@ const Handovers: React.FC = () => {
           </div>
         </div>
 
-        {/* Sidebar: High-Alert Indicators */}
+        {/* Sidebar */}
         <div className="space-y-8">
            <div className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm space-y-8">
               <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-[var(--border-main)] pb-4">Critical Vital Aggregates</h4>
@@ -148,64 +176,39 @@ const Handovers: React.FC = () => {
                         </div>
                         <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">{metric.label}</span>
                       </div>
-                      <span className="text-sm font-black text-[var(--text-main)]">{metric.value}</span>
+                      <span className="text-sm font-black">{metric.value}</span>
                    </div>
                  ))}
               </div>
            </div>
-
-           <div className="bg-blue-600 rounded-[2rem] p-8 text-white space-y-6 shadow-lg shadow-blue-100 dark:shadow-none">
-              <div className="flex items-center space-x-2 text-blue-200">
-                 <div className="p-1.5 bg-white/10 rounded-lg"><Info size={16} /></div>
-                 <h4 className="text-[10px] font-bold uppercase tracking-[0.2em]">Lead Commentary</h4>
-              </div>
-              <p className="text-[15px] font-medium leading-relaxed italic text-blue-50">
-                "Ward is at 85% capacity. Strict adherence to thermal chain protocol is required for the upcoming night shift."
-              </p>
-           </div>
         </div>
       </div>
 
-      {/* Global Handover Modal - High Fidelity Mobbin Style */}
+      {/* Handover Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-             <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
-                onClick={() => setIsModalOpen(false)} 
-             />
-             <motion.div 
-                initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 50, scale: 0.95 }}
-                className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-5xl max-h-[90vh] overflow-hidden relative z-10 shadow-2xl flex flex-col border border-[var(--border-main)]"
-             >
-                {/* Modal Header */}
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" onClick={() => setIsModalOpen(false)} />
+             <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 50, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-5xl max-h-[90vh] overflow-hidden relative z-10 shadow-2xl flex flex-col border border-[var(--border-main)] text-[var(--text-main)]">
                 <div className="p-8 sm:p-12 border-b border-[var(--border-main)] flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-main)]/50">
                    <div className="space-y-1">
-                      <h3 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">Structured Transition Report</h3>
+                      <h3 className="text-3xl font-bold tracking-tight">Structured Transition Report</h3>
                       <div className="flex items-center space-x-3 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600">
                          <Clock size={14} />
                          <span>Linked to Shift Period: Afternoon</span>
                          <div className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-700" />
-                         <span className="text-slate-400">Entry #882-V16</span>
+                         <span className="text-slate-400">Institutional v16.0</span>
                       </div>
                    </div>
                    <div className="flex items-center space-x-2 bg-[var(--card-bg)] border border-[var(--border-main)] p-1.5 rounded-xl shadow-sm">
                       <div className="w-8 h-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white shadow-lg"><ShieldCheck size={16} /></div>
-                      <div className="px-3">
+                      <div className="px-3 text-[var(--text-main)]">
                          <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Auth Required</p>
-                         <p className="text-xs font-bold text-[var(--text-main)]">Digital Signature Active</p>
+                         <p className="text-xs font-bold">Digital Signature Active</p>
                       </div>
                    </div>
                 </div>
-
-                {/* Modal Content Scroll Area */}
-                <div className="flex-1 overflow-y-auto p-8 sm:p-12 custom-scrollbar space-y-12 bg-[var(--bg-main)]/30">
-                   {/* Contextual Grid */}
+                <div className="flex-1 overflow-y-auto p-8 sm:p-12 space-y-12 bg-[var(--bg-main)]/30">
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                       <div className="space-y-6">
                          <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center space-x-2">
@@ -215,95 +218,26 @@ const Handovers: React.FC = () => {
                          <div className="space-y-4 bg-[var(--card-bg)] p-6 rounded-[2rem] border border-[var(--border-main)] shadow-sm">
                             <div className="space-y-1">
                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Consultant of Day</p>
-                               <p className="text-sm font-bold text-[var(--text-main)]">{shiftData.consultant}</p>
+                               <p className="text-sm font-bold">{shiftData.consultant}</p>
                             </div>
                             <div className="space-y-1">
                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Unit Manager</p>
-                               <p className="text-sm font-bold text-[var(--text-main)]">{shiftData.manager}</p>
-                            </div>
-                            <div className="pt-2">
-                               <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-2">Nursing Team</p>
-                               <div className="flex -space-x-2">
-                                  {shiftData.staff.map(s => <div key={s} title={s} className="w-8 h-8 rounded-xl bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-[10px] font-bold text-slate-500 shadow-sm">{s[0]}</div>)}
-                               </div>
+                               <p className="text-sm font-bold">{shiftData.manager}</p>
                             </div>
                          </div>
                       </div>
-
                       <div className="md:col-span-2 space-y-6">
                          <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center space-x-2">
                             <Beaker size={14} className="text-blue-600" />
                             <span>Clinical Commentary</span>
                          </h4>
-                         <textarea 
-                            rows={8}
-                            className="w-full bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-6 text-sm font-medium text-[var(--text-main)] outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-600 transition-all shadow-sm resize-none placeholder:text-slate-300"
-                            placeholder="Enter ward-level updates, safety flags, equipment status, and urgent instructions for the incoming team..."
-                         />
-                      </div>
-                   </div>
-
-                   {/* Neonate Grid - Exhaustive Implementation */}
-                   <div className="space-y-8">
-                      <div className="flex items-center justify-between border-b border-[var(--border-main)] pb-4">
-                         <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] flex items-center space-x-2">
-                            <Baby size={16} className="text-emerald-600" />
-                            <span>Patient Progress Inventory</span>
-                         </h4>
-                         <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Total Active: 08</span>
-                      </div>
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                         {[
-                           { name: 'Baby Mary Jane', id: 'NBU-001', diag: 'RDS', weight: '1.250kg', vitals: { hr: 142, spo2: 95, temp: 36.8, sugar: 3.8 }, status: 'Serious' },
-                           { name: 'Baby John Doe', id: 'NBU-002', diag: 'Sepsis', weight: '2.100kg', vitals: { hr: 138, spo2: 98, temp: 36.5, sugar: 4.2 }, status: 'Stable' },
-                         ].map(p => (
-                            <div key={p.id} className={`p-8 rounded-[2.5rem] border group transition-all shadow-sm ${p.status === 'Serious' ? 'bg-rose-50/30 dark:bg-rose-900/10 border-rose-100 dark:border-rose-800' : 'bg-[var(--card-bg)] border-[var(--border-main)] hover:border-emerald-200'}`}>
-                               <div className="flex justify-between items-start mb-6">
-                                  <div className="space-y-1">
-                                     <h5 className="text-lg font-bold text-[var(--text-main)] tracking-tight">{p.name}</h5>
-                                     <p className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">{p.id} • {p.diag}</p>
-                                  </div>
-                                  <span className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${p.status === 'Serious' ? 'bg-rose-500 text-white shadow-lg shadow-rose-200 border-rose-600' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800'}`}>{p.status}</span>
-                               </div>
-                               
-                               <div className="grid grid-cols-2 gap-4 mb-8">
-                                  <div className="space-y-1">
-                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Vital Signs (Shift End)</p>
-                                     <div className="flex flex-wrap gap-2 pt-1">
-                                        <div className="px-2 py-1 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-lg text-[10px] font-black text-[var(--text-main)] font-mono">HR:{p.vitals.hr}</div>
-                                        <div className="px-2 py-1 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-lg text-[10px] font-black text-blue-600 font-mono">SpO2:{p.vitals.spo2}%</div>
-                                        <div className="px-2 py-1 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-lg text-[10px] font-black text-amber-600 font-mono">T:{p.vitals.temp}°C</div>
-                                     </div>
-                                  </div>
-                                  <div className="space-y-1">
-                                     <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest text-right">Investigations</p>
-                                     <p className="text-[10px] font-bold text-[var(--text-main)] text-right pt-1 uppercase tracking-widest">Sugar: {p.vitals.sugar} mmol/L</p>
-                                  </div>
-                               </div>
-
-                               <div className="space-y-3">
-                                  <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Patient shift plan</p>
-                                  <textarea className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl p-4 text-xs font-medium text-[var(--text-main)] outline-none focus:border-emerald-600 transition-all resize-none h-24" placeholder="Specific notes for next shift..."></textarea>
-                               </div>
-                            </div>
-                         ))}
+                         <textarea rows={8} className="w-full bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-6 text-sm font-medium text-[var(--text-main)] outline-none focus:border-emerald-600 transition-all shadow-sm resize-none placeholder:text-slate-300" placeholder="Enter ward-level updates, safety flags, and instructions..."/>
                       </div>
                    </div>
                 </div>
-
-                {/* Modal Footer */}
                 <div className="p-8 sm:p-12 border-t border-[var(--border-main)] flex items-center justify-between bg-[var(--card-bg)]">
                    <button onClick={() => setIsModalOpen(false)} className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-[var(--text-main)] transition-colors">Discard Draft</button>
-                   <div className="flex items-center space-x-6">
-                      <div className="hidden sm:flex items-center space-x-2 text-[10px] font-bold text-slate-300 uppercase tracking-widest">
-                         <ShieldCheck size={14} className="text-emerald-500" />
-                         <span>Ready for Institutional Archival</span>
-                      </div>
-                      <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-4 rounded-2xl font-black text-sm shadow-xl shadow-emerald-100 dark:shadow-none transition-all active:scale-95">
-                         Finalize & Authenticate Shift
-                      </button>
-                   </div>
+                   <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-4 rounded-2xl font-black text-sm shadow-xl transition-all active:scale-95">Finalize & Authenticate Shift</button>
                 </div>
              </motion.div>
           </div>

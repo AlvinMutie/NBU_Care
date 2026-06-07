@@ -1,22 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ShieldCheck, Search, Filter, Download, 
   CheckCircle2, History, ArrowRight,
   Lock, Terminal
 } from 'lucide-react';
+import api from '../services/api';
 
 const AuditLogs: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [logs, setLogs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [pagination, setPagination] = useState<any>(null);
 
-  const logs = [
-    { id: 1, time: '09:45:22 AM', date: '2026-06-07', user: 'Patrick Kamau', role: 'Staff Nurse', action: 'Dose Calculation', detail: 'Dopamine for NBU-001', status: 'Success' },
-    { id: 2, time: '09:30:10 AM', date: '2026-06-07', user: 'Teresa Njoroge', role: 'In-Charge', action: 'System Login', detail: 'Session started from IP 192.168.1.45', status: 'Success' },
-    { id: 3, time: '08:15:45 AM', date: '2026-06-07', user: 'System Core', role: 'Automated', action: 'Data Backup', detail: 'Cloud synchronization completed', status: 'Success' },
-    { id: 4, time: '07:45:12 AM', date: '2026-06-07', user: 'Dr. Cynthia Wekesa', role: 'Medical Officer', action: 'Patient Admission', detail: 'Baby Mary Jane (NBU-001) registered', status: 'Success' },
-  ];
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const fetchLogs = async (page = 1) => {
+    setLoading(true);
+    try {
+      const response = await api.get(`/logs?page=${page}&search=${searchTerm}`);
+      setLogs(response.data.data.data);
+      setPagination(response.data.data);
+    } catch (err) {
+      console.error('Failed to fetch logs:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchLogs(1);
+  };
+
+  if (loading && logs.length === 0) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Deciphering forensic ledger...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-700 pb-28">
+    <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
       {/* Structural Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
@@ -32,7 +60,7 @@ const AuditLogs: React.FC = () => {
       {/* Stats Quick-Bar */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
          {[
-           { label: 'Total Events', val: '2,456', icon: History, color: 'text-slate-600', bg: 'bg-slate-50' },
+           { label: 'Total Events', val: pagination?.total || '0', icon: History, color: 'text-slate-600', bg: 'bg-slate-50' },
            { label: 'Security Alerts', val: '00', icon: Lock, color: 'text-emerald-600', bg: 'bg-emerald-50' },
            { label: 'Dose Calculations', val: '156', icon: Terminal, color: 'text-blue-600', bg: 'bg-blue-50' },
            { label: 'System Uptime', val: '100%', icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
@@ -51,7 +79,7 @@ const AuditLogs: React.FC = () => {
 
       {/* Main Ledger Table */}
       <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] overflow-hidden shadow-sm">
-        <div className="p-8 border-b border-[var(--border-main)] flex flex-col md:flex-row items-center gap-4 bg-[var(--bg-main)]/50">
+        <form onSubmit={handleSearch} className="p-8 border-b border-[var(--border-main)] flex flex-col md:flex-row items-center gap-4 bg-[var(--bg-main)]/50">
           <div className="relative flex-1 w-full">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
             <input 
@@ -62,11 +90,8 @@ const AuditLogs: React.FC = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <button className="flex items-center space-x-2 px-6 py-3 bg-[var(--card-bg)] border border-[var(--border-main)] rounded-xl text-slate-500 font-bold text-xs uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800 transition-all">
-            <Filter size={14} />
-            <span>Time Range</span>
-          </button>
-        </div>
+          <button type="submit" className="px-8 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl text-xs font-bold uppercase tracking-widest shadow-lg active:scale-95 transition-all">Search Ledger</button>
+        </form>
 
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
@@ -83,17 +108,17 @@ const AuditLogs: React.FC = () => {
               {logs.map((log) => (
                 <tr key={log.id} className="hover:bg-[var(--bg-main)]/50 transition-colors group">
                   <td className="px-10 py-6 whitespace-nowrap">
-                    <div className="text-xs font-black text-[var(--text-main)]/80 font-mono tracking-tighter">{log.time}</div>
-                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">{log.date}</div>
+                    <div className="text-xs font-black text-[var(--text-main)]/80 font-mono tracking-tighter">{new Date(log.created_at).toLocaleTimeString()}</div>
+                    <div className="text-[10px] text-slate-400 font-bold uppercase tracking-tight">{new Date(log.created_at).toLocaleDateString()}</div>
                   </td>
                   <td className="px-10 py-6 whitespace-nowrap">
                     <div className="flex items-center space-x-3">
                        <div className="w-9 h-9 rounded-[0.8rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-[10px] font-black text-slate-500 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
-                          {log.user.split(' ').map(n => n[0]).join('')}
+                          {log.user?.name?.split(' ').map((n: any) => n[0]).join('') || '??'}
                        </div>
                        <div>
-                          <div className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-700 transition-colors">{log.user}</div>
-                          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{log.role}</div>
+                          <div className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-700 transition-colors">{log.user?.name || 'System'}</div>
+                          <div className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{log.user?.role || 'Service Account'}</div>
                        </div>
                     </div>
                   </td>
@@ -110,7 +135,7 @@ const AuditLogs: React.FC = () => {
                   <td className="px-10 py-6 text-right">
                     <div className="flex items-center justify-end space-x-2 text-emerald-500 opacity-60 group-hover:opacity-100 transition-opacity">
                        <CheckCircle2 size={16} strokeWidth={3} />
-                       <span className="text-[10px] font-black uppercase tracking-[0.15em]">SHA-256 Valid</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.15em]">Forensically Signed</span>
                     </div>
                   </td>
                 </tr>
@@ -119,21 +144,31 @@ const AuditLogs: React.FC = () => {
           </table>
         </div>
         
-        <div className="p-8 border-t border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-main)]/30">
-           <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Showing 4 of 2,456 high-fidelity events</p>
-           <div className="flex items-center space-x-2">
-              <button className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-[var(--text-main)] transition-colors">Previous</button>
-              <div className="flex items-center bg-[var(--card-bg)] border border-[var(--border-main)] rounded-xl p-1 shadow-sm">
-                 <button className="w-8 h-8 flex items-center justify-center bg-slate-900 dark:bg-emerald-600 text-white rounded-lg text-xs font-bold">1</button>
-                 <button className="w-8 h-8 flex items-center justify-center text-slate-400 hover:bg-[var(--bg-main)] rounded-lg text-xs font-bold transition-all">2</button>
-                 <button className="w-8 h-8 flex items-center justify-center text-slate-400 hover:bg-[var(--bg-main)] rounded-lg text-xs font-bold transition-all">3</button>
-              </div>
-              <button className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-[var(--text-main)] transition-colors flex items-center space-x-2 group">
-                 <span>Next</span>
-                 <ArrowRight size={14} className="group-hover:translate-x-1 transition-all" />
-              </button>
-           </div>
-        </div>
+        {pagination && (
+          <div className="p-8 border-t border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-main)]/30">
+             <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Showing {logs.length} of {pagination.total} high-fidelity events</p>
+             <div className="flex items-center space-x-2">
+                <button 
+                  disabled={!pagination.prev_page_url}
+                  onClick={() => fetchLogs(pagination.current_page - 1)}
+                  className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-[var(--text-main)] transition-colors disabled:opacity-30"
+                >
+                  Previous
+                </button>
+                <div className="flex items-center bg-[var(--card-bg)] border border-[var(--border-main)] rounded-xl p-1 shadow-sm">
+                   <button className="w-8 h-8 flex items-center justify-center bg-slate-900 dark:bg-emerald-600 text-white rounded-lg text-xs font-bold">{pagination.current_page}</button>
+                </div>
+                <button 
+                  disabled={!pagination.next_page_url}
+                  onClick={() => fetchLogs(pagination.current_page + 1)}
+                  className="px-4 py-2 text-xs font-bold text-slate-600 dark:text-slate-400 hover:text-[var(--text-main)] transition-colors flex items-center space-x-2 group disabled:opacity-30"
+                >
+                   <span>Next</span>
+                   <ArrowRight size={14} className="group-hover:translate-x-1 transition-all" />
+                </button>
+             </div>
+          </div>
+        )}
       </div>
     </div>
   );

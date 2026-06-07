@@ -31,6 +31,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/logs', [AuditController::class, 'index']);
 
     Route::get('/admin/stats', [AdminController::class, 'stats']);
+    Route::get('/admin/analytics', [AdminController::class, 'analytics']);
     Route::get('/admin/users', [AdminController::class, 'users']);
     Route::get('/auth/pending', [AdminController::class, 'pendingUsers']);
     Route::post('/auth/verify/{user}', [AdminController::class, 'verifyUser']);

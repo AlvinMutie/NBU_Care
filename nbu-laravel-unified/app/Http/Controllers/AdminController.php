@@ -23,6 +23,25 @@ class AdminController extends Controller
         ]);
     }
 
+    public function analytics()
+    {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'distribution' => [
+                    ['name' => 'Critical', 'value' => Neonate::where('status', 'Critical')->count(), 'color' => '#ef4444'],
+                    ['name' => 'Serious', 'value' => Neonate::where('status', 'Serious')->count(), 'color' => '#f59e0b'],
+                    ['name' => 'Stable', 'value' => Neonate::where('status', 'Stable')->count(), 'color' => '#10b981'],
+                ],
+                'staffing' => [
+                    ['name' => 'Day', 'required' => 12, 'actual' => User::where('role', 'Staff Nurse')->count()],
+                    ['name' => 'Afternoon', 'required' => 10, 'actual' => max(4, User::where('role', 'Staff Nurse')->count() - 2)],
+                    ['name' => 'Night', 'required' => 8, 'actual' => max(2, User::where('role', 'Staff Nurse')->count() - 4)],
+                ]
+            ]
+        ]);
+    }
+
     public function users()
     {
         $users = User::all();
