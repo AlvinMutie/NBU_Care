@@ -17,24 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('phone')->nullable();
-            $table->string('id_number')->nullable();
-            $table->string('profile_image')->nullable();
-            $table->string('hospital_id')->unique()->nullable();
-            $table->enum('role', [
-                'Nursing In-Charge',
-                'Nurse',
-                'Consultant Pediatrician',
-                'CO Pediatrics / MO',
-                'Student',
-                'ICT / IT Support',
-                'Hospital Management'
-            ])->default('Student');
-            $table->enum('status', ['Pending', 'Approved', 'Rejected', 'Restricted'])->default('Pending');
-            $table->boolean('is_verified')->default(false);
-            $table->foreignId('verified_by')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('verification_date')->nullable();
-            $table->jsonb('learning_stats')->nullable();
+            $table->string('role')->default('Student'); // [Nursing In-Charge, Staff Nurse, Consultant Pediatrician, Medical Officer, Student]
+            $table->string('status')->default('Pending'); // [Pending, Approved, Rejected, Restricted]
+            $table->boolean('isVerified')->default(false);
+            $table->foreignId('verifiedBy')->nullable()->constrained('users');
             $table->rememberToken();
             $table->timestamps();
         });
