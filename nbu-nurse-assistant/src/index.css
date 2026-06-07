@@ -11,12 +11,36 @@
 
 @layer base {
   body {
-    @apply bg-brand-slate text-slate-100 antialiased;
+    @apply transition-colors duration-300 antialiased;
+  }
+  
+  /* System-wide light/dark variables */
+  :root {
+    --bg-main: #F8FAFC;
+    --text-main: #0F172A;
+    --card-bg: #FFFFFF;
+    --border-main: #E2E8F0;
+    --bg-sidebar: #FFFFFF;
+    --bg-header: #FFFFFF;
+  }
+
+  .dark {
+    --bg-main: #0f172a;
+    --text-main: #f8fafc;
+    --card-bg: #1e293b;
+    --border-main: #334155;
+    --bg-sidebar: #1e293b;
+    --bg-header: #1e293b;
+  }
+
+  body {
+    background-color: var(--bg-main);
+    color: var(--text-main);
   }
 }
 
 @utility glass-card {
-  @apply bg-white/10 backdrop-blur-md border border-white/20 rounded-xl shadow-xl;
+  @apply bg-white/10 dark:bg-slate-900/10 backdrop-blur-md border border-white/20 dark:border-white/10 rounded-xl shadow-xl;
 }
 
 @utility glass-button {
@@ -25,4 +49,9 @@
 
 @utility stat-card {
   @apply glass-card p-6 flex flex-col items-center justify-center text-center;
+}
+
+/* Custom transitions */
+.theme-transition {
+  @apply transition-all duration-300;
 }
