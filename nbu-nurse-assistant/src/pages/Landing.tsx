@@ -4,11 +4,12 @@ import {
   ShieldCheck, Activity, 
   Thermometer, Zap, GraduationCap,
   ClipboardList, Heart, Lock, ArrowRight,
-  Stethoscope, UserCheck, BarChart3,
-  Waves, Sun, Moon
+  Stethoscope, BarChart3,
+  Waves, Sun, Moon, UserCheck, Globe
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useTheme } from '../services/ThemeContext';
+import babyImage from '../assets/baby2.jpg';
 
 const Landing: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
@@ -18,7 +19,7 @@ const Landing: React.FC = () => {
     { label: 'Active Unit Occupancy', value: '42 / 50', sub: 'Cots Occupied', trend: '84% Capacity', icon: Stethoscope },
     { label: 'Acuity Status Summary', value: '12 Critical', sub: '18 High-Dep | 12 Stable', trend: 'Level 3 NICU', icon: Activity },
     { label: 'Active Unit Leadership', value: 'Dr. Alamin', sub: 'SN. Grace (Charge)', trend: 'Shift: 08:00 - 20:00', icon: UserCheck },
-    { label: 'Global Safety Override', value: 'v16.2 Initialized', sub: 'Safety Protocol Active', trend: 'System: Secure', icon: ShieldCheck, status: 'emerald' },
+    { label: 'Safety Override Status', value: 'v16.2 Active', sub: 'Protocol Initialized', trend: 'Override: Enabled', icon: ShieldCheck, status: 'emerald' },
   ];
 
   const weightBands = [
@@ -49,7 +50,8 @@ const Landing: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0f172a] text-[#0F172A] dark:text-slate-100 font-sans transition-colors duration-500 overflow-x-hidden scroll-smooth">
-      {/* Institutional Navigation */}
+      
+      {/* 🏛️ INSTITUTIONAL NAVIGATION */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-xl flex items-center justify-between px-6 lg:px-12">
         <div className="flex items-center space-x-4">
           <Link to="/" className="flex items-center space-x-4">
@@ -84,42 +86,79 @@ const Landing: React.FC = () => {
         </div>
       </nav>
 
-      <main className="max-w-7xl mx-auto px-6 lg:px-12 pt-32 pb-24 space-y-12">
-        
-        {/* HERO OVERVIEW (Top Row) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {stats.map((stat, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-6 rounded-[2rem] shadow-sm relative overflow-hidden group hover:border-emerald-200 dark:hover:border-emerald-900/50 transition-all"
-            >
-              <div className="relative z-10 flex justify-between items-start mb-5">
-                 <div className="w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors">
-                    <stat.icon size={24} />
-                 </div>
-                 <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${stat.status === 'emerald' ? 'bg-emerald-500 text-white animate-pulse' : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700'}`}>
-                    {stat.trend}
-                 </div>
-              </div>
-              <div className="relative z-10">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                <h3 className="text-3xl font-black tracking-tighter text-[#0F172A] dark:text-white leading-none mb-1">{stat.value}</h3>
-                <p className="text-sm font-bold text-slate-500 dark:text-slate-400">{stat.sub}</p>
-              </div>
-              {/* Capacity Bar for Card 1 */}
-              {i === 0 && (
-                <div className="mt-4 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                  <div className="h-full bg-emerald-500 w-[84%]" />
-                </div>
-              )}
-            </motion.div>
-          ))}
+      {/* 🖼️ HERO SECTION WITH BLENDED IMAGE */}
+      <section className="relative pt-32 pb-20 overflow-hidden">
+        {/* Advanced Background Blending */}
+        <div className="absolute top-0 right-0 w-full h-[650px] pointer-events-none z-0">
+           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-[#F8FAFC] dark:via-[#0f172a] to-[#F8FAFC] dark:to-[#0f172a] z-10" />
+           <div className="absolute inset-0 bg-gradient-to-r from-[#F8FAFC] dark:from-[#0f172a] via-[#F8FAFC]/40 dark:via-transparent to-transparent z-10" />
+           <img 
+            src={babyImage} 
+            alt="Neonatal Care" 
+            className="w-full h-full object-cover object-[85%_center] opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-overlay grayscale"
+           />
         </div>
 
-        {/* CORE COMMAND SPLIT-GRID */}
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20">
+          <motion.div 
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="mb-16 space-y-6"
+          >
+             <div className="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">v16.2 Safety Protocol Active</span>
+             </div>
+             <h1 className="text-6xl lg:text-8xl font-black tracking-tighter text-[#0F172A] dark:text-white leading-[0.9]">
+               Clinical <br /> Command Hub.
+             </h1>
+             <p className="text-xl text-slate-500 dark:text-slate-400 max-w-2xl leading-relaxed font-medium">
+               High-fidelity operational visibility into the Neonatal Building Unit. Standardizing survival indices through forensic digital orchestration.
+             </p>
+          </motion.div>
+
+          {/* 1. HERO OVERVIEW (Top Row StatCards) */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {stats.map((stat, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden group hover:border-emerald-500/50 transition-all"
+              >
+                <div className="relative z-10 flex justify-between items-start mb-6">
+                   <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors">
+                      <stat.icon size={28} />
+                   </div>
+                   <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${stat.status === 'emerald' ? 'bg-emerald-500 text-white animate-pulse' : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700'}`}>
+                      {stat.trend}
+                   </div>
+                </div>
+                <div className="relative z-10">
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                  <h3 className="text-3xl font-black tracking-tighter text-[#0F172A] dark:text-white leading-none mb-2">{stat.value}</h3>
+                  <p className="text-sm font-bold text-slate-500 dark:text-slate-400">{stat.sub}</p>
+                </div>
+                {/* Capacity Bar for Card 1 */}
+                {i === 0 && (
+                  <div className="mt-5 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      animate={{ width: '84%' }}
+                      transition={{ duration: 2, ease: "easeOut" }}
+                      className="h-full bg-emerald-500" 
+                    />
+                  </div>
+                )}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 2. CORE COMMAND SPLIT-GRID */}
+      <main className="max-w-7xl mx-auto px-6 lg:px-12 pb-24 space-y-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
           {/* LEFT COLUMNS (Span 2) */}
@@ -138,7 +177,7 @@ const Landing: React.FC = () => {
                     </div>
                   </div>
                   <div className="hidden sm:block text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-xl">
-                     Audit Protocol v16.2
+                     SHA-256 Audit Trail
                   </div>
                </div>
                <div className="overflow-x-auto no-scrollbar">
@@ -153,7 +192,7 @@ const Landing: React.FC = () => {
                     </thead>
                     <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                       {weightBands.map((w, i) => (
-                        <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                        <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
                            <td className="px-8 py-6">
                               <div className="font-black text-[#0F172A] dark:text-white tracking-tight">{w.band}</div>
                            </td>
@@ -167,7 +206,7 @@ const Landing: React.FC = () => {
                               </div>
                            </td>
                            <td className="px-8 py-6">
-                              <div className="text-sm font-bold text-rose-500 uppercase tracking-tighter">Rolling {w.infection}</div>
+                              <div className="text-sm font-bold text-rose-500 uppercase tracking-tighter opacity-60 group-hover:opacity-100 transition-opacity">Rolling {w.infection}</div>
                            </td>
                         </tr>
                       ))}
@@ -178,22 +217,24 @@ const Landing: React.FC = () => {
 
             {/* Respiratory Support Census Grid */}
             <div id="respiratory" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm scroll-mt-24">
-               <div className="flex items-center justify-between mb-8">
+               <div className="flex items-center justify-between mb-8 px-2">
                   <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 flex items-center space-x-3">
                      <Thermometer size={18} className="text-emerald-500" />
                      <span>Respiratory Support Census</span>
                   </h3>
+                  <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800 mx-6" />
+                  <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest">Census: 42 Total</span>
                </div>
                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {respiratoryCensus.map((r, i) => (
-                    <div key={i} className="flex items-center justify-between p-5 bg-slate-50 dark:bg-slate-800/50 rounded-[1.5rem] border border-slate-100 dark:border-slate-700/50 group hover:border-emerald-300 transition-all">
-                       <div className="flex items-center space-x-4">
-                          <div className="w-10 h-10 rounded-xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm">
-                             <r.icon size={20} />
+                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[1.8rem] border border-slate-100 dark:border-slate-700/50 group hover:border-emerald-400/50 transition-all">
+                       <div className="flex items-center space-x-5">
+                          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm border border-slate-100 dark:border-slate-700">
+                             <r.icon size={22} />
                           </div>
                           <div>
                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{r.mode}</p>
-                             <p className="text-lg font-black text-[#0F172A] dark:text-white tracking-tight">{r.count} Devices</p>
+                             <p className="text-xl font-black text-[#0F172A] dark:text-white tracking-tight">{r.count} Devices</p>
                           </div>
                        </div>
                        <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
@@ -218,9 +259,9 @@ const Landing: React.FC = () => {
                   <Zap size={18} className="text-amber-500" />
                   <span>Biomedical Registry</span>
                </h3>
-               <div className="space-y-8">
+               <div className="space-y-10">
                   {equipmentRegistry.map((eq, i) => (
-                    <div key={i} className="space-y-3">
+                    <div key={i} className="space-y-4">
                        <div className="flex items-center justify-between">
                           <span className="text-sm font-black text-[#0F172A] dark:text-white uppercase tracking-tight">{eq.name}</span>
                           <span className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800">{eq.pressure}</span>
@@ -244,19 +285,19 @@ const Landing: React.FC = () => {
             {/* Academic Hub Registry */}
             <section className="bg-[#0F172A] dark:bg-slate-800/40 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden">
                <div className="absolute top-0 right-0 p-8 opacity-10">
-                  <GraduationCap size={100} className="text-white" />
+                  <GraduationCap size={120} className="text-white" />
                </div>
                <div className="relative z-10 mb-10">
                   <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] mb-1">Knowledge Hub</p>
-                  <h3 className="text-2xl font-black text-white tracking-tighter">Academic Hub Registry</h3>
+                  <h3 className="text-2xl font-black text-white tracking-tighter">Academic Registry</h3>
                </div>
                <div className="space-y-6 relative z-10">
                   {[
-                    { label: 'Active Clinician Sims', value: '14 Modules', icon: Activity },
+                    { label: 'Active Clinician Sims', value: '14 Active', icon: Activity },
                     { label: 'Student Progress Index', value: '82.4% Comp.', icon: ClipboardList },
-                    { label: 'Shift Rota Coverage', value: '100% Active', icon: Heart },
+                    { label: 'Shift Rota Coverage', value: '100% Validated', icon: Heart },
                   ].map((ac, i) => (
-                    <div key={i} className="flex items-center space-x-5 p-4 bg-white/5 rounded-2xl border border-white/5">
+                    <div key={i} className="flex items-center space-x-5 p-5 bg-white/5 rounded-[1.5rem] border border-white/5">
                        <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-emerald-500"><ac.icon size={20} /></div>
                        <div>
                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">{ac.label}</p>
@@ -265,20 +306,20 @@ const Landing: React.FC = () => {
                     </div>
                   ))}
                </div>
-               <button className="w-full mt-10 bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-emerald-950/20 active:scale-95">
-                  Access Institutional Academy
+               <button className="w-full mt-10 bg-emerald-600 hover:bg-emerald-700 text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-emerald-950/20 active:scale-95">
+                  Enter Academic Portal
                </button>
             </section>
 
             {/* Secure Gateway Login Portal Shortcut */}
             <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm group hover:border-emerald-500/50 transition-all cursor-pointer">
-               <Link to="/login" className="flex flex-col space-y-5">
+               <Link to="/login" className="flex flex-col space-y-6">
                   <div className="w-16 h-16 rounded-2xl bg-[#0F172A] dark:bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-slate-200 dark:shadow-emerald-900/20 group-hover:scale-110 transition-transform">
                      <Lock size={28} />
                   </div>
                   <div>
-                     <h3 className="text-2xl font-black text-[#0F172A] dark:text-white tracking-tighter uppercase">Secure Gateway</h3>
-                     <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mt-1">Authorized Entry Portal</p>
+                     <h3 className="text-2xl font-black text-[#0F172A] dark:text-white tracking-tighter uppercase leading-none">Secure Gateway</h3>
+                     <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mt-2">Institutional Entry Point</p>
                   </div>
                   <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-emerald-600 transition-colors">Initiate Auth Session</span>
@@ -291,22 +332,31 @@ const Landing: React.FC = () => {
         </div>
       </main>
 
-      {/* Footer - Legal & Versioning */}
-      <footer id="contact" className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-900 py-16 transition-colors duration-500">
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 flex flex-col md:flex-row justify-between items-center gap-10 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
-           <div className="flex flex-col md:flex-row items-center gap-6">
-              <span className="text-slate-900 dark:text-white">&copy; 2026 NeoDesk Clinical Systems</span>
-              <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" />
-              <div className="flex items-center space-x-4">
-                 <a href="#demographics" className="hover:text-emerald-600 transition-colors">Demographics</a>
-                 <a href="#respiratory" className="hover:text-emerald-600 transition-colors">Respiratory</a>
-                 <a href="#registry" className="hover:text-emerald-600 transition-colors">Equipment</a>
-              </div>
-           </div>
-           <div className="flex items-center space-x-12">
-              <span className="text-slate-400 dark:text-slate-700">Build: v16.2.844.STABLE</span>
-              <span className="text-emerald-600/60 dark:text-emerald-500/30">AES-256 Validated Signature</span>
-           </div>
+      {/* 🏛️ FOOTER - Legal & Versioning */}
+      <footer id="contact" className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-20 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
+             <div className="flex flex-col space-y-4">
+                <div className="flex items-center space-x-4">
+                   <span className="text-slate-900 dark:text-white text-sm font-black">&copy; 2026 NeoDesk Clinical Systems</span>
+                </div>
+                <div className="flex items-center space-x-6 text-slate-300 dark:text-slate-700">
+                   <a href="#demographics" className="hover:text-emerald-600 transition-colors">Registry</a>
+                   <a href="#respiratory" className="hover:text-emerald-600 transition-colors">Respiratory</a>
+                   <a href="#registry" className="hover:text-emerald-600 transition-colors">Biomedical</a>
+                </div>
+             </div>
+             <div className="flex flex-col md:items-end space-y-4">
+                <div className="flex items-center space-x-8">
+                   <span className="text-slate-400 dark:text-slate-700">Protocol: v16.2.844.STABLE</span>
+                   <span className="text-emerald-600/60 dark:text-emerald-500/30 flex items-center space-x-2">
+                      <Globe size={12} />
+                      <span>Validated Infrastructure</span>
+                   </span>
+                </div>
+                <p className="text-slate-300 dark:text-slate-800 tracking-[0.2em]">Forensic SHA-256 Verified Build Signature</p>
+             </div>
+          </div>
         </div>
       </footer>
     </div>
