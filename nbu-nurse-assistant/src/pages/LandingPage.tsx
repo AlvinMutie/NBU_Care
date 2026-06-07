@@ -1,360 +1,477 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { 
-  ShieldCheck, Activity, 
-  Thermometer, Zap, GraduationCap,
-  ClipboardList, Heart, Lock, ArrowRight,
-  Stethoscope, BarChart3,
-  Waves, Sun, Moon, UserCheck, Globe
-} from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useTheme } from '../services/ThemeContext';
+import type { Variants } from 'framer-motion';
+import { 
+  ShieldCheck, Activity, Bell, Users, FileText, 
+  Heart, CheckCircle2, Shield,
+  Globe, Mail, MapPin, Phone,
+  MessageSquare, Stethoscope, Database,
+  Play
+} from 'lucide-react';
 import babyImage from '../assets/baby2.jpg';
 
 const LandingPage: React.FC = () => {
-  const { theme, toggleTheme } = useTheme();
+  const containerVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.2 }
+    }
+  };
 
-  // 📊 Operational Data Matrices as per institutional mandate
-  const stats = [
-    { label: 'Active Unit Occupancy', value: '42 / 50', sub: 'Cots Occupied', trend: '84% Capacity', icon: Stethoscope },
-    { label: 'Acuity Status Summary', value: '12 Critical', sub: '18 High-Dep | 12 Stable', trend: 'Level 3 NICU', icon: Activity },
-    { label: 'Active Unit Leadership', value: 'Dr. Alamin', sub: 'SN. Grace (Charge)', trend: 'Shift: 08:00 - 20:00', icon: UserCheck },
-    { label: 'Safety Override Status', value: 'v16.2 Active', sub: 'Protocol Initialized', trend: 'Override: Enabled', icon: ShieldCheck, status: 'emerald' },
-  ];
-
-  const weightBands = [
-    { band: 'ELBW (<1000g)', count: 8, survival: '92.4%', infection: '1.2%' },
-    { band: 'VLBW (1000g-1500g)', count: 14, survival: '96.1%', infection: '0.8%' },
-    { band: 'LBW (1500g-2500g)', count: 20, survival: '99.2%', infection: '0.4%' },
-  ];
-
-  const respiratoryCensus = [
-    { mode: 'Mechanical Ventilation', count: 6, status: 'Critical', icon: Activity },
-    { mode: 'Bubble CPAP', count: 18, status: 'Serious', icon: Waves },
-    { mode: 'Oxygen Therapy', count: 12, status: 'Stable', icon: Thermometer },
-    { mode: 'Room Air', count: 6, status: 'Pre-Discharge', icon: Heart },
-  ];
-
-  const equipmentRegistry = [
-    { name: 'Radiant Warmers', available: 38, total: 42, pressure: 'Optimal' },
-    { name: 'Phototherapy Lamps', available: 18, total: 24, pressure: 'Optimal' },
-    { name: 'Pipeline Oxygen', available: 'Active', total: 'Pipeline', pressure: '4.2 Bar' },
-  ];
+  const itemVariants: Variants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { 
+      opacity: 1, y: 0, 
+      transition: { duration: 0.6, ease: "easeOut" } 
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] dark:bg-[#0f172a] text-[#0F172A] dark:text-slate-100 font-sans transition-colors duration-500 overflow-x-hidden scroll-smooth">
+    <div className="min-h-screen bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-500 overflow-x-hidden scroll-smooth">
       
-      {/* 🏛️ INSTITUTIONAL NAVIGATION */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-[#0f172a]/90 backdrop-blur-xl flex items-center justify-between px-6 lg:px-12">
-        <div className="flex items-center space-x-4">
-          <Link to="/" className="flex items-center space-x-4 group">
-            <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/20 group-hover:rotate-12 transition-transform duration-500">
-              <ShieldCheck className="text-white" size={22} strokeWidth={2.5} />
+      {/* 1. Navigation Bar */}
+      <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 transition-all duration-300">
+        <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-6 lg:px-12">
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-all">
+              <ShieldCheck className="text-white" size={24} />
             </div>
-            <div className="flex flex-col">
-              <span className="text-xl font-bold tracking-tighter uppercase leading-none">NeoDesk</span>
-              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mt-1">Operational Command</span>
-            </div>
+            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">NeoDesk</span>
           </Link>
-        </div>
-        
-        <div className="flex items-center space-x-10">
-           <div className="hidden lg:flex items-center space-x-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-              <a href="#demographics" className="hover:text-emerald-600 transition-colors">Demographics</a>
-              <a href="#respiratory" className="hover:text-emerald-600 transition-colors">Respiratory</a>
-              <a href="#registry" className="hover:text-emerald-600 transition-colors">Equipment</a>
-           </div>
-           <div className="flex items-center space-x-4">
-              <button 
-                onClick={toggleTheme}
-                className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-500 dark:text-slate-400 flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-sm"
-                aria-label="Toggle Theme"
-              >
-                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
-              </button>
-              <Link to="/login" className="bg-[#0F172A] dark:bg-emerald-600 text-white px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-xl hover:scale-105 active:scale-95 transition-all">
-                Secure Gateway
-              </Link>
-           </div>
+          
+          <div className="hidden md:flex items-center space-x-10 text-[13px] font-semibold text-slate-500 dark:text-slate-400">
+            <a href="#features" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Features</a>
+            <a href="#why-neodesk" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Why NeoDesk</a>
+            <a href="#about" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">About</a>
+            <a href="#contact" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact</a>
+          </div>
+
+          <div className="flex items-center space-x-4">
+            <Link to="/login" className="px-6 py-2.5 rounded-xl text-[13px] font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 transition-all">
+              Login
+            </Link>
+            <Link to="/register" className="bg-emerald-500 hover:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-[13px] font-bold shadow-lg shadow-emerald-500/20 transition-all">
+              Access Platform
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* 🖼️ HERO SECTION WITH BLENDED IMAGE */}
-      <section className="relative pt-32 pb-20 overflow-hidden min-h-[500px] flex items-center">
-        {/* Advanced Background Image Blending */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-           <img 
+      {/* 2. Hero Section (Full Screen) */}
+      <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-gradient-to-tr from-slate-50 to-white dark:from-[#0f172a] dark:to-[#1e293b]">
+        {/* Background Visuals - Healthcare Inspired */}
+        <div className="absolute top-0 right-0 w-full lg:w-1/2 h-full z-0">
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/40 dark:from-[#0f172a] dark:via-[#0f172a]/40 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent dark:from-[#0f172a] to-white dark:to-[#0f172a] z-10" />
+          <img 
             src={babyImage} 
-            alt="Clinical Environment" 
-            className="w-full h-full object-cover object-[80%_center] opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-overlay filter grayscale brightness-110"
-           />
-           {/* Multi-stage gradient mask for seamless edge blending */}
-           <div className="absolute inset-0 bg-gradient-to-b from-[#F8FAFC]/50 via-[#F8FAFC] to-[#F8FAFC] dark:from-[#0f172a]/50 dark:via-[#0f172a] dark:to-[#0f172a]" />
-           <div className="absolute inset-0 bg-gradient-to-r from-[#F8FAFC] via-[#F8FAFC]/30 to-transparent dark:from-[#0f172a] dark:via-[#0f172a]/30 dark:to-transparent" />
+            alt="Neonatal Care" 
+            className="w-full h-full object-cover object-[70%_center] opacity-60 dark:opacity-40 filter saturate-[0.8] brightness-105 transition-all duration-1000"
+          />
         </div>
 
-        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 w-full">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 relative z-20 w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-16 space-y-6 max-w-3xl"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="space-y-8"
           >
-             <div className="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 shadow-sm backdrop-blur-md">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em]">v16.2 Safety Protocol Active</span>
-             </div>
-             <h1 className="text-6xl lg:text-8xl font-black tracking-tighter text-[#0F172A] dark:text-white leading-[0.9]">
-               Clinical <br /> Command Hub.
-             </h1>
-             <p className="text-xl text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
-               High-fidelity operational visibility into the Neonatal Building Unit. Standardizing survival indices through forensic digital orchestration and precision telemetry.
-             </p>
+            <motion.div variants={itemVariants} className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest">
+              <Activity size={14} className="animate-pulse" />
+              <span>Next-Gen Neonatal Monitoring</span>
+            </motion.div>
+            
+            <motion.h1 variants={itemVariants} className="text-5xl lg:text-[72px] font-bold tracking-tight text-slate-900 dark:text-white leading-[1.1]">
+              Smarter Neonatal Care. <br />
+              <span className="text-emerald-500 underline decoration-emerald-500/30">Better Outcomes.</span>
+            </motion.h1>
+            
+            <motion.p variants={itemVariants} className="text-lg text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed">
+              NeoDesk is a professional-grade clinical operating system designed to standardize neonatal care through precision engineering and trustworthy healthcare technology.
+            </motion.p>
+
+            <motion.div variants={itemVariants} className="flex flex-col sm:flex-row items-center gap-4">
+              <Link to="/register" className="w-full sm:w-auto bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-4 rounded-2xl font-bold shadow-2xl shadow-emerald-500/30 transition-all hover:-translate-y-1 active:translate-y-0 text-center">
+                Access Platform
+              </Link>
+              <a href="#features" className="w-full sm:w-auto px-10 py-4 rounded-2xl font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all text-center">
+                Learn More
+              </a>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="flex items-center space-x-8 pt-8">
+               <div className="flex -space-x-4">
+                  {[1,2,3,4].map(i => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-200 dark:bg-slate-800 overflow-hidden">
+                       <img src={`https://i.pravatar.cc/100?u=${i}`} alt="Clinician" />
+                    </div>
+                  ))}
+               </div>
+               <p className="text-xs font-medium text-slate-400">
+                  Trusted by <span className="font-bold text-slate-900 dark:text-white">400+</span> neonatal specialists worldwide.
+               </p>
+            </motion.div>
           </motion.div>
 
-          {/* 1. HERO OVERVIEW (Top Row) - 4-Column Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, i) => (
+          {/* Right Side: Dashboard Preview Placeholder */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9, x: 50 }}
+            animate={{ opacity: 1, scale: 1, x: 0 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="hidden lg:block relative"
+          >
+             {/* Floating Stat Card 1 */}
+             <div className="absolute -top-10 -left-10 bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-5 rounded-2xl shadow-2xl border border-white/20 z-20">
+                <div className="flex items-center space-x-4">
+                   <div className="w-10 h-10 bg-rose-50 dark:bg-rose-900/20 rounded-lg flex items-center justify-center text-rose-500">
+                      <Heart size={20} fill="currentColor" />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-black uppercase text-slate-400">Heart Rate</p>
+                      <p className="text-xl font-black text-slate-900 dark:text-white">142 BPM</p>
+                   </div>
+                </div>
+             </div>
+
+             {/* Main Preview Component */}
+             <div className="bg-slate-200/20 dark:bg-white/5 rounded-[2.5rem] p-4 backdrop-blur-sm border border-white/10 shadow-2xl">
+                <div className="bg-white dark:bg-slate-900 rounded-[2rem] overflow-hidden shadow-inner border border-slate-200 dark:border-slate-800 aspect-[4/3] flex items-center justify-center relative">
+                   <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-blue-500/5" />
+                   <div className="text-center space-y-4 relative z-10 px-8">
+                      <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-900/20 rounded-full flex items-center justify-center text-emerald-500 mx-auto">
+                         <Play size={24} fill="currentColor" />
+                      </div>
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-slate-400">Clinical OS v16.2</h4>
+                      <p className="text-lg font-bold text-slate-900 dark:text-white">Interactive Monitoring Dashboard Preview</p>
+                   </div>
+                </div>
+             </div>
+
+             {/* Floating Stat Card 2 */}
+             <div className="absolute -bottom-10 -right-10 bg-emerald-500 p-5 rounded-2xl shadow-2xl z-20 text-white">
+                <div className="flex items-center space-x-4">
+                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                      <CheckCircle2 size={20} />
+                   </div>
+                   <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest opacity-80">Safety Check</p>
+                      <p className="text-xl font-bold">100% Passed</p>
+                   </div>
+                </div>
+             </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* 3. Core Features Section */}
+      <section id="features" className="py-32 bg-white dark:bg-[#0f172a] transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="text-center max-w-2xl mx-auto mb-20 space-y-4">
+             <h2 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Precision Engineering</h2>
+             <h3 className="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">Professional Clinical Features</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[
+              { 
+                title: 'Neonatal Monitoring', 
+                desc: 'Real-time physiological telemetry and vitals tracking with clinical precision.', 
+                icon: Activity 
+              },
+              { 
+                title: 'Clinical Documentation', 
+                desc: 'Structured medical records designed for the high-stakes environment of the NICU.', 
+                icon: FileText 
+              },
+              { 
+                title: 'Patient Safety Alerts', 
+                desc: 'Proactive threshold monitoring and intelligent early-warning systems.', 
+                icon: Bell 
+              },
+              { 
+                title: 'Staff Collaboration', 
+                desc: 'Unified team communication and automated handover reporting orchestration.', 
+                icon: Users 
+              },
+              { 
+                title: 'Digital Health Records', 
+                desc: 'Secure, accessible, and comprehensive patient history for informed decision making.', 
+                icon: Database 
+              },
+              { 
+                title: 'Clinical Decision Support', 
+                desc: 'Intelligent engines providing evidence-based guidance for NICU workflows.', 
+                icon: Stethoscope 
+              },
+            ].map((f, i) => (
               <motion.div 
-                key={i}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden group hover:border-emerald-500/50 transition-all"
+                key={i} 
+                whileHover={{ y: -10 }}
+                className="group p-10 rounded-[2rem] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:bg-white dark:hover:bg-slate-800 hover:shadow-xl hover:border-emerald-100 dark:hover:border-emerald-900"
               >
-                <div className="relative z-10 flex justify-between items-start mb-6">
-                   <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center text-slate-400 group-hover:text-emerald-600 transition-colors">
-                      <stat.icon size={28} />
-                   </div>
-                   <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${stat.status === 'emerald' ? 'bg-emerald-500 text-white animate-pulse' : 'bg-slate-50 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-slate-700'}`}>
-                      {stat.trend}
-                   </div>
+                <div className="w-14 h-14 rounded-2xl bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-700 text-emerald-500 flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform">
+                  <f.icon size={28} />
                 </div>
-                <div className="relative z-10">
-                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                  <h3 className="text-3xl font-black tracking-tighter text-[#0F172A] dark:text-white leading-none mb-2">{stat.value}</h3>
-                  <p className="text-sm font-bold text-slate-500 dark:text-slate-400">{stat.sub}</p>
-                </div>
-                {/* Active Capacity telemetry bar */}
-                {i === 0 && (
-                  <div className="mt-5 h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: '84%' }}
-                      transition={{ duration: 2, ease: "easeOut" }}
-                      className="h-full bg-emerald-500" 
-                    />
-                  </div>
-                )}
+                <h4 className="text-xl font-bold mb-4 text-slate-900 dark:text-white">{f.title}</h4>
+                <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm font-medium">{f.desc}</p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* 📊 CORE COMMAND SPLIT-GRID (Main Body) */}
-      <main className="max-w-7xl mx-auto px-6 lg:px-12 pb-24 space-y-12 relative z-20">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          
-          {/* LEFT COLUMNS (Span 2) - Clinical Matrices */}
-          <div className="lg:col-span-2 space-y-8">
-            
-            {/* Patient Demographics & Survival Indices */}
-            <section id="demographics" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[2.5rem] overflow-hidden shadow-sm scroll-mt-24">
-               <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-white/5">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl text-emerald-600">
-                       <BarChart3 size={22} />
-                    </div>
-                    <div>
-                       <h2 className="text-xl font-black tracking-tight text-[#0F172A] dark:text-white uppercase tracking-tighter">Clinical Demographics</h2>
-                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Survival categorization by Birth Weight</p>
-                    </div>
-                  </div>
-                  <div className="hidden sm:block text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-xl border border-emerald-100 dark:border-emerald-800">
-                     Forensic Audit Active
-                  </div>
-               </div>
-               <div className="overflow-x-auto no-scrollbar">
-                  <table className="w-full text-left border-collapse">
-                    <thead>
-                      <tr className="bg-slate-50/50 dark:bg-slate-800/30">
-                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Weight Band</th>
-                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Active Census</th>
-                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Survival Index</th>
-                        <th className="px-8 py-5 text-[10px] font-black text-slate-400 uppercase tracking-[0.25em]">Nosocomial Rate</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {weightBands.map((w, i) => (
-                        <tr key={i} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors group">
-                           <td className="px-8 py-6">
-                              <div className="font-black text-[#0F172A] dark:text-white tracking-tight">{w.band}</div>
-                           </td>
-                           <td className="px-8 py-6">
-                              <div className="text-lg font-black text-slate-700 dark:text-slate-300">{w.count} Cases</div>
-                           </td>
-                           <td className="px-8 py-6">
-                              <div className="inline-flex items-center space-x-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 px-3 py-1 rounded-lg text-xs font-black">
-                                 <Activity size={12} />
-                                 <span>{w.survival}</span>
-                              </div>
-                           </td>
-                           <td className="px-8 py-6">
-                              <div className="text-sm font-bold text-rose-500 uppercase tracking-tighter">Rolling {w.infection}</div>
-                           </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-               </div>
-            </section>
+      {/* 4. Why NeoDesk Section (Split Layout) */}
+      <section id="why-neodesk" className="py-32 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+           <div className="order-2 lg:order-1 relative">
+              <div className="absolute inset-0 bg-emerald-500/10 rounded-[3rem] blur-3xl" />
+              <div className="relative bg-white dark:bg-slate-800 p-4 rounded-[3rem] shadow-2xl border border-slate-100 dark:border-slate-700">
+                 <img 
+                  src="https://images.unsplash.com/photo-1579684385127-1ef15d508118?auto=format&fit=crop&q=80&w=800" 
+                  alt="Hospital Environment" 
+                  className="rounded-[2.5rem] w-full object-cover aspect-[4/3] grayscale hover:grayscale-0 transition-all duration-700"
+                 />
+              </div>
+           </div>
+           <div className="order-1 lg:order-2 space-y-8">
+              <h2 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Clinical Excellence</h2>
+              <h3 className="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white leading-tight">Designed to support <br /> healthcare professionals.</h3>
+              <ul className="space-y-6">
+                {[
+                  { title: 'Improving Neonatal Outcomes', desc: 'Standardized care paths and precision monitoring for newborn health.' },
+                  { title: 'Supporting Professionals', desc: 'Reducing cognitive load with intuitive, hospital-grade UI/UX design.' },
+                  { title: 'Centralizing Information', desc: 'A unified clinical OS for the entire Neonatal Building Unit.' },
+                  { title: 'Enhancing Workflows', desc: 'Forensic digital orchestration for shift continuities and handovers.' },
+                ].map((item, i) => (
+                  <li key={i} className="flex items-start space-x-4">
+                     <div className="mt-1 w-5 h-5 rounded-full bg-emerald-500 flex items-center justify-center text-white">
+                        <CheckCircle2 size={12} />
+                     </div>
+                     <div>
+                        <h5 className="font-bold text-slate-900 dark:text-white">{item.title}</h5>
+                        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1 font-medium">{item.desc}</p>
+                     </div>
+                  </li>
+                ))}
+              </ul>
+           </div>
+        </div>
+      </section>
 
-            {/* Respiratory Support Census */}
-            <section id="respiratory" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm scroll-mt-24">
-               <div className="flex items-center justify-between mb-8 px-2">
-                  <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 flex items-center space-x-3">
-                     <Thermometer size={18} className="text-emerald-500" />
-                     <span>Respiratory Support Census</span>
-                  </h3>
-                  <div className="h-px flex-1 bg-slate-100 dark:bg-slate-800 mx-6" />
-                  <span className="text-[10px] font-black text-slate-300 dark:text-slate-600 uppercase tracking-widest leading-none">Global Network Active</span>
-               </div>
-               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {respiratoryCensus.map((r, i) => (
-                    <div key={i} className="flex items-center justify-between p-6 bg-slate-50 dark:bg-slate-800/50 rounded-[1.8rem] border border-slate-100 dark:border-slate-700/50 group hover:border-emerald-400/50 transition-all">
-                       <div className="flex items-center space-x-5">
-                          <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 flex items-center justify-center text-slate-400 group-hover:text-emerald-500 transition-colors shadow-sm border border-slate-100 dark:border-slate-700">
-                             <r.icon size={22} />
+      {/* 5. Platform Preview Section */}
+      <section className="py-32 bg-white dark:bg-[#0f172a] transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center space-y-20">
+           <div className="space-y-6 max-w-3xl mx-auto">
+              <h3 className="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">Designed for Healthcare Professionals</h3>
+              <p className="text-lg text-slate-500 dark:text-slate-400 font-medium">Experience a system built for zero-error clinical performance.</p>
+           </div>
+
+           <div className="relative group">
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-500/20 to-blue-500/20 rounded-[3rem] blur-3xl opacity-50 group-hover:opacity-100 transition-opacity" />
+              <div className="relative bg-slate-900 rounded-[3rem] p-10 lg:p-20 shadow-2xl overflow-hidden">
+                 <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20" />
+                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 items-start">
+                    {/* Mockup Column 1 */}
+                    <div className="space-y-6">
+                       <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 text-left space-y-4">
+                          <div className="flex items-center space-x-3">
+                             <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center"><Heart size={20} className="text-white" /></div>
+                             <span className="font-bold text-white uppercase text-xs tracking-widest">Neonatal Profile</span>
                           </div>
-                          <div>
-                             <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-0.5">{r.mode}</p>
-                             <p className="text-xl font-black text-[#0F172A] dark:text-white tracking-tight">{r.count} Devices</p>
+                          <div className="h-2 w-full bg-white/10 rounded-full overflow-hidden">
+                             <div className="h-full bg-emerald-500 w-[65%]" />
+                          </div>
+                          <p className="text-[10px] text-white/60 font-medium tracking-wide leading-relaxed">BIO-ID: NBU-094-X / GA: 28w 4d / Weight: 1240g</p>
+                       </div>
+                    </div>
+                    {/* Mockup Column 2 (Main Chart) */}
+                    <div className="lg:col-span-2 bg-white/5 backdrop-blur-md rounded-3xl p-8 border border-white/10 text-left relative overflow-hidden">
+                       <div className="flex justify-between items-center mb-8">
+                          <h4 className="font-bold text-white uppercase text-xs tracking-[0.2em]">Monitoring Telemetry</h4>
+                          <div className="flex space-x-2">
+                             <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                             <div className="w-2 h-2 rounded-full bg-amber-500" />
                           </div>
                        </div>
-                       <div className={`px-3 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest ${
-                          r.status === 'Critical' ? 'text-rose-500 bg-rose-50 dark:bg-rose-900/20' : 
-                          r.status === 'Serious' ? 'text-amber-500 bg-amber-50 dark:bg-amber-900/20' :
-                          'text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20'
-                       }`}>
-                          {r.status}
+                       <div className="h-48 w-full flex items-end justify-between space-x-1">
+                          {[40, 70, 45, 90, 65, 80, 55, 75, 40, 85, 50, 70, 45].map((h, i) => (
+                            <motion.div 
+                              key={i} 
+                              initial={{ height: 0 }}
+                              animate={{ height: `${h}%` }}
+                              transition={{ delay: i * 0.05, duration: 1 }}
+                              className="flex-1 bg-emerald-500/40 rounded-t-sm" 
+                            />
+                          ))}
                        </div>
                     </div>
-                  ))}
-               </div>
-            </section>
-          </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </section>
 
-          {/* RIGHT COLUMN (Span 1) - System Registries */}
-          <div className="space-y-8">
-            
-            {/* Biomedical Engineering Registry */}
-            <section id="registry" className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm scroll-mt-24">
-               <h3 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400 mb-8 flex items-center space-x-3">
-                  <Zap size={18} className="text-amber-500" />
-                  <span>Biomedical Registry</span>
-               </h3>
-               <div className="space-y-10">
-                  {equipmentRegistry.map((eq, i) => (
-                    <div key={i} className="space-y-4">
-                       <div className="flex items-center justify-between">
-                          <span className="text-sm font-black text-[#0F172A] dark:text-white uppercase tracking-tight">{eq.name}</span>
-                          <span className="text-[9px] font-black text-emerald-600 uppercase tracking-[0.2em] bg-emerald-50 dark:bg-emerald-900/20 px-3 py-1 rounded-lg border border-emerald-100 dark:border-emerald-800 shadow-sm">{eq.pressure}</span>
-                       </div>
-                       <div className="flex items-center space-x-4">
-                          <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
-                             <motion.div 
-                               initial={{ width: 0 }}
-                               animate={{ 
-                                 width: (typeof eq.available === 'number' && typeof eq.total === 'number') 
-                                   ? `${(eq.available / eq.total) * 100}%` 
-                                   : '100%' 
-                               }}
-                               transition={{ duration: 1.5, ease: "easeOut" }}
-                               className="h-full bg-[#0F172A] dark:bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)]" 
-                             />
-                          </div>
-                          <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">{eq.available} / {eq.total}</span>
-                       </div>
-                    </div>
-                  ))}
-               </div>
-            </section>
-
-            {/* Academic Hub Registry */}
-            <section className="bg-[#0F172A] dark:bg-slate-900/40 p-8 rounded-[2.5rem] shadow-2xl relative overflow-hidden group">
-               <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:rotate-12 transition-transform duration-700">
-                  <GraduationCap size={140} className="text-white" />
-               </div>
-               <div className="relative z-10 mb-10">
-                  <p className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.4em] mb-1">Academic Engine</p>
-                  <h3 className="text-2xl font-black text-white tracking-tighter">Knowledge Registry</h3>
-               </div>
-               <div className="space-y-6 relative z-10">
-                  {[
-                    { label: 'Active Clinician Sims', value: '14 Active', icon: Activity },
-                    { label: 'Student Progress Index', value: '82.4% Comp.', icon: ClipboardList },
-                    { label: 'Shift Rota Coverage', value: '100% Validated', icon: Heart },
-                  ].map((ac, i) => (
-                    <div key={i} className="flex items-center space-x-5 p-5 bg-white/5 rounded-[1.5rem] border border-white/5 backdrop-blur-sm">
-                       <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center text-emerald-500"><ac.icon size={20} /></div>
-                       <div>
-                          <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-0.5">{ac.label}</p>
-                          <p className="text-sm font-black text-white tracking-tight leading-none">{ac.value}</p>
-                       </div>
-                    </div>
-                  ))}
-               </div>
-               <button className="w-full mt-10 bg-emerald-600 hover:bg-emerald-700 text-white py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] transition-all shadow-xl shadow-emerald-950/20 active:scale-95">
-                  Launch Study Matrix
-               </button>
-            </section>
-
-            {/* Secure Gateway Login Portal Shortcut */}
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8 rounded-[2.5rem] shadow-sm group hover:border-emerald-500/50 transition-all cursor-pointer relative overflow-hidden">
-               <div className="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/5 rounded-full group-hover:scale-150 transition-transform duration-1000" />
-               <Link to="/login" className="flex flex-col space-y-6 relative z-10">
-                  <div className="w-16 h-16 rounded-2xl bg-[#0F172A] dark:bg-emerald-600 flex items-center justify-center text-white shadow-xl shadow-slate-200 dark:shadow-emerald-900/20 group-hover:scale-110 transition-transform">
-                     <Lock size={28} />
-                  </div>
-                  <div>
-                     <h3 className="text-2xl font-black text-[#0F172A] dark:text-white tracking-tighter uppercase leading-none">Secure Gateway</h3>
-                     <p className="text-xs font-medium text-slate-400 uppercase tracking-widest mt-2">Institutional Entry Point</p>
-                  </div>
-                  <div className="flex items-center justify-between pt-6 border-t border-slate-100 dark:border-slate-800">
-                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-400 group-hover:text-emerald-600 transition-colors">Initiate Auth Session</span>
-                     <ArrowRight size={18} className="text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
-                  </div>
-               </Link>
-            </section>
+      {/* 6. Impact Statistics Section */}
+      <section className="py-32 bg-slate-50 dark:bg-slate-900/50 transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {[
+              { label: '24/7 Clinical Monitoring', value: 'Live Telemetry', icon: Activity },
+              { label: '100% Digital Records', value: 'Forensic Precision', icon: Database },
+              { label: 'Real-Time Safety Alerts', value: 'Threshold Logic', icon: Bell },
+              { label: 'Secure Role-Based Access', value: 'Institutional SSO', icon: Shield },
+            ].map((s, i) => (
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="bg-white dark:bg-slate-800 p-8 rounded-[2rem] shadow-sm text-center space-y-4 border border-slate-100 dark:border-slate-700"
+              >
+                <div className="w-12 h-12 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center text-emerald-500 mx-auto">
+                  <s.icon size={24} />
+                </div>
+                <h4 className="text-sm font-bold text-slate-400 uppercase tracking-widest leading-relaxed">{s.label}</h4>
+                <p className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{s.value}</p>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </main>
+      </section>
 
-      {/* 🏛️ FOOTER - Legal & Technical Versioning */}
-      <footer id="contact" className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-20 transition-colors duration-500 relative z-20">
+      {/* 7. About Section */}
+      <section id="about" className="py-32 bg-white dark:bg-[#0f172a] transition-colors duration-500">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+           <div className="space-y-8">
+              <h2 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">The NeoDesk Story</h2>
+              <h3 className="text-4xl lg:text-5xl font-bold tracking-tight text-slate-900 dark:text-white">Transforming clinical safety through innovation.</h3>
+              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                NeoDesk was born from a simple yet powerful mission: to eliminate clinical variables and human error in neonatal wards. By centralizing patient data and automating high-stakes calculations, we enable clinicians to focus on what matters most—saving lives.
+              </p>
+              <div className="grid grid-cols-2 gap-8 pt-4">
+                 <div>
+                    <h4 className="text-4xl font-black text-emerald-500 tracking-tighter">94%</h4>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Error Reduction</p>
+                 </div>
+                 <div>
+                    <h4 className="text-4xl font-black text-emerald-500 tracking-tighter">2.4s</h4>
+                    <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-2">Data Retrieval</p>
+                 </div>
+              </div>
+           </div>
+           <div className="relative">
+              <div className="absolute inset-0 bg-blue-500/10 rounded-[3rem] blur-3xl" />
+              <div className="relative bg-white dark:bg-slate-800 p-8 rounded-[3rem] shadow-2xl border border-slate-100 dark:border-slate-700">
+                 <div className="space-y-6">
+                    <div className="flex items-center space-x-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                       <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white"><Stethoscope size={20} /></div>
+                       <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Clinical Safety Priority</p>
+                    </div>
+                    <div className="flex items-center space-x-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                       <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center text-white"><Activity size={20} /></div>
+                       <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Standardized NICU Protocols</p>
+                    </div>
+                    <div className="flex items-center space-x-4 p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                       <div className="w-10 h-10 bg-purple-500 rounded-xl flex items-center justify-center text-white"><Database size={20} /></div>
+                       <p className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Secure Digital Transformation</p>
+                    </div>
+                 </div>
+              </div>
+           </div>
+        </div>
+      </section>
+
+      {/* 8. Final Call-to-Action Section */}
+      <section className="py-20 px-6 lg:px-12 bg-white dark:bg-[#0f172a] transition-colors duration-500">
+         <motion.div 
+          whileHover={{ scale: 1.01 }}
+          className="max-w-7xl mx-auto rounded-[3.5rem] bg-gradient-to-br from-emerald-500 to-emerald-700 p-12 lg:p-24 text-center space-y-10 shadow-[0_50px_100px_-20px_rgba(16,185,129,0.4)] relative overflow-hidden"
+         >
+            <div className="absolute top-0 right-0 p-32 opacity-10 pointer-events-none transform translate-x-1/3 -translate-y-1/3 text-white">
+               <ShieldCheck size={500} strokeWidth={1} />
+            </div>
+            
+            <div className="relative z-10 space-y-8">
+               <h2 className="text-4xl lg:text-7xl font-bold text-white tracking-tight leading-none">Ready to Transform <br /> Neonatal Care?</h2>
+               <p className="text-emerald-50 max-w-2xl mx-auto text-lg font-medium leading-relaxed opacity-90">
+                 Join the growing network of NICU units using the most advanced clinical operating system for neonatal health outcomes.
+               </p>
+               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-6">
+                  <Link to="/register" className="w-full sm:w-auto bg-slate-900 text-white px-12 py-5 rounded-2xl font-bold shadow-2xl transition-all hover:bg-black active:scale-95">
+                    Access Platform
+                  </Link>
+                  <button className="w-full sm:w-auto bg-white/20 backdrop-blur-md text-white border border-white/30 px-12 py-5 rounded-2xl font-bold hover:bg-white/30 transition-all">
+                    Contact Administrator
+                  </button>
+               </div>
+            </div>
+         </motion.div>
+      </section>
+
+      {/* 9. Footer */}
+      <footer id="contact" className="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white pt-24 pb-12 transition-colors duration-500 border-t border-slate-100 dark:border-slate-900">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12 text-[10px] font-black uppercase tracking-[0.4em] text-slate-400">
-             <div className="flex flex-col space-y-6">
-                <div className="flex items-center space-x-6">
-                   <span className="text-slate-900 dark:text-white text-sm font-black">&copy; 2026 NeoDesk Clinical Systems</span>
-                   <div className="hidden md:block w-px h-6 bg-slate-200 dark:bg-slate-800" />
-                   <span className="text-emerald-600 dark:text-emerald-500/50">Institutional Grade OS</span>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-20">
+            <div className="lg:col-span-4 space-y-8">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-2xl shadow-emerald-500/30">
+                  <ShieldCheck className="text-white" size={24} />
                 </div>
-                <div className="flex items-center space-x-8 text-slate-300 dark:text-slate-700">
-                   <a href="#demographics" className="hover:text-emerald-600 transition-colors">Registry Hub</a>
-                   <a href="#respiratory" className="hover:text-emerald-600 transition-colors">Telemetric Data</a>
-                   <a href="#registry" className="hover:text-emerald-600 transition-colors">Inventory</a>
-                </div>
-             </div>
-             <div className="flex flex-col md:items-end space-y-6">
-                <div className="flex items-center space-x-12">
-                   <span className="text-slate-400 dark:text-slate-700">Protocol: v16.2.844.STABLE</span>
-                   <span className="text-emerald-600/60 dark:text-emerald-500/30 flex items-center space-x-3">
-                      <Globe size={14} />
-                      <span className="tracking-[0.1em]">Validated Global Infrastructure</span>
-                   </span>
-                </div>
-                <p className="text-slate-300 dark:text-slate-800 tracking-[0.2em] font-medium">Forensic SHA-256 Verified Build Signature: 7D2F...9E4A</p>
+                <span className="text-2xl font-bold tracking-tight uppercase">NeoDesk</span>
+              </div>
+              <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed font-medium">
+                The gold standard in clinical operating systems. Standardizing neonatal care through precision engineering.
+              </p>
+              <div className="flex items-center space-x-4">
+                {[MessageSquare, Mail, Globe].map((Icon, i) => (
+                  <a key={i} href="#" className="w-12 h-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all flex items-center justify-center">
+                    <Icon size={20} />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="lg:col-span-2 space-y-8 text-left">
+              <h4 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Platform</h4>
+              <ul className="space-y-4 text-[14px] font-bold text-slate-500 dark:text-slate-400">
+                <li><a href="#features" className="hover:text-slate-900 dark:hover:text-white transition-colors">Features</a></li>
+                <li><a href="#why-neodesk" className="hover:text-slate-900 dark:hover:text-white transition-colors">Overview</a></li>
+                <li><a href="#about" className="hover:text-slate-900 dark:hover:text-white transition-colors">About</a></li>
+              </ul>
+            </div>
+
+            <div className="lg:col-span-2 space-y-8 text-left">
+              <h4 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Legal</h4>
+              <ul className="space-y-4 text-[14px] font-bold text-slate-500 dark:text-slate-400">
+                <li><a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Privacy Policy</a></li>
+                <li><a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">Compliance</a></li>
+              </ul>
+            </div>
+
+            <div className="lg:col-span-4 space-y-8 text-left">
+              <h4 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Connect</h4>
+              <ul className="space-y-6">
+                <li className="flex items-center space-x-4">
+                  <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 text-emerald-500"><MapPin size={18} /></div>
+                  <span className="text-sm font-bold text-slate-900 dark:text-slate-200">Westlands, Nairobi, KE</span>
+                </li>
+                <li className="flex items-center space-x-4">
+                  <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-100 dark:border-slate-800 text-emerald-500"><Phone size={18} /></div>
+                  <span className="text-sm font-bold text-slate-900 dark:text-slate-200">+254 (0) 700 000 000</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-12 border-t border-slate-200 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-8 text-[11px] font-bold uppercase tracking-[0.3em] text-slate-400">
+             <span>&copy; 2026 NeoDesk Clinical Systems. All Rights Reserved.</span>
+             <div className="flex items-center space-x-6">
+                <span className="text-slate-300 dark:text-slate-700">Hospital Grade OS</span>
+                <span className="text-emerald-500/50">v16.2 Stable</span>
              </div>
           </div>
         </div>
