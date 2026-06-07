@@ -1,33 +1,160 @@
-Act as an expert frontend engineer. I need you to create a clean, elegant, and professional public Landing Page for the NBU Care platform. This is the public-facing front door of the application, so it should feel welcoming, trustworthy, and minimal—not cluttered with raw hospital telemetry.
+Redesign the NeoDesk landing page into a modern, premium healthcare website focused on neonatal care and newborn health outcomes.
 
-### 🏛️ Target File & Routing:
-- Overwrite or create `src/pages/LandingPage.jsx`.
-- It must integrate smoothly with our responsive layouts and natively support the "Professional Slate & Warm Emerald" dark mode theme.
+IMPORTANT:
+This is the PUBLIC LANDING PAGE before login, not an admin dashboard. Do not display audit logs, role management, verification queues, user tables, or other internal system components.
 
-### 📐 Component Structure:
-1. HERO SECTION:
-   - Centered or split-grid layout with a bold heading: "Advanced Neonatal Care & Clinical Excellence".
-   - A welcoming sub-heading describing the platform as a high-fidelity management and training hub for Newborn Units.
-   - A sharp, prominent Primary CTA button labeled "Access Staff Portal" that routes users to the secure login page.
+Design Goals:
 
-2. INSTITUTIONAL IMPACT STATS (The Data Row):
-   - A clean 4-column row (`grid-cols-2 lg:grid-cols-4`) showing static, high-level trust metrics:
-     * "50+ Specialized Cots"
-     * "24/7 Active Monitoring"
-     * "100% Certified Clinicians"
-     * "Integrated Training Hub"
-   - Style these purely with text, clean labels, and subtle borders. No graphic charts or progress bars.
+* Professional healthcare appearance
+* Modern hospital-grade UI
+* Clean, minimal, trustworthy design
+* Mobile-first and fully responsive
+* Soft healthcare aesthetic
+* Inspired by leading healthcare technology websites
+* Focus on newborn care, patient safety, and clinical excellence
 
-3. CORE PILLARS SECTION:
-   - A 3-card grid highlighting the platform's focus:
-     * Card 1: Intensive Care (Advanced respiratory and incubator management).
-     * Card 2: Clinical Education (High-fidelity simulation and student tracking).
-     * Card 3: Safety Protocols (Global validation architectures ensuring patient safety).
+Color Palette:
 
-4. PUBLIC FOOTER:
-   - Clean, dim text containing copyright, version notes, and quick layout links (About, User Guide).
+* Emerald Green (#10B981)
+* Soft Medical Blue (#3B82F6)
+* White backgrounds
+* Light gray sections
+* Warm accent highlights
+* Smooth gradients
+* Soft shadows
 
-### 🎨 Styling Constraints:
-- Use deep slate/zinc backgrounds, crisp borders, and warm emerald accents for links, badges, and buttons.
-- Use `lucide-react` icons (like Shield, GraduationCap, Activity, ArrowRight) to visually anchor headings.
-- Ensure 100% mobile responsiveness with no layout clipping or overlapping text
+Landing Page Structure:
+
+1. Navigation Bar
+
+* NeoDesk logo
+* Home
+* Features
+* About
+* Contact
+* Login button
+* Sticky navigation on scroll
+
+2. Hero Section (Full Screen)
+   Left Side:
+
+* Large headline:
+  "Smarter Neonatal Care. Better Outcomes."
+* Supporting description explaining the platform's purpose
+* Primary CTA: "Access Platform"
+* Secondary CTA: "Learn More"
+
+Right Side:
+
+* Modern healthcare illustration or dashboard preview
+* Neonatal monitoring visualization
+* Floating statistic cards
+
+Background:
+
+* Soft gradient
+* Healthcare-inspired visuals
+* Professional and welcoming
+
+3. Core Features Section
+   Display 3–6 feature cards with icons:
+
+* Neonatal Monitoring
+* Clinical Documentation
+* Patient Safety Alerts
+* Staff Collaboration
+* Digital Health Records
+* Clinical Decision Support
+
+Each card should have:
+
+* Icon
+* Title
+* Short description
+* Hover animation
+
+4. Why NeoDesk Section
+   Split layout:
+
+* Illustration on one side
+* Content on the other
+
+Focus on:
+
+* Improving neonatal outcomes
+* Supporting healthcare professionals
+* Centralizing patient information
+* Enhancing clinical workflows
+
+5. Platform Preview Section
+   Show a professional mockup/dashboard preview.
+
+Include:
+
+* Neonatal profile card
+* Monitoring charts
+* Safety alert examples
+* Modern glassmorphism cards
+* Layered UI effects
+
+Headline:
+"Designed for Healthcare Professionals"
+
+6. Impact Statistics Section
+   Four premium statistic cards:
+
+24/7 Clinical Monitoring
+100% Digital Records
+Real-Time Safety Alerts
+Secure Role-Based Access
+
+Use animated counters and modern card styling.
+
+7. About Section
+   Tell the story of NeoDesk.
+
+Focus on:
+
+* Neonatal care
+* Digital transformation in healthcare
+* Clinical safety
+* Efficient patient management
+
+8. Final Call-to-Action Section
+   Large modern banner.
+
+Headline:
+"Ready to Transform Neonatal Care?"
+
+Buttons:
+
+* Access Platform
+* Contact Administrator
+
+Use a strong gradient background.
+
+9. Footer
+   Include:
+
+* About
+* Features
+* Contact
+* Privacy Policy
+* Terms of Service
+* Copyright
+
+UI Requirements:
+
+* Tailwind CSS
+* Modern React components
+* Smooth scrolling
+* Framer Motion animations where appropriate
+* Rounded corners
+* Professional healthcare iconography
+* Subtle hover effects
+* High accessibility standards
+* Dark mode support
+* Premium SaaS-quality design
+
+Overall Goal:
+Make the landing page feel like a professional healthcare technology platform used by hospitals and neonatal units, emphasizing trust, safety, innovation, and better newborn outcomes rather than administrative software features.
