@@ -1,64 +1,74 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight } from 'lucide-react';
 
 const Login: React.FC = () => {
-  const [showPassword, setShowPassword] = useState(false);
-
   return (
-    <div className="min-h-screen bg-brand-slate flex items-center justify-center p-6 relative overflow-hidden">
-      {/* Background Blobs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-emerald-500/10 blur-[120px] rounded-full" />
-      <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[100px] rounded-full" />
-
+    <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 relative overflow-hidden font-sans text-[#0F172A]">
+      {/* Structural Background Pattern */}
+      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
+      
       <div className="w-full max-w-md relative z-10">
-        <div className="glass-card p-8 sm:p-12 space-y-8 animate-in fade-in zoom-in-95 duration-700">
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 bg-emerald-500 rounded-2xl mx-auto flex items-center justify-center shadow-lg shadow-emerald-500/20 mb-6">
-              <ShieldCheck className="text-white" size={32} />
-            </div>
-            <h1 className="text-3xl font-bold text-slate-100 tracking-tight">NeoDesk</h1>
-            <p className="text-slate-400 text-sm font-medium">Clinical Intelligence Portal v16.0</p>
+        <div className="bg-white border border-slate-200 rounded-[2.5rem] p-10 sm:p-14 shadow-2xl space-y-12 animate-in fade-in zoom-in-95 duration-700">
+          
+          <div className="text-center space-y-3">
+            <Link to="/" className="inline-flex items-center space-x-2.5 mb-4 group">
+              <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <ShieldCheck className="text-white" size={28} />
+              </div>
+            </Link>
+            <h1 className="text-4xl font-black tracking-tighter">Welcome back.</h1>
+            <p className="text-slate-500 font-medium tracking-tight">Clinical Intelligence Portal v16.0</p>
           </div>
 
-          <form className="space-y-6">
-            <div className="space-y-4">
+          <form className="space-y-8">
+            <div className="space-y-5">
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Institutional Email</label>
-                <input 
-                  type="email" 
-                  placeholder="name@hospital.go.ke"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-slate-600"
-                />
+                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Institutional Email</label>
+                <div className="relative group">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-600 transition-colors" size={18} />
+                  <input 
+                    type="email" 
+                    placeholder="name@hospital.go.ke"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                  />
+                </div>
               </div>
+
               <div className="space-y-2">
                 <div className="flex justify-between px-1">
-                   <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Password</label>
-                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest hover:text-emerald-400 transition-colors">
-                      {showPassword ? 'Hide' : 'Show'}
-                   </button>
+                   <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Access Key</label>
                 </div>
-                <input 
-                  type={showPassword ? 'text' : 'password'} 
-                  placeholder="••••••••"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all placeholder:text-slate-600 font-mono"
-                />
+                <div className="relative group">
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-600 transition-colors" size={18} />
+                  <input 
+                    type="password" 
+                    placeholder="••••••••"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-2xl py-4 pl-12 pr-4 text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300 font-mono"
+                  />
+                </div>
               </div>
             </div>
 
             <Link to="/dashboard" className="block w-full">
-              <button type="button" className="w-full glass-button py-4 font-bold shadow-lg shadow-emerald-500/20 active:scale-[0.98] transition-transform">
-                Authenticate Session
+              <button type="button" className="w-full bg-slate-900 text-white py-5 rounded-2xl font-bold flex items-center justify-center space-x-3 group hover:bg-black transition-all shadow-xl shadow-slate-200 active:scale-95">
+                <span>Authenticate Session</span>
+                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>
           </form>
 
-          <div className="pt-6 border-t border-white/5 flex flex-col space-y-4">
-             <p className="text-xs text-center text-slate-500">
-               New to the unit? <Link to="/register" className="text-emerald-400 font-bold hover:text-emerald-300 ml-1">Request Access</Link>
+          <div className="pt-8 border-t border-slate-100 flex flex-col space-y-6">
+             <p className="text-xs text-center text-slate-400 font-medium">
+               New to the neonatal unit? <Link to="/register" className="text-emerald-600 font-black hover:text-emerald-700 ml-1 underline decoration-emerald-200 underline-offset-4">Join Clinical Registry</Link>
              </p>
           </div>
         </div>
+        
+        <p className="mt-12 text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] leading-relaxed max-w-xs mx-auto opacity-60">
+          Secured by institutional SSO. <br />
+          Validated Clinical Access only.
+        </p>
       </div>
     </div>
   );

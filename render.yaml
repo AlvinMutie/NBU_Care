@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: nbu-nurse-assistant
+    env: static
+    buildCommand: cd nbu-nurse-assistant && npm install && npm run build
+    staticPublishPath: nbu-nurse-assistant/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+  - type: web
+    name: nbu-laravel-unified
+    env: php
+    plan: free
+    buildCommand: cd nbu-laravel-unified && composer install --no-dev && php artisan config:cache && php artisan route:cache
+    startCommand: cd nbu-laravel-unified && php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_KEY
+        sync: false
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: DB_CONNECTION
+        value: sqlite
+      - key: DB_DATABASE
+        value: database/database.sqlite
