@@ -4,10 +4,10 @@ import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { 
   ShieldCheck, Calculator, ClipboardList, 
-  CheckCircle2, PlayCircle, GraduationCap,
+  CheckCircle2, GraduationCap,
   Globe, Sun, Moon, MessageSquare, Mail, MapPin, Phone,
   Activity, Shield, Database, Fingerprint, Award,
-  Cpu, Zap, BookOpen, History as HistoryIcon
+  Cpu, Zap, History as HistoryIcon, Users, PlayCircle
 } from 'lucide-react';
 import { useTheme } from '../services/ThemeContext';
 import babyImage from '../assets/baby2.jpg';
@@ -40,7 +40,7 @@ const Landing: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 selection:bg-emerald-500/10 overflow-x-hidden font-sans transition-colors duration-500">
+    <div className="min-h-screen bg-white dark:bg-[#0f172a] text-slate-900 dark:text-slate-100 selection:bg-emerald-500/10 overflow-x-hidden font-sans transition-colors duration-500 scroll-smooth">
       {/* Structural Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-50 h-20 border-b border-slate-100 dark:border-slate-800 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl transition-all duration-500">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-6 lg:px-12">
@@ -77,7 +77,7 @@ const Landing: React.FC = () => {
         </div>
       </nav>
 
-      {/* Hero Section - Redesigned for zero overlap and better blending */}
+      {/* Hero Section */}
       <section className="relative min-h-screen flex items-center bg-white dark:bg-[#0f172a] transition-colors duration-500 overflow-hidden pt-20">
         {/* Background Image Container with advanced blending */}
         <div className="absolute top-0 right-0 w-full lg:w-[65%] h-full pointer-events-none z-0">
@@ -87,7 +87,7 @@ const Landing: React.FC = () => {
            <img 
             src={babyImage} 
             alt="Neonatal Excellence" 
-            className="w-full h-full object-cover object-[75%_center] mix-blend-multiply dark:mix-blend-overlay opacity-90 dark:opacity-50 transition-all duration-1000 group-hover:scale-105"
+            className="w-full h-full object-cover object-[75%_center] mix-blend-multiply dark:mix-blend-overlay opacity-90 dark:opacity-50 transition-all duration-1000"
            />
         </div>
 
@@ -98,11 +98,6 @@ const Landing: React.FC = () => {
             animate="visible"
             className="lg:w-3/5 space-y-10"
           >
-            <motion.div variants={itemVariants} className="inline-flex items-center space-x-3 px-4 py-2 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 text-emerald-700 dark:text-emerald-400 shadow-sm">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="text-[10px] font-black uppercase tracking-[0.25em]">Validated v16.0 Core Active</span>
-            </motion.div>
-            
             <motion.h1 variants={itemVariants} className="text-6xl lg:text-[90px] font-black tracking-tight leading-[0.85] text-slate-900 dark:text-white drop-shadow-sm">
               Smarter Care. <br />
               <span className="text-emerald-600">Zero Variables.</span>
@@ -120,34 +115,29 @@ const Landing: React.FC = () => {
                  <div className="w-12 h-12 rounded-full bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform shadow-inner border border-emerald-100 dark:border-emerald-800">
                     <PlayCircle size={28} fill="currentColor" className="text-white dark:text-[#0f172a]" />
                  </div>
-                 <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">Core Protocol Demo</span>
+                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Core Protocol Demo</span>
               </div>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="pt-10 flex items-center space-x-10 opacity-40 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
-               <div className="flex flex-col text-center">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">94%</span>
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Error Reduction</span>
+            <motion.div variants={itemVariants} className="pt-10 flex items-center space-x-12 opacity-30 grayscale hover:grayscale-0 hover:opacity-100 transition-all duration-1000">
+               <div className="flex flex-col">
+                  <span className="text-2xl font-black text-slate-900 dark:text-white tracking-widest uppercase">Verified</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Security Core</span>
                </div>
                <div className="w-px h-10 bg-slate-200 dark:bg-slate-800" />
-               <div className="flex flex-col text-center">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">100%</span>
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Compliance</span>
-               </div>
-               <div className="w-px h-10 bg-slate-200 dark:bg-slate-800" />
-               <div className="flex flex-col text-center">
-                  <span className="text-3xl font-black text-slate-900 dark:text-white">2.4s</span>
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Decision Speed</span>
+               <div className="flex flex-col text-left">
+                  <span className="text-2xl font-black text-slate-900 dark:text-white tracking-widest uppercase">Validated</span>
+                  <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Calculations</span>
                </div>
             </motion.div>
           </motion.div>
         </div>
       </section>
 
-      {/* Vision & Core Pillars Section - Content from MD */}
+      {/* Vision Section */}
       <motion.section 
         id="vision" 
-        className="py-32 bg-white dark:bg-[#0f172a] border-y border-slate-100 dark:border-slate-800 transition-colors duration-500"
+        className="py-32 bg-white dark:bg-[#0f172a] border-y border-slate-100 dark:border-slate-800 transition-colors duration-500 scroll-mt-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -180,10 +170,10 @@ const Landing: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* Modules Grid - Detailed Functional Architecture */}
+      {/* Modules Section */}
       <motion.section 
         id="modules" 
-        className="py-40 bg-slate-50 dark:bg-slate-900/20 transition-colors duration-500"
+        className="py-40 bg-slate-50 dark:bg-slate-900/20 transition-colors duration-500 scroll-mt-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-100px" }}
@@ -193,41 +183,45 @@ const Landing: React.FC = () => {
           <div className="text-center max-w-3xl mx-auto mb-32 space-y-8">
             <motion.p variants={itemVariants} className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-600">Functional Architecture</motion.p>
             <motion.h2 variants={itemVariants} className="text-5xl lg:text-8xl font-black tracking-tighter text-slate-900 dark:text-white leading-[0.85]">Unified Modules. <br /> Surgical Accuracy.</motion.h2>
-            <motion.p variants={itemVariants} className="text-slate-500 dark:text-slate-400 font-medium text-lg italic">"From medication safety to educational excellence."</motion.p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               { 
+                id: 'registry',
+                title: 'Patient Registry', 
+                desc: 'Digital census of patient status, including admissions and clinical biodata.', 
+                icon: Users 
+              },
+              { 
+                id: 'handover',
                 title: 'Shift Handover', 
-                desc: 'Digital recording of patient status, including the last set of vitals and clinical plans.', 
+                desc: 'Structured transition reports with vital trend visualization and validation.', 
                 icon: ClipboardList 
               },
               { 
-                title: 'Knowledge Hub', 
-                desc: 'An editorial-grade library of standardized clinical procedures and diagnostic pathways.', 
-                icon: BookOpen 
-              },
-              { 
-                title: 'Precision Calculators', 
-                desc: 'Intelligent engines for drug dosing (mg/kg to mL), IV fluid rates, and dilution logic.', 
+                id: 'dosing',
+                title: 'Precision Dosing', 
+                desc: 'Intelligent engines for drug calculations, IV fluid rates, and dilution logic.', 
                 icon: Calculator 
               },
               { 
-                title: 'Case Simulations', 
-                desc: 'High-fidelity environments for training and clinical competency verification.', 
+                id: 'academy',
+                title: 'Clinical Academy', 
+                desc: 'Validated Knowledge Hub for clinical competency and standardized procedures.', 
                 icon: GraduationCap 
               },
             ].map((f, i) => (
               <motion.div 
+                id={f.id}
                 key={i} 
                 variants={itemVariants}
-                className="group p-10 rounded-[3rem] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-900 transition-all duration-500 shadow-sm hover:shadow-2xl"
+                className="group p-10 rounded-[3rem] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:border-emerald-200 dark:hover:border-emerald-900 transition-all duration-500 shadow-sm hover:shadow-2xl scroll-mt-24"
               >
                 <div className={`w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 text-slate-400 flex items-center justify-center mb-8 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500 shadow-lg`}>
                   <f.icon size={26} strokeWidth={2.5} />
                 </div>
-                <h3 className="text-xl font-black mb-6 text-slate-900 dark:text-white tracking-tight leading-tight uppercase">{f.title}</h3>
+                <h3 className="text-xl font-black mb-4 text-slate-900 dark:text-white tracking-tight leading-tight uppercase">{f.title}</h3>
                 <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed font-medium">{f.desc}</p>
               </motion.div>
             ))}
@@ -238,7 +232,7 @@ const Landing: React.FC = () => {
       {/* Governance Section */}
       <motion.section 
         id="governance" 
-        className="py-40 bg-white dark:bg-[#0f172a] transition-colors duration-500"
+        className="py-40 bg-white dark:bg-[#0f172a] transition-colors duration-500 scroll-mt-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -281,10 +275,10 @@ const Landing: React.FC = () => {
                   </div>
                   <div className="h-px bg-white/5 w-24 mx-auto" />
                   <div className="space-y-6 text-center">
-                     <p className="text-2xl font-bold text-white tracking-tight uppercase">Security Core v16.0</p>
-                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-[10px] font-black uppercase text-slate-400 tracking-widest">Bank-Grade Encryption</div>
-                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-[10px] font-black uppercase text-slate-400 tracking-widest">PostgreSQL Relational Core</div>
+                     <p className="text-2xl font-bold text-white tracking-tight uppercase tracking-widest">Security Core v16.0</p>
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Bank-Grade Encryption</div>
+                        <div className="p-4 bg-white/5 rounded-2xl border border-white/10 text-[10px] font-black uppercase text-slate-400 tracking-[0.2em]">Relational Data Core</div>
                      </div>
                   </div>
                </div>
@@ -292,10 +286,10 @@ const Landing: React.FC = () => {
          </div>
       </motion.section>
 
-      {/* Tech Stack / Infrastructure Section */}
+      {/* Tech Stack Section */}
       <motion.section 
         id="stack" 
-        className="py-40 bg-slate-50 dark:bg-slate-900/20 transition-colors duration-500"
+        className="py-40 bg-slate-50 dark:bg-slate-900/20 transition-colors duration-500 scroll-mt-24"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -303,7 +297,7 @@ const Landing: React.FC = () => {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 text-center">
            <motion.p variants={itemVariants} className="text-xs font-black uppercase tracking-[0.4em] text-emerald-600 mb-8">Technical Specification</motion.p>
-           <motion.h2 variants={itemVariants} className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white mb-20 uppercase">Modern Institutional Stack.</motion.h2>
+           <motion.h2 variants={itemVariants} className="text-4xl lg:text-6xl font-black tracking-tighter text-slate-900 dark:text-white mb-20 uppercase tracking-widest">Modern Institutional Stack.</motion.h2>
            <div className="grid grid-cols-2 md:grid-cols-5 gap-8 lg:gap-12">
               {[
                 { name: 'React 18+', icon: Cpu, label: 'Framework' },
@@ -315,7 +309,7 @@ const Landing: React.FC = () => {
                 <motion.div key={i} variants={itemVariants} className="space-y-4">
                    <div className="w-16 h-16 rounded-[1.5rem] bg-white dark:bg-slate-800 mx-auto flex items-center justify-center text-slate-300 dark:text-slate-600 shadow-sm border border-slate-100 dark:border-slate-800 transition-all hover:text-emerald-500 hover:border-emerald-200"><s.icon size={28} /></div>
                    <div>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{s.label}</p>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{s.label}</p>
                       <p className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">{s.name}</p>
                    </div>
                 </motion.div>
@@ -324,16 +318,16 @@ const Landing: React.FC = () => {
         </div>
       </motion.section>
 
-      {/* Enhanced Multi-Column Footer - Behance Inspiration */}
+      {/* Enhanced Multi-Column Footer */}
       <footer id="contact" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white pt-40 pb-16 transition-colors duration-500 border-t border-slate-100 dark:border-slate-900">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-24 mb-32">
             <div className="lg:col-span-4 space-y-12">
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-4 text-left">
                 <div className="w-14 h-14 bg-emerald-600 rounded-[1.4rem] flex items-center justify-center shadow-2xl shadow-emerald-600/30">
                   <ShieldCheck className="text-white" size={28} strokeWidth={2.5} />
                 </div>
-                <div className="space-y-1 text-left">
+                <div className="space-y-1">
                    <span className="text-3xl font-black tracking-tighter uppercase leading-none">NeoDesk</span>
                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em]">Precision Core</p>
                 </div>
@@ -343,7 +337,7 @@ const Landing: React.FC = () => {
               </p>
               <div className="flex items-center space-x-5">
                 {[MessageSquare, Mail, Globe].map((Icon, i) => (
-                  <a key={i} href="#" className="w-12 h-12 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-900 flex items-center justify-center transition-all">
+                  <a key={i} href="#" className="w-12 h-12 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl text-slate-400 dark:text-slate-500 hover:text-emerald-600 dark:hover:text-emerald-400 hover:border-emerald-200 dark:hover:border-emerald-900 flex items-center justify-center transition-all shadow-sm">
                     <Icon size={20} strokeWidth={2.5} />
                   </a>
                 ))}
@@ -353,28 +347,29 @@ const Landing: React.FC = () => {
             <div className="lg:col-span-2 space-y-10 text-left">
               <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-600">Platform</h4>
               <ul className="space-y-6 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                {['Registry', 'Dosing', 'Handover', 'Academy'].map(item => (
-                  <li key={item}><a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">{item}</a></li>
-                ))}
+                <li><a href="#vision" className="hover:text-slate-900 dark:hover:text-white transition-colors">Vision</a></li>
+                <li><a href="#modules" className="hover:text-slate-900 dark:hover:text-white transition-colors">Modules</a></li>
+                <li><a href="#governance" className="hover:text-slate-900 dark:hover:text-white transition-colors">Governance</a></li>
+                <li><a href="#stack" className="hover:text-slate-900 dark:hover:text-white transition-colors">Stack</a></li>
               </ul>
             </div>
 
             <div className="lg:col-span-2 space-y-10 text-left">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-600">Roles</h4>
+              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-600">Security</h4>
               <ul className="space-y-6 text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest">
-                {['Consultant', 'In-Charge', 'Staff Nurse', 'Student'].map(item => (
-                  <li key={item}><a href="#" className="hover:text-slate-900 dark:hover:text-white transition-colors">{item}</a></li>
-                ))}
+                <li><a href="#governance" className="hover:text-slate-900 dark:hover:text-white transition-colors">Audit Trail</a></li>
+                <li><a href="#governance" className="hover:text-slate-900 dark:hover:text-white transition-colors">Compliance</a></li>
+                <li><a href="#stack" className="hover:text-slate-900 dark:hover:text-white transition-colors">Technical</a></li>
               </ul>
             </div>
 
             <div className="lg:col-span-4 space-y-10 bg-slate-50 dark:bg-slate-900 p-12 rounded-[4rem] border border-slate-100 dark:border-slate-800 shadow-inner relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 text-emerald-600 opacity-[0.03] rotate-12"><Globe size={160} /></div>
-              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-600 relative z-10 text-left">Institutional HQ</h4>
+              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-600 relative z-10 text-left uppercase tracking-widest">Institutional HQ</h4>
               <ul className="space-y-8 relative z-10 text-left">
                 <li className="flex items-start space-x-4 text-left">
                   <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-emerald-600"><MapPin size={20} strokeWidth={2.5} /></div>
-                  <span className="text-base font-bold text-slate-900 dark:text-slate-200 leading-snug">Precision Medical Center,<br />Westlands, Nairobi, KE</span>
+                  <span className="text-base font-bold text-slate-900 dark:text-slate-200 leading-snug tracking-tight">Precision Medical Center,<br />Westlands, Nairobi, KE</span>
                 </li>
                 <li className="flex items-center space-x-4 text-left">
                   <div className="p-3 bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700 text-emerald-600"><Phone size={20} strokeWidth={2.5} /></div>
@@ -385,21 +380,14 @@ const Landing: React.FC = () => {
           </div>
 
           <div className="pt-20 border-t border-slate-100 dark:border-slate-900 flex flex-col lg:flex-row justify-between items-center gap-12">
-            <div className="flex flex-col md:flex-row items-center gap-8 text-[11px] font-black uppercase tracking-[0.4em] text-slate-300 dark:text-slate-700">
-               <span>&copy; 2026 NeoDesk Clinical Systems</span>
-               <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-slate-200 dark:bg-slate-800" />
-               <span className="text-emerald-600/50 dark:text-emerald-600/30">Secure. Validated. Verified.</span>
+            <div className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-300 dark:text-slate-700">
+               &copy; 2026 NeoDesk Clinical Systems. All Rights Reserved.
             </div>
             
             <div className="flex items-center space-x-12">
               <div className="text-right">
-                <p className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest mb-2">Developed By</p>
-                <p className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tighter">AlvinMutie</p>
-              </div>
-              <div className="w-px h-12 bg-slate-100 dark:bg-slate-900" />
-              <div className="text-right">
                 <p className="text-[10px] font-black text-slate-300 dark:text-slate-700 uppercase tracking-widest mb-2">Institutional Build</p>
-                <p className="text-sm font-black text-emerald-600 uppercase tracking-tighter italic">v16.0 Unified Core</p>
+                <p className="text-sm font-black text-emerald-600 uppercase tracking-tighter italic leading-none">v16.0 Unified Core</p>
               </div>
             </div>
           </div>
