@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
@@ -6,11 +6,13 @@ import {
   ShieldCheck, Activity, Bell, Users, FileText, 
   Heart, CheckCircle2, Shield,
   Mail, MapPin, Stethoscope, Database,
-  Play, Zap, Share2, Globe, MessageSquare
+  Zap, Share2, Globe, MessageSquare, Send
 } from 'lucide-react';
 import babyImage from '../assets/baby2.jpg';
 
 const LandingPage: React.FC = () => {
+  const [formData, setFormData] = useState({ name: '', email: '', institution: '' });
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {
@@ -45,7 +47,7 @@ const LandingPage: React.FC = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 transition-all duration-300">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-6 lg:px-12">
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-all">
+            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/20 group-hover:scale-105 transition-all">
               <ShieldCheck className="text-white" size={24} />
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">NeoDesk</span>
@@ -69,8 +71,8 @@ const LandingPage: React.FC = () => {
         </div>
       </nav>
 
-      {/* 🖼️ 2. HERO SECTION (Full Screen with Integrated Background) */}
-      <section className="relative h-[95vh] min-h-[700px] flex items-center pt-20 overflow-hidden">
+      {/* 🖼️ 2. HERO SECTION */}
+      <section className="relative h-[90vh] min-h-[600px] flex items-center pt-20 overflow-hidden">
         {/* Background Image with clinical blending */}
         <div className="absolute inset-0 z-0">
            <img 
@@ -89,11 +91,6 @@ const LandingPage: React.FC = () => {
             variants={containerVariants}
             className="max-w-3xl space-y-8"
           >
-            <motion.div variants={itemFadeUp} className="inline-flex items-center space-x-2 px-3 py-1.5 rounded-full bg-emerald-50/80 dark:bg-emerald-900/40 border border-emerald-100/50 dark:border-emerald-800/50 text-emerald-600 dark:text-emerald-400 text-xs font-bold uppercase tracking-widest backdrop-blur-sm">
-              <Activity size={14} className="animate-pulse" />
-              <span>NeoDesk Clinical OS v16.2</span>
-            </motion.div>
-            
             <motion.h1 variants={itemFadeUp} className="text-6xl lg:text-[88px] font-bold tracking-tight text-slate-900 dark:text-white leading-[0.95]">
               Smarter Care. <br />
               <span className="text-emerald-500">Better Outcomes.</span>
@@ -103,16 +100,10 @@ const LandingPage: React.FC = () => {
               Eliminating variables in neonatal care through surgical precision and automated clinical intelligence.
             </motion.p>
 
-            <motion.div variants={itemFadeUp} className="flex flex-col sm:flex-row items-center gap-6 pt-4">
-              <Link to="/register" className="w-full sm:w-auto bg-[#0f172a] dark:bg-emerald-600 text-white px-12 py-5 rounded-2xl font-bold shadow-2xl transition-all hover:scale-105 active:scale-95 text-center text-sm uppercase tracking-widest">
+            <motion.div variants={itemFadeUp} className="flex pt-4">
+              <Link to="/register" className="w-full sm:w-auto bg-[#0f172a] dark:bg-emerald-600 text-white px-14 py-5 rounded-2xl font-bold shadow-2xl transition-all hover:scale-105 active:scale-95 text-center text-sm uppercase tracking-widest">
                 Access Platform
               </Link>
-              <div className="flex items-center space-x-4 cursor-pointer group">
-                 <div className="w-12 h-12 rounded-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-md">
-                    <Play size={20} fill="currentColor" />
-                 </div>
-                 <span className="font-bold text-slate-500 dark:text-slate-400 uppercase text-xs tracking-widest group-hover:text-emerald-500 transition-colors">Watch Overview</span>
-              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -308,29 +299,76 @@ const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 🚀 7. CTA SECTION */}
-      <section className="py-24 px-6 lg:px-12 bg-white dark:bg-[#0f172a] transition-colors duration-500">
+      {/* 🚀 7. TRANSFORMING CARE / LEAD GEN SECTION */}
+      <section id="contact" className="py-24 px-6 lg:px-12 bg-white dark:bg-[#0f172a] transition-colors duration-500 scroll-mt-20">
          <motion.div 
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="max-w-7xl mx-auto rounded-[4rem] bg-gradient-to-br from-emerald-500 to-emerald-700 p-12 lg:p-28 text-center space-y-10 shadow-2xl relative overflow-hidden"
+          className="max-w-7xl mx-auto rounded-[3.5rem] bg-gradient-to-br from-emerald-500 to-emerald-700 p-10 lg:p-16 text-center space-y-12 shadow-2xl relative overflow-hidden"
          >
-            <div className="relative z-10 space-y-10">
-               <h2 className="text-5xl lg:text-8xl font-bold text-white tracking-tighter leading-none">Transforming care.</h2>
-               <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-                  <Link to="/register" className="w-full sm:w-auto bg-[#0f172a] text-white px-16 py-6 rounded-[2rem] font-bold shadow-2xl hover:scale-105 transition-all text-lg uppercase tracking-widest">
-                    Get Started
-                  </Link>
+            <div className="absolute top-0 right-0 p-40 opacity-10 pointer-events-none transform translate-x-1/4 -translate-y-1/4 text-white">
+               <ShieldCheck size={500} strokeWidth={1} />
+            </div>
+            
+            <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center text-left">
+               <div className="space-y-8">
+                  <h2 className="text-4xl lg:text-6xl font-bold text-white tracking-tighter leading-tight">Ready to Transform <br /> Neonatal Care?</h2>
+                  <p className="text-emerald-50 text-lg font-medium leading-relaxed opacity-90">
+                    Submit your details to request a comprehensive institutional walkthrough and safety audit.
+                  </p>
+                  <div className="flex items-center space-x-6">
+                     <div className="flex -space-x-3">
+                        {[1,2,3].map(i => (
+                          <div key={i} className="w-10 h-10 rounded-full border-2 border-emerald-400 bg-white/20 overflow-hidden">
+                             <img src={`https://i.pravatar.cc/100?u=staff${i}`} alt="Specialist" />
+                          </div>
+                        ))}
+                     </div>
+                     <p className="text-xs font-bold text-emerald-100 uppercase tracking-widest">Awaiting your deployment.</p>
+                  </div>
+               </div>
+
+               <div className="bg-white/10 backdrop-blur-3xl rounded-[2.5rem] p-8 border border-white/20 shadow-2xl space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                     <input 
+                      type="text" 
+                      placeholder="Full Name" 
+                      className="bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder:text-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all text-sm"
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                     />
+                     <input 
+                      type="email" 
+                      placeholder="Institutional Email" 
+                      className="bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder:text-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all text-sm"
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                     />
+                  </div>
+                  <input 
+                    type="text" 
+                    placeholder="Institution / Hospital Name" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-5 py-4 text-white placeholder:text-emerald-200/50 focus:outline-none focus:ring-2 focus:ring-white/30 transition-all text-sm"
+                    value={formData.institution}
+                    onChange={(e) => setFormData({...formData, institution: e.target.value})}
+                  />
+                  <button className="w-full bg-white text-emerald-700 py-4 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center space-x-2 hover:bg-emerald-50 active:scale-95 transition-all shadow-xl">
+                     <span>Initiate Connection</span>
+                     <Send size={14} />
+                  </button>
+                  <p className="text-[10px] text-center text-emerald-200/60 font-medium tracking-wide">
+                     By submitting, you agree to our terms for institutional clinical review.
+                  </p>
                </div>
             </div>
          </motion.div>
       </section>
 
       {/* 🏛️ 8. FOOTER */}
-      <footer id="contact" className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white pt-40 pb-20 border-t border-slate-100 dark:border-slate-900 transition-colors">
+      <footer className="bg-white dark:bg-slate-950 text-slate-900 dark:text-white pt-24 pb-16 border-t border-slate-100 dark:border-slate-900 transition-colors">
         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-20 mb-32">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
             <div className="lg:col-span-6 space-y-10 text-left">
               <div className="flex items-center space-x-4">
                 <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center shadow-2xl shadow-emerald-500/30">
@@ -366,13 +404,13 @@ const LandingPage: React.FC = () => {
                 </li>
                 <li className="flex items-center space-x-5">
                   <Mail className="text-emerald-500" size={22} />
-                  <span className="text-lg font-bold text-slate-900 dark:text-slate-200">hello@neodesk.care</span>
+                  <span className="text-lg font-bold text-slate-900 dark:text-slate-200">clinical@neodesk.care</span>
                 </li>
               </ul>
             </div>
           </div>
 
-          <div className="pt-16 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-10">
+          <div className="pt-12 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-10">
              <div className="text-sm font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">
                 &copy; 2026 NeoDesk Clinical Systems. v16.2 Stable.
              </div>
