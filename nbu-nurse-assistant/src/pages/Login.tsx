@@ -1,8 +1,41 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Lock, Mail, ArrowRight, ChevronLeft } from 'lucide-react';
+import api from '../services/api';
 
 const Login: React.FC = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    if (!email || !password) {
+      setError('Email and access key are required.');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await api.post('/auth/login', { email, password });
+      if (response.data.success) {
+        localStorage.setItem('auth_token', response.data.data.access_token);
+        localStorage.setItem('user_name', response.data.data.user.name);
+        localStorage.setItem('user_role', response.data.data.user.role);
+        navigate('/dashboard');
+      } else {
+        setError(response.data.message || 'Login failed.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.response?.data?.message || 'Connection failed. Please verify the backend is running.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center p-6 relative overflow-hidden font-sans text-[var(--text-main)]">
       {/* Structural Background Pattern */}
@@ -31,7 +64,7 @@ const Login: React.FC = () => {
             <p className="text-slate-500 font-medium tracking-tight">Clinical Intelligence Portal v16.0</p>
           </div>
 
-          <form className="space-y-8">
+          <form className="space-y-8" onSubmit={handleLogin}>
             <div className="space-y-5">
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] px-1">Institutional Email</label>
@@ -39,6 +72,8 @@ const Login: React.FC = () => {
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-600 transition-colors" size={18} />
                   <input 
                     type="email" 
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     placeholder="name@hospital.go.ke"
                     className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
                   />
@@ -53,6 +88,8 @@ const Login: React.FC = () => {
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-emerald-600 transition-colors" size={18} />
                   <input 
                     type="password" 
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300 font-mono"
                   />
@@ -60,12 +97,14 @@ const Login: React.FC = () => {
               </div>
             </div>
 
-            <Link to="/dashboard" className="block w-full">
-              <button type="button" className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center space-x-3 group hover:bg-black dark:hover:bg-emerald-700 transition-all shadow-xl shadow-slate-200 dark:shadow-none active:scale-95">
-                <span>Authenticate Session</span>
-                <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
-              </button>
-            </Link>
+            {error && (
+              <p className="text-rose-500 text-xs font-bold text-center mt-2">{error}</p>
+            )}
+
+            <button type="submit" disabled={loading} className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center space-x-3 group hover:bg-black dark:hover:bg-emerald-700 transition-all shadow-xl shadow-slate-200 dark:shadow-none active:scale-95 disabled:opacity-50">
+              <span>{loading ? 'Authenticating...' : 'Authenticate Session'}</span>
+              {!loading && <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />}
+            </button>
           </form>
 
           <div className="pt-8 border-t border-[var(--border-main)] flex flex-col space-y-6">

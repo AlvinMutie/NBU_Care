@@ -18,13 +18,15 @@ const Layout: React.FC = () => {
 
   // Simulated User Context
   const user = {
-    name: 'Patrick Kamau',
-    role: 'Staff Nurse', // Try 'Nursing In-Charge'
+    name: localStorage.getItem('user_name') || 'Patrick Kamau',
+    role: localStorage.getItem('user_role') || 'Staff Nurse',
     verified: true
   };
 
   const handleLogout = () => {
-    // In a real app, clear tokens/session here
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_role');
     navigate('/');
   };
 

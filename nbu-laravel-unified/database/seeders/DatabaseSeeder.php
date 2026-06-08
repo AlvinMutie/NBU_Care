@@ -66,6 +66,55 @@ class DatabaseSeeder extends Seeder
             User::create($userData);
         }
 
+        // Seed Neonates
+        \App\Models\Neonate::create([
+            'hospital_number' => 'N-001',
+            'name' => 'Baby Liam',
+            'dob' => now()->subDays(4)->toDateString(),
+            'gender' => 'Male',
+            'birth_weight' => 1.850,
+            'current_weight' => 1.920,
+            'gestational_age' => 32,
+            'apgar_1' => 6,
+            'apgar_5' => 8,
+            'apgar_10' => 9,
+            'place_of_birth' => 'Maternity Ward A',
+            'delivery_method' => 'Emergency C-Section',
+            'status' => 'Critical',
+        ]);
+
+        \App\Models\Neonate::create([
+            'hospital_number' => 'N-002',
+            'name' => 'Baby Chloe',
+            'dob' => now()->subDays(2)->toDateString(),
+            'gender' => 'Female',
+            'birth_weight' => 2.100,
+            'current_weight' => 2.150,
+            'gestational_age' => 35,
+            'apgar_1' => 7,
+            'apgar_5' => 9,
+            'apgar_10' => 10,
+            'place_of_birth' => 'Maternity Ward B',
+            'delivery_method' => 'Normal Vaginal Delivery',
+            'status' => 'Serious',
+        ]);
+
+        \App\Models\Neonate::create([
+            'hospital_number' => 'N-003',
+            'name' => 'Baby Ethan',
+            'dob' => now()->subDays(7)->toDateString(),
+            'gender' => 'Male',
+            'birth_weight' => 3.200,
+            'current_weight' => 3.320,
+            'gestational_age' => 38,
+            'apgar_1' => 8,
+            'apgar_5' => 9,
+            'apgar_10' => 10,
+            'place_of_birth' => 'External Admission',
+            'delivery_method' => 'Normal Vaginal Delivery',
+            'status' => 'Stable',
+        ]);
+
         // Initial Clinical Content (Examples)
         Flashcard::create([
             'title' => 'Neonatal Resuscitation',
