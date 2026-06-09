@@ -29,8 +29,8 @@ const Academy: React.FC = () => {
       const mappedModules = [
         ...flashRes.data.data.map((f: any) => ({ 
           ...f, 
-          title: f.question, 
-          category: 'Clinical Quiz', 
+          title: f.title, 
+          category: f.category || 'Clinical Quiz', 
           icon: Zap, 
           level: 'Essential',
           completed: false 

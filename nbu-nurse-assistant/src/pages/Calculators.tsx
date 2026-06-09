@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { 
   Beaker, CheckCircle2, ChevronRight, ChevronLeft, 
   AlertCircle, ShieldCheck, Pill, Search, User,
-  Clock, Info, FileText, Scale
+  Clock, Info, FileText, Scale, RefreshCcw
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -220,14 +220,101 @@ const Calculators: React.FC = () => {
                   </motion.div>
                 )}
 
-                {currentStep > 3 && (
-                  <div className="flex flex-col items-center justify-center text-slate-300 italic py-32 space-y-8 text-center">
-                    <div className="w-20 h-20 rounded-[2rem] border-2 border-[var(--bg-main)] border-t-emerald-600 animate-spin" />
-                    <div className="space-y-2">
-                       <p className="text-xl font-bold text-[var(--text-main)]">Formulating Precision Result...</p>
-                       <p className="text-sm font-medium text-slate-400">Executing weight-concentration mapping for {selectedPatient?.name}</p>
+                {currentStep === 4 && (
+                  <motion.div 
+                    key="step4"
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="space-y-10"
+                  >
+                    <div className="space-y-1">
+                       <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Dilution Strategy</h3>
+                       <p className="text-slate-500 font-medium">Standard NICU volumes for fluid restriction.</p>
                     </div>
-                  </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                       <div className="p-8 bg-slate-900 rounded-[2rem] text-white space-y-6">
+                          <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Fluid Volume</p>
+                          <div className="flex items-baseline space-x-2">
+                             <span className="text-5xl font-black">24</span>
+                             <span className="text-xl font-bold opacity-60">ml / 24h</span>
+                          </div>
+                          <p className="text-xs text-slate-400 leading-relaxed">Standard micro-infusion volume for neonatal patients requiring fluid control.</p>
+                       </div>
+                       <div className="p-8 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-[2rem] space-y-6">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculated Rate</p>
+                          <div className="flex items-baseline space-x-2">
+                             <span className="text-5xl font-black text-[var(--text-main)]">1.0</span>
+                             <span className="text-xl font-bold text-slate-400">ml/hr</span>
+                          </div>
+                          <button 
+                            onClick={nextStep}
+                            className="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold shadow-lg shadow-emerald-100 dark:shadow-none active:scale-95 transition-all mt-4"
+                          >
+                             Finalize Calculation
+                          </button>
+                       </div>
+                    </div>
+                  </motion.div>
+                )}
+
+                {currentStep === 5 && (
+                  <motion.div 
+                    key="step5"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    className="space-y-10"
+                  >
+                    <div className="space-y-4 text-center">
+                       <div className="w-20 h-20 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 rounded-[2.5rem] flex items-center justify-center shadow-inner mx-auto">
+                          <ShieldCheck size={40} />
+                       </div>
+                       <div>
+                          <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Calculation Validated</h3>
+                          <p className="text-slate-500 font-medium">Cross-referenced with institutional protocol v16.42.</p>
+                       </div>
+                    </div>
+
+                    <div className="bg-[var(--bg-main)] border border-[var(--border-main)] rounded-[2.5rem] overflow-hidden">
+                       <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
+                          <div>
+                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Infusion Rate</p>
+                             <p className="text-4xl font-black text-emerald-400">0.45 ml/hr</p>
+                          </div>
+                          <Beaker size={40} className="text-slate-700" />
+                       </div>
+                       <div className="p-8 space-y-6">
+                          <div className="grid grid-cols-2 gap-8">
+                             <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Drug Amount</p>
+                                <p className="text-sm font-bold">1.25 mg</p>
+                             </div>
+                             <div>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Diluent Volume</p>
+                                <p className="text-sm font-bold">23.75 ml</p>
+                             </div>
+                          </div>
+                          <div className="pt-6 border-t border-[var(--border-main)]">
+                             <p className="text-[10px] font-bold text-rose-500 uppercase tracking-widest mb-2 flex items-center space-x-2">
+                                <AlertCircle size={12} />
+                                <span>Double Check Mandatory</span>
+                             </p>
+                             <p className="text-xs text-slate-500 leading-relaxed italic">
+                                Ensure syringe is labeled with patient ID, drug name, total dose, and dilution volume before bedside deployment.
+                             </p>
+                          </div>
+                       </div>
+                    </div>
+
+                    <button 
+                      onClick={() => setCurrentStep(1)}
+                      className="w-full bg-[var(--card-bg)] border border-[var(--border-main)] text-slate-600 py-5 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center space-x-3"
+                    >
+                       <RefreshCcw size={18} />
+                       <span>Reset Pipeline for New Calculation</span>
+                    </button>
+                  </motion.div>
                 )}
              </AnimatePresence>
 

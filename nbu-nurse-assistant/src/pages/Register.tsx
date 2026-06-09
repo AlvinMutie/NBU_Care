@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, User, Mail, Lock, IdCard, Camera, ChevronRight, Eye, EyeOff, CheckCircle2, ChevronLeft } from 'lucide-react';
+import { ShieldCheck, User, Mail, Lock, IdCard, ChevronRight, Eye, EyeOff, CheckCircle2, ChevronLeft, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 
@@ -8,7 +8,6 @@ const Register: React.FC = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -26,11 +25,6 @@ const Register: React.FC = () => {
     'Medical Officer',
     'Student',
   ];
-
-  const handleImageUpload = () => {
-    // Simulate camera/upload
-    setProfileImage('https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&h=200&auto=format&fit=crop');
-  };
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,40 +47,32 @@ const Register: React.FC = () => {
   };
 
   const isStep1Complete = formData.fullName && formData.email && formData.password;
-  const isStep2Complete = formData.role && formData.hospitalId && profileImage;
+  const isStep2Complete = formData.role && formData.hospitalId;
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center p-6 relative overflow-hidden font-sans text-[var(--text-main)]">
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
-      
-      <div className="w-full max-w-xl relative z-10">
-        <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 sm:p-12 shadow-2xl space-y-10 animate-in fade-in zoom-in-95 duration-700">
-          
-          <div className="flex justify-between items-center">
-            <Link 
-              to="/" 
-              className="inline-flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-colors group"
-            >
-              <ChevronLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-              <span>Back to Home</span>
-            </Link>
+    <div className="min-h-screen bg-[var(--bg-main)] flex flex-col justify-center py-12 px-6 lg:px-8 animate-in fade-in duration-1000">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-6">
+        <Link to="/" className="inline-flex items-center space-x-3 group">
+          <div className="w-12 h-12 bg-slate-900 dark:bg-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
+            <ShieldCheck className="text-white" size={28} />
           </div>
+          <span className="text-2xl font-black tracking-tighter text-[var(--text-main)]">NeoDesk<span className="text-emerald-600">.</span></span>
+        </Link>
+        <div className="space-y-1">
+           <h1 className="text-3xl font-black tracking-tight text-[var(--text-main)]">Access Protocol</h1>
+           <p className="text-slate-500 font-medium">Initialize your institutional clinical credentials.</p>
+        </div>
+      </div>
 
-          <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <ShieldCheck className="text-white" size={24} />
-              </div>
-              <div>
-                <h1 className="text-xl font-black text-[var(--text-main)] tracking-tight leading-none">NeoDesk</h1>
-                <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold mt-1">Clinical Registry</p>
-              </div>
-            </Link>
-            <div className="flex items-center space-x-2">
-               {[1, 2].map(i => (
-                 <div key={i} className={`h-1.5 w-10 rounded-full transition-all duration-500 ${step >= i ? 'bg-emerald-600' : 'bg-[var(--bg-main)]'}`} />
-               ))}
-            </div>
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-xl">
+        <div className="bg-[var(--card-bg)] border border-[var(--border-main)] py-10 px-8 sm:px-12 rounded-[3rem] shadow-sm relative overflow-hidden">
+          {/* Progress Indicator */}
+          <div className="absolute top-0 left-0 w-full h-1 bg-[var(--bg-main)]">
+            <motion.div 
+              initial={{ width: '0%' }}
+              animate={{ width: step === 1 ? '50%' : '100%' }}
+              className="h-full bg-emerald-500 shadow-[0_0_10px_#10b981]"
+            />
           </div>
 
           <form onSubmit={handleRegistration} className="space-y-8">
@@ -121,6 +107,7 @@ const Register: React.FC = () => {
                           onChange={(e) => setFormData({...formData, fullName: e.target.value})}
                           placeholder="As per Hospital ID"
                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                          required
                         />
                       </div>
                     </div>
@@ -135,6 +122,7 @@ const Register: React.FC = () => {
                           onChange={(e) => setFormData({...formData, email: e.target.value})}
                           placeholder="name@hospital.go.ke"
                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                          required
                         />
                       </div>
                     </div>
@@ -149,6 +137,7 @@ const Register: React.FC = () => {
                           onChange={(e) => setFormData({...formData, password: e.target.value})}
                           placeholder="Minimum 8 characters"
                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-12 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                          required
                         />
                         <button 
                           type="button" 
@@ -191,8 +180,9 @@ const Register: React.FC = () => {
                           value={formData.role}
                           onChange={(e) => setFormData({...formData, role: e.target.value})}
                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-bold appearance-none cursor-pointer"
+                          required
                         >
-                          <option value="" disabled selected>Select Role</option>
+                          <option value="" disabled>Select Role</option>
                           {roles.map(role => <option key={role} value={role}>{role}</option>)}
                         </select>
                      </div>
@@ -206,35 +196,20 @@ const Register: React.FC = () => {
                             onChange={(e) => setFormData({...formData, hospitalId: e.target.value})}
                             placeholder="HOSP-2026-X"
                             className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 pl-12 pr-4 text-[var(--text-main)] focus:outline-none focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 transition-all font-medium placeholder:text-slate-300"
+                            required
                           />
                         </div>
                      </div>
                   </div>
 
-                  <div className="space-y-3">
-                     <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Passport Verification (Mandatory)</label>
-                     <div 
-                        onClick={handleImageUpload}
-                        className={`w-full h-40 border-2 border-dashed rounded-[2rem] flex flex-col items-center justify-center space-y-3 transition-all cursor-pointer group ${profileImage ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/10' : 'border-[var(--border-main)] hover:border-emerald-400 hover:bg-[var(--bg-main)]'}`}
-                      >
-                        {profileImage ? (
-                           <div className="flex flex-col items-center space-y-2">
-                              <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-emerald-500 shadow-md">
-                                 <img src={profileImage} alt="Profile Preview" className="w-full h-full object-cover" />
-                              </div>
-                              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center space-x-1">
-                                 <CheckCircle2 size={12} />
-                                 <span>Image Captured</span>
-                              </span>
-                           </div>
-                        ) : (
-                           <>
-                              <Camera className="text-slate-300 group-hover:text-emerald-500 transition-colors" size={32} />
-                              <span className="text-xs text-slate-400 font-bold uppercase tracking-widest">Click to Capture Photo</span>
-                           </>
-                        )}
-                     </div>
-                     <p className="text-[10px] text-center text-slate-400 font-medium">Please use a clear, recent, passport-style photo showing your full face.</p>
+                  <div className="p-6 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 rounded-3xl space-y-2">
+                     <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest flex items-center space-x-2">
+                        <ShieldCheck size={14} />
+                        <span>Institutional Verification</span>
+                     </p>
+                     <p className="text-xs text-slate-500 font-medium leading-relaxed">
+                        By submitting, you confirm that these credentials belong to you and will be used solely for authorized clinical tasks.
+                     </p>
                   </div>
 
                   <div className="flex space-x-4">
@@ -259,14 +234,14 @@ const Register: React.FC = () => {
             </AnimatePresence>
           </form>
 
-          <div className="pt-8 border-t border-[var(--border-main)] text-center">
-            <p className="text-xs text-slate-400 font-medium">
-              Already have clinical access? <Link to="/login" className="text-emerald-600 font-black hover:text-emerald-700 ml-1 underline decoration-emerald-200 underline-offset-4">Authenticate Now</Link>
-            </p>
+          <div className="mt-10 pt-10 border-t border-[var(--border-main)] text-center">
+             <p className="text-sm font-medium text-slate-500">
+               Already hold institutional access? <Link to="/login" className="text-emerald-600 font-bold hover:underline">Log in here</Link>
+             </p>
           </div>
         </div>
-        
-        <p className="mt-12 text-center text-[10px] text-slate-400 font-bold uppercase tracking-[0.3em] leading-relaxed max-w-sm mx-auto opacity-60">
+
+        <p className="mt-10 text-center text-[10px] font-black text-slate-400 uppercase tracking-[0.3em] leading-relaxed max-w-sm mx-auto opacity-60">
           Security Protocol v16.0 <br />
           All submissions are forensicially audited.
         </p>

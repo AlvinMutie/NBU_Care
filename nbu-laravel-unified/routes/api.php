@@ -7,6 +7,7 @@ use App\Http\Controllers\VitalController;
 use App\Http\Controllers\AuditController;
 use App\Http\Controllers\LearningController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ShiftController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -37,4 +38,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/auth/verify/{user}', [AdminController::class, 'verifyUser']);
     Route::get('/admin/settings', [AdminController::class, 'settings']);
     Route::patch('/admin/settings', [AdminController::class, 'updateSettings']);
+
+    Route::get('/shifts', [ShiftController::class, 'index']);
+    Route::post('/shifts/assign', [ShiftController::class, 'assign']);
 });
