@@ -8,12 +8,12 @@ This document provides a comprehensive audit of the system's current functionali
 - **CRUD Engine:** System Admins and Nursing In-Charges can Create, Read, Update, and Delete clinical protocols (Flashcards and Scenarios).
 - **Protocol Library:** Populated with 20+ standardized neonatal protocols (APGAR, CPAP, Sepsis, etc.).
 - **Competency Validation (Student Mode):** Students (Intern Nurses) can trigger "Take Test" mode for any module to validate their protocol alignment.
-- **RBAC Security:** Non-admin roles (Students, Staff Nurses) are restricted to Read-only access with validation capabilities.
 
 ### 2. Authentication & Lifecycle
 - **Logout Routing:** Session termination successfully routes users back to the Institutional Hero section for high-level context.
 - **Registration Flow:** Streamlined registration (capture removed) with Hospital ID validation.
-- **Verification Queue:** Institutional vetting system for leads to approve/reject new clinician registrations.
+- **Verification Queue:** Institutional vetting system for leads to approve/reject new clinician registrations. Includes role-based access and live feedback.
+- **RBAC Security:** Navigation and management functions are restricted based on clinical roles. Only 'Nursing In-Charge' or 'Consultant' roles can access institutional controls.
 
 ### 3. Command Center (Dashboard)
 - **Role-Based Views:**

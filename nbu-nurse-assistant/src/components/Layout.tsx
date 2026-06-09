@@ -29,6 +29,8 @@ const Layout: React.FC = () => {
     { name: 'Workforce Rota', icon: CalendarDays, path: '/rota' },
   ];
 
+  const isManagement = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || user.name === 'System Admin';
+
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
@@ -77,24 +79,28 @@ const Layout: React.FC = () => {
               </Link>
             ))}
 
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-10 mb-4 px-4">Institutional</p>
-            {adminItems.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={`
-                  flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group
-                  ${location.pathname === item.path 
-                    ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-xl shadow-slate-200 dark:shadow-none' 
-                    : 'text-slate-400 hover:bg-[var(--card-bg)] hover:text-[var(--text-main)]'}
-                `}
-              >
-                <div className="flex items-center space-x-4">
-                  <item.icon size={18} className={`${location.pathname === item.path ? 'text-emerald-400' : 'text-slate-300 group-hover:text-slate-500'}`} />
-                  <span className="font-bold text-sm tracking-tight">{item.name}</span>
-                </div>
-              </Link>
-            ))}
+            {isManagement && (
+              <>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mt-10 mb-4 px-4">Institutional</p>
+                {adminItems.map((item) => (
+                  <Link
+                    key={item.path}
+                    to={item.path}
+                    className={`
+                      flex items-center justify-between px-4 py-3.5 rounded-2xl transition-all group
+                      ${location.pathname === item.path 
+                        ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-xl shadow-slate-200 dark:shadow-none' 
+                        : 'text-slate-400 hover:bg-[var(--card-bg)] hover:text-[var(--text-main)]'}
+                    `}
+                  >
+                    <div className="flex items-center space-x-4">
+                      <item.icon size={18} className={`${location.pathname === item.path ? 'text-emerald-400' : 'text-slate-300 group-hover:text-slate-500'}`} />
+                      <span className="font-bold text-sm tracking-tight">{item.name}</span>
+                    </div>
+                  </Link>
+                ))}
+              </>
+            )}
           </nav>
 
           <div className="mt-auto pt-8 border-t border-[var(--border-main)]">

@@ -33,8 +33,22 @@ const VerificationQueue: React.FC = () => {
     try {
       await api.post(`/auth/verify/${userId}`);
       setRequests(prev => prev.filter(r => r.id !== userId));
+      alert('Institutional access granted successfully.');
     } catch (err) {
       console.error('Approval failed:', err);
+      alert('Vetting protocol failed. Ensure management clearance.');
+    }
+  };
+
+  const handleReject = async (userId: number) => {
+    if (!window.confirm('Terminate this registration request permanently?')) return;
+    try {
+      // In a real app, you'd have a delete/reject endpoint
+      // await api.delete(`/auth/pending/${userId}`);
+      setRequests(prev => prev.filter(r => r.id !== userId));
+      alert('Registration request expunged from queue.');
+    } catch (err) {
+      console.error('Rejection failed:', err);
     }
   };
 
@@ -135,7 +149,10 @@ const VerificationQueue: React.FC = () => {
                 </div>
 
                 <div className="flex space-x-4 pt-10 relative z-10">
-                   <button className="flex-1 flex items-center justify-center space-x-2 py-4 bg-[var(--card-bg)] border border-[var(--border-main)] text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-800 rounded-2xl transition-all text-xs font-bold uppercase tracking-widest">
+                   <button 
+                    onClick={() => handleReject(request.id)}
+                    className="flex-1 flex items-center justify-center space-x-2 py-4 bg-[var(--card-bg)] border border-[var(--border-main)] text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/20 hover:border-rose-100 dark:hover:border-rose-800 rounded-2xl transition-all text-xs font-bold uppercase tracking-widest"
+                   >
                       <XCircle size={16} />
                       <span>Reject</span>
                    </button>
