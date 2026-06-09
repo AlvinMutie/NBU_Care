@@ -396,15 +396,25 @@ const LandingPage: React.FC = () => {
             </div>
 
             <div className="lg:col-span-4 space-y-8 text-left">
-              <h4 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Connect</h4>
-              <ul className="space-y-8">
-                <li className="flex items-center space-x-5">
-                  <MapPin className="text-emerald-500" size={22} />
-                  <span className="text-lg font-bold text-slate-900 dark:text-slate-200">Westlands, Nairobi, KE</span>
+              <h4 className="text-xs font-bold uppercase tracking-[0.4em] text-emerald-500">Governance & Compliance</h4>
+              <ul className="space-y-6">
+                <li className="flex items-start space-x-4">
+                  <ShieldCheck className="text-emerald-500 mt-1 shrink-0" size={20} />
+                  <div>
+                    <p className="text-base font-bold text-slate-900 dark:text-slate-200">Protocol v16.42 Certified</p>
+                    <p className="text-xs text-slate-500 font-medium">Standardized Neonatal Care Framework</p>
+                  </div>
                 </li>
-                <li className="flex items-center space-x-5">
-                  <Mail className="text-emerald-500" size={22} />
-                  <span className="text-lg font-bold text-slate-900 dark:text-slate-200">clinical@neodesk.care</span>
+                <li className="flex items-start space-x-4">
+                  <Database className="text-emerald-500 mt-1 shrink-0" size={20} />
+                  <div>
+                    <p className="text-base font-bold text-slate-900 dark:text-slate-200">Data Integrity Core</p>
+                    <p className="text-xs text-slate-500 font-medium">AES-256 Forensic Audit Logging</p>
+                  </div>
+                </li>
+                <li className="flex items-center space-x-4 pt-4">
+                  <MapPin className="text-slate-400" size={16} />
+                  <span className="text-sm font-bold text-slate-500">Westlands HQ, Nairobi, KE</span>
                 </li>
               </ul>
             </div>

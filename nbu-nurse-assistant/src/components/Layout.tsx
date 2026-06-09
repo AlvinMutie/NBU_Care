@@ -31,7 +31,7 @@ const Layout: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
-    navigate('/login');
+    navigate('/');
   };
 
   return (

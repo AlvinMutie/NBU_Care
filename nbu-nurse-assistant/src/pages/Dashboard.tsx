@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, Activity, Beaker, ShieldCheck, TrendingUp, 
   Phone, ArrowRight, ClipboardCheck,
-  Clock, Zap, BookOpen, BarChart3, PieChart, RefreshCcw, AlertCircle
+  Clock, Zap, BookOpen, BarChart3, PieChart, RefreshCcw, AlertCircle,
+  GraduationCap, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart as RePieChart, Pie, Cell
 } from 'recharts';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 const Dashboard: React.FC = () => {
@@ -24,6 +26,10 @@ const Dashboard: React.FC = () => {
   });
   const [recentLogs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+
+  const isStudent = user.role === 'Student';
+  const isAdmin = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || user.name === 'System Admin';
 
   useEffect(() => {
     fetchDashboardData();
@@ -61,8 +67,10 @@ const Dashboard: React.FC = () => {
       {/* Structural Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Command Center</h2>
-          <p className="text-slate-500 font-medium">Real-time clinical orchestration and ward monitoring.</p>
+          <h2 className="text-3xl font-bold tracking-tight">{isStudent ? 'Learning Command' : 'Command Center'}</h2>
+          <p className="text-slate-500 font-medium">
+             {isStudent ? 'Your clinical competency and study progress overview.' : 'Real-time clinical orchestration and ward monitoring.'}
+          </p>
         </div>
         <div className="flex items-center gap-4 bg-[var(--card-bg)] border border-[var(--border-main)] p-2 px-6 rounded-2xl shadow-sm">
            <button onClick={fetchDashboardData} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
@@ -82,10 +90,10 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-8 space-y-8">
            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
-                { label: 'Live Cases', value: stats.live_cases, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                { label: 'Active Staff', value: stats.total_staff, icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
+                { label: isStudent ? 'Academy Modules' : 'Live Cases', value: isStudent ? '24' : stats.live_cases, icon: isStudent ? GraduationCap : Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                { label: isStudent ? 'Study Hours' : 'Active Staff', value: isStudent ? '12.5' : stats.total_staff, icon: isStudent ? Clock : Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
                 { label: 'Safety Score', value: `${stats.safety_score}%`, icon: ShieldCheck, color: 'text-amber-600', bg: 'bg-amber-50' },
-                { label: 'Meds Audit', value: stats.doses_given, icon: Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
+                { label: isStudent ? 'Tests Taken' : 'Meds Audit', value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
               ].map((stat, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -106,123 +114,173 @@ const Dashboard: React.FC = () => {
               ))}
            </div>
 
-           {/* Active Ward Alerts - Redesigned to fit better */}
-           <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] p-8 shadow-sm overflow-hidden">
-              <div className="flex flex-col md:flex-row justify-between gap-10">
-                 <div className="flex-1 space-y-6">
-                    <div className="space-y-1">
-                       <div className="flex items-center space-x-3 text-rose-600">
-                          <AlertCircle size={20} />
-                          <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
-                       </div>
-                       <p className="text-xs text-slate-500 font-medium">Real-time flags requiring clinical validation.</p>
-                    </div>
-                    
-                    <div className="space-y-3">
-                       {[
-                         { baby: 'Baby Liam', id: 'N-001', alert: 'Tachycardia Trend', time: '5m ago', type: 'Critical' },
-                         { baby: 'Baby Chloe', id: 'N-002', alert: 'Dextrose Dilution', time: '12m ago', type: 'Serious' },
-                         { baby: 'Baby Ethan', id: 'N-005', alert: 'Low SpO2 Alert', time: '15m ago', type: 'Critical' },
-                       ].map((alert, i) => (
-                         <div key={i} className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between hover:border-rose-200 transition-all">
-                            <div className="flex items-center space-x-4">
-                               <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] ${alert.type === 'Critical' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
-                                  {alert.baby.split(' ')[1][0]}
-                               </div>
-                               <div>
-                                  <p className="text-xs font-bold">{alert.baby}</p>
-                                  <p className="text-[10px] text-slate-500 font-medium">{alert.alert}</p>
-                               </div>
-                            </div>
-                            <button className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all">Resolve</button>
+           {isStudent ? (
+             /* Student Specific Learning Aspect */
+             <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden group shadow-2xl">
+                <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
+                   <BookOpen size={300} />
+                </div>
+                <div className="relative z-10 space-y-8">
+                   <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-400">
+                      <Zap size={12} fill="currentColor" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Recommended Study Module</span>
+                   </div>
+                   <div className="space-y-3">
+                      <h3 className="text-3xl font-bold tracking-tight">Neonatal Resuscitation <br /> Protocols (v16.0)</h3>
+                      <p className="text-slate-400 text-sm max-w-lg font-medium leading-relaxed">
+                         Master the latest evidence-based resuscitation guidelines for extremely preterm neonates.
+                      </p>
+                   </div>
+                   <Link to="/academy" className="inline-flex items-center space-x-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
+                      <span>Enter Academy</span>
+                      <ArrowRight size={18} />
+                   </Link>
+                </div>
+             </div>
+           ) : (
+             /* Active Ward Alerts - Redesigned to fit better */
+             <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] p-8 shadow-sm overflow-hidden">
+                <div className="flex flex-col md:flex-row justify-between gap-10">
+                   <div className="flex-1 space-y-6">
+                      <div className="space-y-1">
+                         <div className="flex items-center space-x-3 text-rose-600">
+                            <AlertCircle size={20} />
+                            <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
                          </div>
-                       ))}
-                    </div>
-                 </div>
-                 
-                 <div className="w-px bg-[var(--border-main)] hidden md:block" />
+                         <p className="text-xs text-slate-500 font-medium">Real-time flags requiring clinical validation.</p>
+                      </div>
+                      
+                      <div className="space-y-3">
+                         {[
+                           { baby: 'Baby Liam', id: 'N-001', alert: 'Tachycardia Trend', time: '5m ago', type: 'Critical' },
+                           { baby: 'Baby Chloe', id: 'N-002', alert: 'Dextrose Dilution', time: '12m ago', type: 'Serious' },
+                           { baby: 'Baby Ethan', id: 'N-005', alert: 'Low SpO2 Alert', time: '15m ago', type: 'Critical' },
+                         ].map((alert, i) => (
+                           <div key={i} className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between hover:border-rose-200 transition-all">
+                              <div className="flex items-center space-x-4">
+                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] ${alert.type === 'Critical' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
+                                    {alert.baby.split(' ')[1][0]}
+                                 </div>
+                                 <div>
+                                    <p className="text-xs font-bold">{alert.baby}</p>
+                                    <p className="text-[10px] text-slate-500 font-medium">{alert.alert}</p>
+                                 </div>
+                              </div>
+                              <button className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all">Resolve</button>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                   
+                   <div className="w-px bg-[var(--border-main)] hidden md:block" />
 
-                 <div className="flex-1 space-y-6">
-                    <div className="space-y-1">
-                       <div className="flex items-center space-x-3 text-emerald-600">
-                          <ShieldCheck size={20} />
-                          <h3 className="text-xl font-bold tracking-tight">Institutional Health</h3>
-                       </div>
-                       <p className="text-xs text-slate-500 font-medium">Aggregated ward health metrics.</p>
-                    </div>
-                    
-                    <div className="space-y-5 pt-2">
-                       {[
-                         { label: 'Calculation Accuracy', val: 100, color: 'bg-emerald-500' },
-                         { label: 'Training Compliance', val: 92, color: 'bg-blue-500' },
-                         { label: 'Protocol Adherence', val: 98, color: 'bg-amber-500' },
-                       ].map((metric) => (
-                         <div key={metric.label} className="space-y-2">
-                            <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                               <span className="text-slate-400">{metric.label}</span>
-                               <span className="text-[var(--text-main)]">{metric.val}%</span>
-                            </div>
-                            <div className="h-1.5 bg-[var(--bg-main)] rounded-full overflow-hidden">
-                               <motion.div 
-                                 initial={{ width: 0 }}
-                                 animate={{ width: `${metric.val}%` }}
-                                 className={`h-full ${metric.color}`}
-                               />
-                            </div>
+                   <div className="flex-1 space-y-6">
+                      <div className="space-y-1">
+                         <div className="flex items-center space-x-3 text-emerald-600">
+                            <ShieldCheck size={20} />
+                            <h3 className="text-xl font-bold tracking-tight">Institutional Health</h3>
                          </div>
-                       ))}
-                    </div>
-                 </div>
-              </div>
-           </div>
+                         <p className="text-xs text-slate-500 font-medium">Aggregated ward health metrics.</p>
+                      </div>
+                      
+                      <div className="space-y-5 pt-2">
+                         {[
+                           { label: 'Calculation Accuracy', val: 100, color: 'bg-emerald-500' },
+                           { label: 'Training Compliance', val: 92, color: 'bg-blue-500' },
+                           { label: 'Protocol Adherence', val: 98, color: 'bg-amber-500' },
+                         ].map((metric) => (
+                           <div key={metric.label} className="space-y-2">
+                              <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
+                                 <span className="text-slate-400">{metric.label}</span>
+                                 <span className="text-[var(--text-main)]">{metric.val}%</span>
+                              </div>
+                              <div className="h-1.5 bg-[var(--bg-main)] rounded-full overflow-hidden">
+                                 <motion.div 
+                                   initial={{ width: 0 }}
+                                   animate={{ width: `${metric.val}%` }}
+                                   className={`h-full ${metric.color}`}
+                                 />
+                              </div>
+                           </div>
+                         ))}
+                      </div>
+                   </div>
+                </div>
+             </div>
+           )}
         </div>
 
         {/* Global Registry Sidebar */}
         <div className="lg:col-span-4 space-y-8">
-           {/* Shift Context Card */}
-           <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group">
+           {/* Shift/Study Context Card */}
+           <div className={`bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group`}>
               <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:rotate-12 transition-transform duration-700">
-                 <Zap size={140} />
+                 {isStudent ? <GraduationCap size={140} /> : <Zap size={140} />}
               </div>
               <div className="space-y-6 relative z-10">
                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.3em]">Current Assignment</p>
-                    <h4 className="text-2xl font-black tracking-tight">Unit Command</h4>
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.3em]">{isStudent ? 'Current Objective' : 'Current Assignment'}</p>
+                    <h4 className="text-2xl font-black tracking-tight">{isStudent ? 'Clinical Intern' : 'Unit Command'}</h4>
                  </div>
                  <p className="text-xs text-slate-400 font-medium leading-relaxed">
-                    Account: {JSON.parse(localStorage.getItem('user_data') || '{}').name}<br/>
-                    Role: {JSON.parse(localStorage.getItem('user_data') || '{}').role}
+                    Account: {user.name}<br/>
+                    Role: {user.role}
                  </p>
                  <div className="pt-2">
                     <button className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
-                       End Active Shift
+                       {isStudent ? 'Update Study Goal' : 'End Active Shift'}
                     </button>
                  </div>
               </div>
            </div>
 
-           <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                 <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
-                 <Clock size={16} className="text-slate-300" />
-              </div>
-              <div className="space-y-5">
-                 {recentLogs.slice(0, 4).map((log, i) => (
-                   <div key={i} className="flex items-start space-x-3">
-                      <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
-                         {log.action[0].toUpperCase()}
-                      </div>
-                      <div className="flex-1 space-y-0.5">
-                         <p className="text-xs font-bold capitalize">{log.action.replace('_', ' ')}</p>
-                         <p className="text-[10px] text-slate-400 font-medium">By {log.user?.name || 'System'}</p>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-              <button className="w-full mt-8 py-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-all">
-                 Full Audit Trail
-              </button>
-           </div>
+           {isStudent ? (
+             <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
+                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-6">Recent Assessments</h4>
+                <div className="space-y-5">
+                   {[
+                     { name: 'APGAR Evaluation', score: '90%', status: 'Passed' },
+                     { name: 'CPAP Initial.', score: '100%', status: 'Passed' },
+                     { name: 'Sepsis Screening', score: '75%', status: 'Retake' },
+                   ].map((test, i) => (
+                     <div key={i} className="flex items-center justify-between p-4 bg-[var(--bg-main)] rounded-2xl">
+                        <div className="space-y-1">
+                           <p className="text-xs font-bold">{test.name}</p>
+                           <p className={`text-[9px] font-black uppercase tracking-widest ${test.status === 'Passed' ? 'text-emerald-500' : 'text-rose-500'}`}>{test.status}</p>
+                        </div>
+                        <p className="text-sm font-black">{test.score}</p>
+                     </div>
+                   ))}
+                </div>
+                <Link to="/academy" className="w-full mt-8 py-4 flex items-center justify-center space-x-2 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-all">
+                   <span>View All Modules</span>
+                   <ChevronRight size={12} />
+                </Link>
+             </div>
+           ) : (
+             <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
+                <div className="flex justify-between items-center mb-6">
+                   <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
+                   <Clock size={16} className="text-slate-300" />
+                </div>
+                <div className="space-y-5">
+                   {recentLogs.slice(0, 4).map((log, i) => (
+                     <div key={i} className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
+                           {log.action[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 space-y-0.5">
+                           <p className="text-xs font-bold capitalize">{log.action.replace('_', ' ')}</p>
+                           <p className="text-[10px] text-slate-400 font-medium">By {log.user?.name || 'System'}</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+                <button className="w-full mt-8 py-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-all">
+                   Full Audit Trail
+                </button>
+             </div>
+           )}
         </div>
       </div>
     </div>

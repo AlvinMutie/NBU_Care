@@ -26,7 +26,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/vitals/history/{neonateId}', [VitalController::class, 'history']);
 
     Route::get('/learning/flashcards', [LearningController::class, 'flashcards']);
+    Route::post('/learning/flashcards', [LearningController::class, 'storeFlashcard']);
+    Route::patch('/learning/flashcards/{flashcard}', [LearningController::class, 'updateFlashcard']);
+    Route::delete('/learning/flashcards/{flashcard}', [LearningController::class, 'destroyFlashcard']);
+
     Route::get('/learning/scenarios', [LearningController::class, 'scenarios']);
+    Route::post('/learning/scenarios', [LearningController::class, 'storeScenario']);
+    Route::patch('/learning/scenarios/{scenario}', [LearningController::class, 'updateScenario']);
+    Route::delete('/learning/scenarios/{scenario}', [LearningController::class, 'destroyScenario']);
 
     Route::get('/logs/recent', [AuditController::class, 'recent']);
     Route::get('/logs', [AuditController::class, 'index']);
