@@ -3,7 +3,7 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Calculator, ClipboardList, 
   BookOpen, Settings as SettingsIcon, Menu, LogOut, ShieldAlert, 
-  Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays
+  Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays, Users2
 } from 'lucide-react';
 import AIChatbot from './AIChatbot';
 
@@ -11,7 +11,20 @@ const Layout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+  
+  // Robust user data retrieval
+  const getUserData = () => {
+    const stored = localStorage.getItem('user_data');
+    if (stored) return JSON.parse(stored);
+    
+    // Fallback for legacy sessions
+    return {
+      name: localStorage.getItem('user_name') || 'Clinician',
+      role: localStorage.getItem('user_role') || 'Staff'
+    };
+  };
+
+  const user = getUserData();
 
   const navItems = [
     { name: 'Command Center', icon: LayoutDashboard, path: '/dashboard' },
@@ -25,7 +38,7 @@ const Layout: React.FC = () => {
   const adminItems = [
     { name: 'Staff Management', icon: UserCheck, path: '/staff' },
     { name: 'System Audit', icon: ShieldAlert, path: '/audit' },
-    { name: 'Institutional Vetting', icon: Users, path: '/verify' },
+    { name: 'Institutional Vetting', icon: Users2, path: '/verify' },
     { name: 'Workforce Rota', icon: CalendarDays, path: '/rota' },
   ];
 

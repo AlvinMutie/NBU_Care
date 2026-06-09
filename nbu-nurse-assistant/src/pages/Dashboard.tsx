@@ -23,8 +23,8 @@ const Dashboard: React.FC = () => {
   const [alerts, setAlerts] = useState<any[]>([]);
   const [recentLogs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
   const user = JSON.parse(localStorage.getItem('user_data') || '{}');
-
   const isStudent = user.role === 'Student';
 
   useEffect(() => {
@@ -66,29 +66,24 @@ const Dashboard: React.FC = () => {
      );
   }
 
-  // Sample data for the new infographic
   const unitActivityData = [
-    { time: '08:00', load: 45 },
-    { time: '10:00', load: 52 },
-    { time: '12:00', load: 48 },
-    { time: '14:00', load: 61 },
-    { time: '16:00', load: 55 },
-    { time: '18:00', load: 67 },
+    { time: '08:00', load: 45 }, { time: '10:00', load: 52 },
+    { time: '12:00', load: 48 }, { time: '14:00', load: 61 },
+    { time: '16:00', load: 55 }, { time: '18:00', load: 67 },
     { time: '20:00', load: 58 },
   ];
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
-      {/* Structural Page Header */}
+      {/* Header with New Ward Load Infographic */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">{isStudent ? 'Learning Command' : 'Command Center'}</h2>
-          <p className="text-slate-500 font-medium">
+          <p className="text-slate-500 font-medium tracking-tight">
              {isStudent ? 'Your clinical competency and study progress overview.' : 'Real-time clinical orchestration and ward monitoring.'}
           </p>
         </div>
         
-        {/* New Unit Health Infographic (Replacing System Status) */}
         <div className="flex items-center gap-6 bg-[var(--card-bg)] border border-[var(--border-main)] p-3 px-6 rounded-3xl shadow-sm">
            <div className="flex flex-col">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Ward Load Index</p>
@@ -111,7 +106,6 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Core Operational Statistics */}
         <div className="lg:col-span-8 space-y-8">
            <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
               {[
@@ -139,7 +133,6 @@ const Dashboard: React.FC = () => {
            </div>
 
            {isStudent ? (
-             /* Student Specific Learning Aspect */
              <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden group shadow-2xl">
                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
                    <BookOpen size={300} />
@@ -162,17 +155,12 @@ const Dashboard: React.FC = () => {
                 </div>
              </div>
            ) : (
-             /* Active Ward Alerts - Connected to real backend */
              <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] p-8 shadow-sm overflow-hidden">
                 <div className="space-y-6">
-                   <div className="space-y-1">
-                      <div className="flex items-center space-x-3 text-rose-600">
-                         <AlertCircle size={20} />
-                         <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
-                      </div>
-                      <p className="text-xs text-slate-500 font-medium">Real-time flags from current admissions.</p>
+                   <div className="flex items-center space-x-3 text-rose-600">
+                      <AlertCircle size={20} />
+                      <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
                    </div>
-                   
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       {alerts.length === 0 ? (
                         <div className="col-span-full p-8 text-center bg-[var(--bg-main)] rounded-2xl border border-dashed border-[var(--border-main)]">
@@ -205,9 +193,7 @@ const Dashboard: React.FC = () => {
            )}
         </div>
 
-        {/* Global Registry Sidebar */}
         <div className="lg:col-span-4 space-y-8">
-           {/* Shift/Study Context Card */}
            <div className={`bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group`}>
               <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:rotate-12 transition-transform duration-700">
                  {isStudent ? <GraduationCap size={140} /> : <Zap size={140} />}
