@@ -412,10 +412,6 @@ const LandingPage: React.FC = () => {
                     <p className="text-xs text-slate-500 font-medium">AES-256 Forensic Audit Logging</p>
                   </div>
                 </li>
-                <li className="flex items-center space-x-4 pt-4">
-                  <MapPin className="text-slate-400" size={16} />
-                  <span className="text-sm font-bold text-slate-500">Westlands HQ, Nairobi, KE</span>
-                </li>
               </ul>
             </div>
           </div>

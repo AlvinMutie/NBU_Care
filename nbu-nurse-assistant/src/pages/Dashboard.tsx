@@ -10,20 +10,21 @@ import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart as RePieChart, Pie, Cell
 } from 'recharts';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const Dashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     total_staff: 0,
     live_cases: 0,
-    doses_given: 0,
-    safety_score: 98
+    doses_given: 0
   });
   const [analytics, setAnalytics] = useState({
     distribution: [],
     staffing: []
   });
+  const [alerts, setAlerts] = useState<any[]>([]);
   const [recentLogs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem('user_data') || '{}');
@@ -38,14 +39,16 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsRes, analyticsRes, logsRes] = await Promise.all([
+      const [statsRes, analyticsRes, logsRes, alertsRes] = await Promise.all([
         api.get('/admin/stats'),
         api.get('/admin/analytics'),
-        api.get('/logs/recent')
+        api.get('/logs/recent'),
+        api.get('/admin/alerts')
       ]);
       setStats(statsRes.data.data);
       setAnalytics(analyticsRes.data.data);
       setLogs(logsRes.data.data);
+      setAlerts(alertsRes.data.data);
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
     } finally {
@@ -88,11 +91,10 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Core Operational Statistics */}
         <div className="lg:col-span-8 space-y-8">
-           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
               {[
                 { label: isStudent ? 'Academy Modules' : 'Live Cases', value: isStudent ? '24' : stats.live_cases, icon: isStudent ? GraduationCap : Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                 { label: isStudent ? 'Study Hours' : 'Active Staff', value: isStudent ? '12.5' : stats.total_staff, icon: isStudent ? Clock : Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-                { label: 'Safety Score', value: `${stats.safety_score}%`, icon: ShieldCheck, color: 'text-amber-600', bg: 'bg-amber-50' },
                 { label: isStudent ? 'Tests Taken' : 'Meds Audit', value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
               ].map((stat, idx) => (
                 <motion.div 
@@ -138,7 +140,7 @@ const Dashboard: React.FC = () => {
                 </div>
              </div>
            ) : (
-             /* Active Ward Alerts - Redesigned to fit better */
+             /* Active Ward Alerts - Connected to real backend */
              <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] p-8 shadow-sm overflow-hidden">
                 <div className="flex flex-col md:flex-row justify-between gap-10">
                    <div className="flex-1 space-y-6">
@@ -147,26 +149,33 @@ const Dashboard: React.FC = () => {
                             <AlertCircle size={20} />
                             <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
                          </div>
-                         <p className="text-xs text-slate-500 font-medium">Real-time flags requiring clinical validation.</p>
+                         <p className="text-xs text-slate-500 font-medium">Real-time flags from current admissions.</p>
                       </div>
                       
                       <div className="space-y-3">
-                         {[
-                           { baby: 'Baby Liam', id: 'N-001', alert: 'Tachycardia Trend', time: '5m ago', type: 'Critical' },
-                           { baby: 'Baby Chloe', id: 'N-002', alert: 'Dextrose Dilution', time: '12m ago', type: 'Serious' },
-                           { baby: 'Baby Ethan', id: 'N-005', alert: 'Low SpO2 Alert', time: '15m ago', type: 'Critical' },
-                         ].map((alert, i) => (
-                           <div key={i} className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between hover:border-rose-200 transition-all">
+                         {alerts.length === 0 ? (
+                           <div className="p-8 text-center bg-[var(--bg-main)] rounded-2xl border border-dashed border-[var(--border-main)]">
+                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No Active Critical Flags</p>
+                           </div>
+                         ) : alerts.map((alert, i) => (
+                           <div 
+                            key={i} 
+                            onClick={() => navigate(`/neonates/${alert.id}`)}
+                            className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between hover:border-rose-200 transition-all cursor-pointer group/alert"
+                           >
                               <div className="flex items-center space-x-4">
                                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] ${alert.type === 'Critical' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
-                                    {alert.baby.split(' ')[1][0]}
+                                    {alert.baby.split(' ')[0][0]}
                                  </div>
                                  <div>
-                                    <p className="text-xs font-bold">{alert.baby}</p>
+                                    <p className="text-xs font-bold group-hover/alert:text-emerald-600 transition-colors">{alert.baby}</p>
                                     <p className="text-[10px] text-slate-500 font-medium">{alert.alert}</p>
                                  </div>
                               </div>
-                              <button className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:bg-emerald-50 px-3 py-1.5 rounded-lg transition-all">Resolve</button>
+                              <div className="text-right">
+                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{alert.time}</p>
+                                 <ChevronRight size={14} className="text-slate-300 group-hover/alert:translate-x-1 transition-all ml-auto mt-1" />
+                              </div>
                            </div>
                          ))}
                       </div>
@@ -227,7 +236,7 @@ const Dashboard: React.FC = () => {
                     Role: {user.role}
                  </p>
                  <div className="pt-2">
-                    <button className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    <button className="px-6 py-2.5 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
                        {isStudent ? 'Update Study Goal' : 'End Active Shift'}
                     </button>
                  </div>

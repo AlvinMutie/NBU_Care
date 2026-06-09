@@ -19,7 +19,8 @@ This document provides a comprehensive audit of the system's current functionali
 - **Role-Based Views:**
   - **Clinical Roles:** Real-time ward monitoring, active alerts, and institutional health metrics.
   - **Student Role:** Personalized "Learning Command" focused on study goals, assessment scores, and recommended modules.
-- **Ward Alert Engine:** Real-time flags for critical trends (Tachycardia, Low SpO2).
+- **Ward Alert Engine:** Real-time flags from current admissions (Critical/Serious). Alerts are interactive and link directly to patient records.
+- **Data Integrity:** Hardcoded metrics (like safety score) have been removed in favor of direct database-driven stats.
 
 ### 4. Workforce Management
 - **Shift Assignment:** API-driven allocation of personnel to specific shifts (Morning/Afternoon/Night).
@@ -27,8 +28,7 @@ This document provides a comprehensive audit of the system's current functionali
 
 ### 5. UI/UX & Layout
 - **Scrollbar Conflict:** Resolved nested scrollbars by consolidating overflow management into the main viewport with custom high-fidelity styling.
-- **Header Dynamics:** Semi-transparent sticky header with `backdrop-blur-xl` for seamless content transitions.
-- **Mobile Responsive:** Optimized for both tablet-based bedside use and desktop station monitoring.
+- **Footer Cleanup:** Removed generic location data and "Connect" section; replaced with standardized "Governance & Compliance" module.
 
 ---
 

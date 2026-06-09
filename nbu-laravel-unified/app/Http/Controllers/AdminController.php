@@ -18,8 +18,37 @@ class AdminController extends Controller
                 'total_staff' => User::count(),
                 'live_cases' => Neonate::where('status', '!=', 'Discharged')->count(),
                 'doses_given' => AuditLog::where('action', 'calculation')->count(),
-                'safety_score' => 98 // Placeholder for logic
             ]
+        ]);
+    }
+
+    public function alerts()
+    {
+        $critical = Neonate::where('status', 'Critical')->get()->map(function($n) {
+            return [
+                'id' => $n->id,
+                'baby' => $n->name,
+                'hospital_id' => $n->hospital_id,
+                'alert' => 'Acuity Status: Critical',
+                'time' => $n->updated_at->diffForHumans(),
+                'type' => 'Critical'
+            ];
+        });
+
+        $serious = Neonate::where('status', 'Serious')->get()->map(function($n) {
+            return [
+                'id' => $n->id,
+                'baby' => $n->name,
+                'hospital_id' => $n->hospital_id,
+                'alert' => 'Acuity Status: Serious',
+                'time' => $n->updated_at->diffForHumans(),
+                'type' => 'Serious'
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => $critical->concat($serious)
         ]);
     }
 
