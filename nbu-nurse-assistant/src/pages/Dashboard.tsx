@@ -6,6 +6,10 @@ import {
   GraduationCap, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, PieChart as RePieChart, Pie, Cell
+} from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -62,6 +66,17 @@ const Dashboard: React.FC = () => {
      );
   }
 
+  // Sample data for the new infographic
+  const unitActivityData = [
+    { time: '08:00', load: 45 },
+    { time: '10:00', load: 52 },
+    { time: '12:00', load: 48 },
+    { time: '14:00', load: 61 },
+    { time: '16:00', load: 55 },
+    { time: '18:00', load: 67 },
+    { time: '20:00', load: 58 },
+  ];
+
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
       {/* Structural Page Header */}
@@ -72,28 +87,37 @@ const Dashboard: React.FC = () => {
              {isStudent ? 'Your clinical competency and study progress overview.' : 'Real-time clinical orchestration and ward monitoring.'}
           </p>
         </div>
-        <div className="flex items-center gap-4 bg-[var(--card-bg)] border border-[var(--border-main)] p-2 px-6 rounded-2xl shadow-sm">
-           <button onClick={fetchDashboardData} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
-              <RefreshCcw size={16} className={loading ? 'animate-spin' : ''} />
-           </button>
-           <div className="w-px h-8 bg-[var(--border-main)]" />
-           <div className="flex flex-col items-end">
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">System Status</p>
-              <p className="text-xs font-bold text-emerald-600 mt-1">Operational</p>
+        
+        {/* New Unit Health Infographic (Replacing System Status) */}
+        <div className="flex items-center gap-6 bg-[var(--card-bg)] border border-[var(--border-main)] p-3 px-6 rounded-3xl shadow-sm">
+           <div className="flex flex-col">
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Ward Load Index</p>
+              <div className="flex items-center space-x-3">
+                 <span className="text-xl font-black text-[var(--text-main)]">67.4%</span>
+                 <div className="w-24 h-8">
+                    <ResponsiveContainer width="100%" height="100%">
+                       <AreaChart data={unitActivityData}>
+                          <Area type="monotone" dataKey="load" stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
+                       </AreaChart>
+                    </ResponsiveContainer>
+                 </div>
+              </div>
            </div>
-           <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_#10b981]" />
+           <div className="w-px h-10 bg-[var(--border-main)]" />
+           <button onClick={fetchDashboardData} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+              <RefreshCcw size={18} className={loading ? 'animate-spin' : ''} />
+           </button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Core Operational Statistics */}
         <div className="lg:col-span-8 space-y-8">
-           <div className={`grid grid-cols-1 sm:grid-cols-2 ${isStudent ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
+           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
               {[
                 { label: isStudent ? 'Academy Modules' : 'Live Cases', value: isStudent ? '24' : stats.live_cases, icon: isStudent ? GraduationCap : Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                 { label: isStudent ? 'Study Hours' : 'Active Staff', value: isStudent ? '12.5' : stats.total_staff, icon: isStudent ? Clock : Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-                ...(isStudent ? [{ label: 'Tests Taken', value: '8', icon: ClipboardCheck, color: 'text-rose-600', bg: 'bg-rose-50' }] : []),
-                { label: isStudent ? 'Safety Rank' : 'Meds Audit', value: isStudent ? 'Elite' : stats.doses_given, icon: isStudent ? ShieldCheck : Beaker, color: 'text-amber-600', bg: 'bg-amber-50' },
+                { label: isStudent ? 'Tests Taken' : 'Meds Audit', value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
               ].map((stat, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -200,7 +224,7 @@ const Dashboard: React.FC = () => {
                  <div className="pt-2">
                     <button 
                       onClick={handleEndShift}
-                      className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                      className="px-6 py-2.5 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
                     >
                        {isStudent ? 'Update Study Goal' : 'End Active Shift'}
                     </button>

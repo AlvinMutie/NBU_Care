@@ -12,17 +12,16 @@ class ShiftController extends Controller
     {
         $request->validate([
             'user_id' => 'required|exists:users,id',
-            'shift_type' => 'required|string',
+            'shift' => 'required|string',
             'date' => 'required|date',
-            'ward' => 'required|string',
+            'role_assigned' => 'nullable|string',
         ]);
 
         $rota = DutyRota::create([
             'user_id' => $request->user_id,
-            'shift_type' => $request->shift_type,
+            'shift' => $request->shift,
             'date' => $request->date,
-            'ward' => $request->ward,
-            'status' => 'Scheduled',
+            'role_assigned' => $request->role_assigned ?? 'Clinician',
         ]);
 
         return response()->json([

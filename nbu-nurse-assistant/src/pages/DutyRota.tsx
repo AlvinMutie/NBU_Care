@@ -18,9 +18,9 @@ const DutyRota: React.FC = () => {
 
   const [newShift, setNewShift] = useState({
     user_id: '',
-    shift_type: 'Morning',
+    shift: 'Morning',
     date: new Date().toISOString().split('T')[0],
-    ward: 'NBU Main',
+    role_assigned: 'Clinician',
   });
 
   useEffect(() => {

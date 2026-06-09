@@ -102,7 +102,7 @@ const Layout: React.FC = () => {
               className="w-full flex items-center space-x-4 px-4 py-4 rounded-2xl text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 transition-all font-bold text-sm"
             >
               <LogOut size={18} />
-              <span>Terminate Session</span>
+              <span>Log Out</span>
             </button>
           </div>
         </div>

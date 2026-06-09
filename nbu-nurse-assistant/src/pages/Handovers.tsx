@@ -9,6 +9,7 @@ import api from '../services/api';
 
 const Handovers: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [detailHandover, setDetailHandover] = useState<any>(null);
   const [activeShiftFilter, setActiveShiftFilter] = useState('All');
   const [handovers, setHandovers] = useState<any[]>([]);
   const [neonates, setNeonates] = useState<any[]>([]);
@@ -154,11 +155,11 @@ const Handovers: React.FC = () => {
                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Handover Reports Found</p>
                 </div>
              ) : handovers.filter(i => activeShiftFilter === 'All' || i.shift_type === activeShiftFilter).map(item => (
-               <div key={item.id} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] flex items-center justify-between group hover:border-emerald-200 hover:shadow-md transition-all">
+               <div key={item.id} onClick={() => setDetailHandover(item)} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] flex items-center justify-between group hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer">
                   <div className="flex items-center space-x-6">
                     <div className="w-16 h-16 rounded-[1.5rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex flex-col items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/20 group-hover:border-emerald-100 dark:group-hover:border-emerald-800 transition-all duration-500">
                        <span className="text-[9px] font-black text-slate-400 group-hover:text-emerald-500 uppercase tracking-widest">{item.shift_type}</span>
-                       <span className="text-lg font-black group-hover:text-emerald-700">{new Date(item.created_at).getHours()}:{new Date(item.created_at).getMinutes()}</span>
+                       <span className="text-lg font-black group-hover:text-emerald-700">{new Date(item.created_at).getHours()}:{new Date(item.created_at).getMinutes().toString().padStart(2, '0')}</span>
                     </div>
                     <div>
                       <div className="text-base font-bold text-[var(--text-main)]">
@@ -202,6 +203,61 @@ const Handovers: React.FC = () => {
            </div>
         </div>
       </div>
+
+      {/* Detail View Modal */}
+      <AnimatePresence>
+         {detailHandover && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-3xl p-10 shadow-2xl space-y-8 border border-[var(--border-main)]">
+                  <div className="flex justify-between items-center border-b border-[var(--border-main)] pb-6">
+                     <div>
+                        <h3 className="text-2xl font-bold tracking-tight">Handover Report Details</h3>
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Ref ID: #{detailHandover.id} • {new Date(detailHandover.created_at).toLocaleString()}</p>
+                     </div>
+                     <button onClick={() => setDetailHandover(null)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
+                  </div>
+                  
+                  <div className="space-y-8">
+                     <div className="grid grid-cols-2 gap-8">
+                        <div>
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Clinician</p>
+                           <p className="text-sm font-bold">{detailHandover.nurse?.name}</p>
+                        </div>
+                        <div>
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Shift</p>
+                           <p className="text-sm font-bold">{detailHandover.shift_type}</p>
+                        </div>
+                     </div>
+
+                     <div className="p-6 bg-[var(--bg-main)] rounded-2xl space-y-4">
+                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Clinical Status</p>
+                        <p className="text-sm font-medium leading-relaxed italic">"{detailHandover.clinical_status}"</p>
+                     </div>
+
+                     <div className="space-y-2">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Treatment Plan & Orders</p>
+                        <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap">{detailHandover.treatment_plan}</p>
+                     </div>
+
+                     <div className="grid grid-cols-3 gap-4">
+                        {[
+                           { label: 'HR', val: detailHandover.vitals_snapshot?.hr, unit: 'bpm' },
+                           { label: 'SpO2', val: detailHandover.vitals_snapshot?.spo2, unit: '%' },
+                           { label: 'Temp', val: detailHandover.vitals_snapshot?.temp, unit: '°C' },
+                        ].map(v => (
+                           <div key={v.label} className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-xl text-center">
+                              <p className="text-[9px] font-black text-slate-400 uppercase">{v.label}</p>
+                              <p className="text-base font-black">{v.val}{v.unit}</p>
+                           </div>
+                        ))}
+                     </div>
+                  </div>
+                  
+                  <button onClick={() => setDetailHandover(null)} className="w-full py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold uppercase text-xs tracking-widest hover:bg-black transition-all mt-4">Close Report</button>
+               </motion.div>
+            </div>
+         )}
+      </AnimatePresence>
 
       {/* Handover Modal */}
       <AnimatePresence>
