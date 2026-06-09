@@ -3,7 +3,7 @@ import {
   GraduationCap, PlayCircle, Search, 
   ShieldCheck, ChevronRight, FileText, 
   Activity, CheckCircle2, Bookmark, Clock, ArrowRight,
-  Info, Zap, Droplets, Thermometer, Plus, Edit2, Trash2, X, Save
+  Info, Zap, Droplets, Thermometer, Plus, Edit2, Trash2, X, Save, ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -15,6 +15,7 @@ const Academy: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingItem, setEditingItem] = useState<any>(null);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [user] = useState<any>(JSON.parse(localStorage.getItem('user_data') || '{}'));
   
   // Student Test State
@@ -27,7 +28,7 @@ const Academy: React.FC = () => {
   const isStudent = user.role === 'Student';
 
   const [formData, setFormData] = useState({
-    type: 'flashcard', // flashcard or scenario
+    type: 'flashcard',
     title: '',
     category: 'Clinical',
     content: '',
@@ -111,7 +112,7 @@ const Academy: React.FC = () => {
   };
 
   const submitTest = () => {
-    const isCorrect = testAnswer.toLowerCase().includes(activeTest.solution?.toLowerCase() || activeTest.content?.toLowerCase().split('.')[0]);
+    const isCorrect = testAnswer.toLowerCase().includes(activeTest.solution?.toLowerCase().split(' ')[0] || activeTest.content?.toLowerCase().split('.')[0]);
     setTestResult({
       status: isCorrect ? 'Mastered' : 'Requires Review',
       feedback: isCorrect ? 'Protocol alignment confirmed.' : 'Inaccurate response detected. Review clinical standards.'
@@ -198,7 +199,8 @@ const Academy: React.FC = () => {
             key={item.type + item.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm hover:border-emerald-200 transition-all group flex flex-col justify-between"
+            onClick={() => setExpandedId(expandedId === (item.type + item.id) ? null : (item.type + item.id))}
+            className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm hover:border-emerald-200 transition-all group flex flex-col cursor-pointer"
           >
              <div className="space-y-6">
                 <div className="flex justify-between items-start">
@@ -208,7 +210,7 @@ const Academy: React.FC = () => {
                    <div className="flex flex-col items-end gap-2">
                       <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">{item.level}</span>
                       {isAdmin && (
-                        <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                            <button onClick={() => { setEditingItem(item); setFormData({...item, type: item.type}); setShowAddModal(true); }} className="p-1.5 text-slate-400 hover:text-blue-600 transition-colors"><Edit2 size={14} /></button>
                            <button onClick={() => handleDelete(item)} className="p-1.5 text-slate-400 hover:text-rose-600 transition-colors"><Trash2 size={14} /></button>
                         </div>
@@ -217,30 +219,54 @@ const Academy: React.FC = () => {
                 </div>
                 <div>
                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-1">{item.category}</p>
-                   <h3 className="text-xl font-bold tracking-tight leading-tight">{item.title}</h3>
+                   <div className="flex items-center justify-between">
+                      <h3 className="text-xl font-bold tracking-tight leading-tight">{item.title}</h3>
+                      <ChevronDown size={18} className={`text-slate-300 transition-transform duration-500 ${expandedId === (item.type + item.id) ? 'rotate-180' : ''}`} />
+                   </div>
                 </div>
-                {item.type === 'flashcard' ? (
-                   <p className="text-sm text-slate-500 leading-relaxed line-clamp-3">{item.content}</p>
-                ) : (
-                   <p className="text-sm text-slate-500 leading-relaxed line-clamp-3">{item.description}</p>
-                )}
+
+                <AnimatePresence>
+                   {expandedId === (item.type + item.id) && (
+                      <motion.div 
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                         <div className="pt-4 border-t border-[var(--border-main)] mt-4">
+                            {item.type === 'flashcard' ? (
+                               <p className="text-sm text-slate-500 leading-relaxed">{item.content}</p>
+                            ) : (
+                               <div className="space-y-4">
+                                  <p className="text-sm text-slate-500 leading-relaxed">{item.description}</p>
+                                  <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)]">
+                                     <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Simulated Problem</p>
+                                     <p className="text-xs font-bold text-[var(--text-main)] italic">"{item.problem}"</p>
+                                  </div>
+                               </div>
+                            )}
+                         </div>
+                      </motion.div>
+                   )}
+                </AnimatePresence>
              </div>
-             <div className="mt-8 pt-6 border-t border-[var(--border-main)] flex items-center justify-between">
+             
+             <div className="mt-auto pt-6 border-t border-[var(--border-main)] flex items-center justify-between mt-8">
                 <div className="flex items-center space-x-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest">
                    <Clock size={12} />
                    <span>{item.type === 'flashcard' ? '2 Min Read' : '10 Min Sim'}</span>
                 </div>
                 {isStudent ? (
                   <button 
-                    onClick={() => startTest(item)}
+                    onClick={(e) => { e.stopPropagation(); startTest(item); }}
                     className="bg-slate-900 dark:bg-emerald-600 text-white px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-md shadow-slate-200 dark:shadow-none"
                   >
                      Take Test
                   </button>
                 ) : (
-                  <button className="text-slate-300 group-hover:text-emerald-600 transition-all">
-                     <ChevronRight size={20} />
-                  </button>
+                  <div className="text-slate-300 group-hover:text-emerald-600 transition-all">
+                     <ArrowRight size={18} />
+                  </div>
                 )}
              </div>
           </motion.div>

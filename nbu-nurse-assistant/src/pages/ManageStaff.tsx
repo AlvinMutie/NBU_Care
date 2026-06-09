@@ -2,14 +2,18 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users2, Search, Filter, Mail, Phone, 
   ShieldCheck, MoreVertical, ShieldAlert,
-  ArrowRight, CheckCircle2, UserCheck
+  ArrowRight, CheckCircle2, UserCheck, Key, X, Save
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 
 const ManageStaff: React.FC = () => {
   const [staff, setStaff] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [resetModal, setResetModal] = useState<any>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [isResetting, setIsResetting] = useState(false);
 
   useEffect(() => {
     fetchStaff();
@@ -27,13 +31,29 @@ const ManageStaff: React.FC = () => {
     }
   };
 
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsResetting(true);
+    try {
+      await api.post(`/admin/users/${resetModal.id}/reset-password`, { password: newPassword });
+      alert(`Access credentials updated for ${resetModal.name}`);
+      setResetModal(null);
+      setNewPassword('');
+    } catch (err) {
+      console.error('Reset failed:', err);
+      alert('Failed to update credentials. Ensure policy alignment (min 8 chars).');
+    } finally {
+      setIsResetting(false);
+    }
+  };
+
   const filteredStaff = staff.filter(s => 
     s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     s.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.email.toLowerCase().includes(searchTerm.toLowerCase())
+    (s.staff_id && s.staff_id.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  if (loading) {
+  if (loading && staff.length === 0) {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center space-y-4 text-slate-400">
         <div className="w-10 h-10 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin" />
@@ -82,46 +102,54 @@ const ManageStaff: React.FC = () => {
       {/* Modern Directory Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {filteredStaff.map((person) => (
-          <div key={person.id} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden group hover:border-emerald-200 transition-all">
-             <div className="flex items-start justify-between relative z-10">
-                <div className="flex items-center space-x-5">
-                   <div className="w-16 h-16 rounded-[1.2rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-slate-400 font-black text-xl shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
-                      {person.name.split(' ').map((n: any) => n[0]).join('')}
-                   </div>
-                   <div>
-                      <h3 className="text-xl font-bold text-[var(--text-main)]">{person.name}</h3>
-                      <div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 mt-1">
-                         <ShieldCheck size={12} />
-                         <span>{person.status} Access</span>
+          <div key={person.id} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm relative overflow-hidden group hover:border-emerald-200 transition-all flex flex-col justify-between">
+             <div>
+                <div className="flex items-start justify-between relative z-10">
+                   <div className="flex items-center space-x-5">
+                      <div className="w-16 h-16 rounded-[1.2rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-slate-400 font-black text-xl shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
+                         {person.name.split(' ').map((n: any) => n[0]).join('')}
+                      </div>
+                      <div>
+                         <h3 className="text-xl font-bold text-[var(--text-main)]">{person.name}</h3>
+                         <div className="flex items-center space-x-2 text-[10px] font-black uppercase tracking-widest text-emerald-600 mt-1">
+                            <ShieldCheck size={12} />
+                            <span>{person.status} Access</span>
+                         </div>
                       </div>
                    </div>
+                   <button className="p-2 text-slate-300 hover:text-emerald-600 transition-colors">
+                      <MoreVertical size={20} />
+                   </button>
                 </div>
-                <button className="p-2 text-slate-300 hover:text-emerald-600 transition-colors">
-                   <MoreVertical size={20} />
-                </button>
-             </div>
 
-             <div className="mt-8 space-y-4 relative z-10">
-                <div className="p-4 bg-[var(--bg-main)] rounded-2xl space-y-3">
-                   <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Role Profile</span>
-                      <span className="text-xs font-bold text-[var(--text-main)]">{person.role}</span>
+                <div className="mt-8 space-y-4 relative z-10">
+                   <div className="p-4 bg-[var(--bg-main)] rounded-2xl space-y-3">
+                      <div className="flex justify-between items-center">
+                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Role Profile</span>
+                         <span className="text-xs font-bold text-[var(--text-main)]">{person.role}</span>
+                      </div>
+                      <div className="h-px bg-[var(--border-main)]" />
+                      <div className="flex justify-between items-center">
+                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Staff ID</span>
+                         <span className="text-xs font-black text-[var(--text-main)] font-mono">{person.staff_id || 'NEO-SYS-00'+person.id}</span>
+                      </div>
                    </div>
-                   <div className="h-px bg-[var(--border-main)]" />
-                   <div className="flex justify-between items-center">
-                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Staff ID</span>
-                      <span className="text-xs font-black text-[var(--text-main)] font-mono">{person.staff_id || 'NEO-SYS-00'+person.id}</span>
+                   
+                   <div className="flex items-center space-x-3 text-slate-400 font-medium text-xs truncate">
+                      <Mail size={14} className="shrink-0" />
+                      <span>{person.email}</span>
                    </div>
-                </div>
-                
-                <div className="flex items-center space-x-3 text-slate-400 font-medium text-xs truncate">
-                   <Mail size={14} className="shrink-0" />
-                   <span>{person.email}</span>
                 </div>
              </div>
 
              <div className="mt-8 pt-6 border-t border-[var(--border-main)] flex justify-between items-center relative z-10">
-                <button className="text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-emerald-600 transition-colors">View Audit Log</button>
+                <button 
+                  onClick={() => setResetModal(person)}
+                  className="flex items-center space-x-2 text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-rose-600 transition-colors"
+                >
+                   <Key size={14} />
+                   <span>Reset Password</span>
+                </button>
                 <div className="flex -space-x-2">
                    {[1, 2, 3].map(i => (
                      <div key={i} className="w-6 h-6 rounded-full border-2 border-[var(--card-bg)] bg-slate-100 flex items-center justify-center text-[8px] font-bold text-slate-400">P{i}</div>
@@ -131,6 +159,53 @@ const ManageStaff: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Password Reset Modal */}
+      <AnimatePresence>
+         {resetModal && (
+           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] w-full max-w-md p-10 shadow-2xl space-y-8"
+              >
+                 <div className="flex justify-between items-center">
+                    <div className="space-y-1">
+                       <h3 className="text-2xl font-bold tracking-tight">Credential Reset</h3>
+                       <p className="text-sm text-slate-500 font-medium">Re-issuing access for {resetModal.name}</p>
+                    </div>
+                    <button onClick={() => setResetModal(null)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
+                 </div>
+
+                 <form onSubmit={handleResetPassword} className="space-y-6">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">New Institutional Password</label>
+                       <div className="relative">
+                          <Key className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                          <input 
+                            type="password" 
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 pl-12 rounded-2xl text-sm font-bold outline-none focus:border-rose-500 transition-all"
+                            placeholder="Min 8 characters..."
+                            required
+                          />
+                       </div>
+                    </div>
+
+                    <button 
+                      type="submit" 
+                      disabled={isResetting || newPassword.length < 8}
+                      className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl flex items-center justify-center space-x-2 hover:bg-black transition-all disabled:opacity-50"
+                    >
+                       {isResetting ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <span>Authorize New Credentials</span>}
+                    </button>
+                 </form>
+              </motion.div>
+           </div>
+         )}
+      </AnimatePresence>
 
       <div className="pt-8 border-t border-[var(--border-main)] flex items-center justify-between">
          <div className="flex items-center space-x-3 text-slate-400">

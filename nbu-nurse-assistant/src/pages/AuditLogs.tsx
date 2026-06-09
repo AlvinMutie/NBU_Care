@@ -62,7 +62,7 @@ const AuditLogs: React.FC = () => {
          {[
            { label: 'Total Events', val: pagination?.total || '0', icon: History, color: 'text-slate-600', bg: 'bg-slate-50' },
            { label: 'Security Alerts', val: '00', icon: Lock, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-           { label: 'Dose Calculations', val: '156', icon: Terminal, color: 'text-blue-600', bg: 'bg-blue-50' },
+           { label: 'Calculations', val: '156', icon: Terminal, color: 'text-blue-600', bg: 'bg-blue-50' },
            { label: 'System Uptime', val: '100%', icon: ShieldCheck, color: 'text-emerald-600', bg: 'bg-emerald-50' },
          ].map(s => (
            <div key={s.label} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-3xl shadow-sm flex items-center space-x-4">
@@ -100,12 +100,16 @@ const AuditLogs: React.FC = () => {
                 <th className="px-10 py-5">Timestamp</th>
                 <th className="px-10 py-5">Clinician</th>
                 <th className="px-10 py-5">Event Signature</th>
-                <th className="px-10 py-5">Trace Details</th>
+                <th className="px-10 py-5">Trace Type</th>
                 <th className="px-10 py-5 text-right">Integrity</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border-main)]">
-              {logs.map((log) => (
+              {logs.length === 0 ? (
+                <tr>
+                   <td colSpan={5} className="p-20 text-center text-slate-400 font-bold uppercase tracking-widest text-sm">No forensic events captured in this cycle</td>
+                </tr>
+              ) : logs.map((log) => (
                 <tr key={log.id} className="hover:bg-[var(--bg-main)]/50 transition-colors group">
                   <td className="px-10 py-6 whitespace-nowrap">
                     <div className="text-xs font-black text-[var(--text-main)]/80 font-mono tracking-tighter">{new Date(log.created_at).toLocaleTimeString()}</div>
@@ -114,7 +118,7 @@ const AuditLogs: React.FC = () => {
                   <td className="px-10 py-6 whitespace-nowrap">
                     <div className="flex items-center space-x-3">
                        <div className="w-9 h-9 rounded-[0.8rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-[10px] font-black text-slate-500 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
-                          {log.user?.name?.split(' ').map((n: any) => n[0]).join('') || '??'}
+                          {log.user?.name?.split(' ').map((n: any) => n[0]).join('') || 'SY'}
                        </div>
                        <div>
                           <div className="text-sm font-bold text-[var(--text-main)] group-hover:text-emerald-700 transition-colors">{log.user?.name || 'System'}</div>
@@ -123,19 +127,19 @@ const AuditLogs: React.FC = () => {
                     </div>
                   </td>
                   <td className="px-10 py-6">
-                    <div className="inline-flex px-3 py-1 rounded-md bg-[var(--bg-main)] text-slate-600 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest border border-[var(--border-main)] group-hover:bg-[var(--card-bg)] transition-all">
+                    <div className="inline-flex px-3 py-1 rounded-md bg-emerald-50 dark:bg-emerald-900/10 text-emerald-700 dark:text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-800 transition-all">
                       {log.action}
                     </div>
                   </td>
                   <td className="px-10 py-6 max-w-xs">
-                    <p className="truncate text-xs font-bold text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors leading-relaxed">
-                       {log.detail}
+                    <p className="truncate text-xs font-bold text-slate-500 uppercase tracking-widest">
+                       {log.resource_type}
                     </p>
                   </td>
                   <td className="px-10 py-6 text-right">
                     <div className="flex items-center justify-end space-x-2 text-emerald-500 opacity-60 group-hover:opacity-100 transition-opacity">
                        <CheckCircle2 size={16} strokeWidth={3} />
-                       <span className="text-[10px] font-black uppercase tracking-[0.15em]">Forensically Signed</span>
+                       <span className="text-[10px] font-black uppercase tracking-[0.15em]">Signed</span>
                     </div>
                   </td>
                 </tr>
@@ -144,7 +148,7 @@ const AuditLogs: React.FC = () => {
           </table>
         </div>
         
-        {pagination && (
+        {pagination && pagination.last_page > 1 && (
           <div className="p-8 border-t border-[var(--border-main)] flex items-center justify-between bg-[var(--bg-main)]/30">
              <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Showing {logs.length} of {pagination.total} high-fidelity events</p>
              <div className="flex items-center space-x-2">

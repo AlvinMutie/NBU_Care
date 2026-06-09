@@ -3,17 +3,19 @@ import {
   ChevronLeft, ChevronRight, 
   Plus, Clock, 
   Phone, ArrowRight, CheckCircle2,
-  CalendarDays, Download, X, User as UserIcon
+  CalendarDays, Download, X, User as UserIcon, AlertCircle
 } from 'lucide-react';
 import api from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const DutyRota: React.FC = () => {
-  const [currentMonth] = useState('June 2026');
   const [shifts, setShifts] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAllocModal, setShowAllocModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [message, setMessage] = useState<{type: 'success'|'error', text: string} | null>(null);
+
   const [newShift, setNewShift] = useState({
     user_id: '',
     shift_type: 'Morning',
@@ -43,12 +45,24 @@ const DutyRota: React.FC = () => {
 
   const handleAssignShift = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsSubmitting(true);
+    setMessage(null);
     try {
-      await api.post('/shifts/assign', newShift);
-      setShowAllocModal(false);
-      fetchData();
-    } catch (err) {
+      await api.post('/shifts/assign', {
+        ...newShift,
+        user_id: parseInt(newShift.user_id)
+      });
+      setMessage({ type: 'success', text: 'Shift allocated and synchronized.' });
+      setTimeout(() => {
+        setShowAllocModal(false);
+        setMessage(null);
+        fetchData();
+      }, 1500);
+    } catch (err: any) {
       console.error('Shift assignment failed:', err);
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Protocol conflict. Allocation failed.' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -61,9 +75,8 @@ const DutyRota: React.FC = () => {
     );
   }
 
-  // Group shifts by date for display
   const groupedShifts = shifts.reduce((acc: any, shift: any) => {
-    const dateStr = new Date(shift.date).toLocaleDateString('en-US', { day: 'numeric', weekday: 'short' });
+    const dateStr = new Date(shift.date).toLocaleDateString('en-US', { day: 'numeric', weekday: 'short', month: 'short' });
     if (!acc[dateStr]) acc[dateStr] = [];
     acc[dateStr].push(shift);
     return acc;
@@ -78,10 +91,6 @@ const DutyRota: React.FC = () => {
           <p className="text-slate-500 font-medium">Manage clinical rotations, lead assignments, and unit coverage.</p>
         </div>
         <div className="flex items-center gap-3">
-           <button className="bg-[var(--bg-main)] border border-[var(--border-main)] text-slate-600 dark:text-slate-400 flex items-center space-x-2 px-6 py-2.5 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800 transition-all shadow-sm">
-              <Download size={14} />
-              <span>Export Schedule</span>
-           </button>
            <button 
             onClick={() => setShowAllocModal(true)}
             className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3 rounded-xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
@@ -102,19 +111,24 @@ const DutyRota: React.FC = () => {
                className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] w-full max-w-lg p-10 shadow-2xl space-y-8"
              >
                 <div className="flex justify-between items-center">
-                   <h3 className="text-2xl font-bold tracking-tight text-[var(--text-main)]">Shift Allocation</h3>
-                   <button onClick={() => setShowAllocModal(false)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl transition-all">
-                      <X size={20} />
-                   </button>
+                   <h3 className="text-2xl font-bold tracking-tight">Shift Allocation</h3>
+                   <button onClick={() => setShowAllocModal(false)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
                 </div>
+
+                {message && (
+                  <div className={`p-4 rounded-2xl flex items-center space-x-3 border ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+                    {message.type === 'success' ? <CheckCircle2 size={18} /> : <AlertCircle size={18} />}
+                    <p className="text-xs font-bold">{message.text}</p>
+                  </div>
+                )}
 
                 <form onSubmit={handleAssignShift} className="space-y-6">
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Personnel</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Select Personnel</label>
                       <select 
                         value={newShift.user_id}
                         onChange={(e) => setNewShift({...newShift, user_id: e.target.value})}
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold text-[var(--text-main)] outline-none focus:border-emerald-500 transition-all"
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                         required
                       >
                          <option value="">Choose Staff Member</option>
@@ -123,30 +137,30 @@ const DutyRota: React.FC = () => {
                    </div>
                    <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Type</label>
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Shift Type</label>
                          <select 
                            value={newShift.shift_type}
                            onChange={(e) => setNewShift({...newShift, shift_type: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold text-[var(--text-main)] outline-none focus:border-emerald-500 transition-all"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold outline-none"
                          >
-                            <option value="Morning">Morning (07:30 - 14:30)</option>
-                            <option value="Afternoon">Afternoon (14:30 - 20:30)</option>
-                            <option value="Night">Night (20:30 - 07:30)</option>
+                            <option value="Morning">Morning</option>
+                            <option value="Afternoon">Afternoon</option>
+                            <option value="Night">Night</option>
                          </select>
                       </div>
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Date</label>
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Date</label>
                          <input 
                            type="date"
                            value={newShift.date}
                            onChange={(e) => setNewShift({...newShift, date: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold text-[var(--text-main)] outline-none focus:border-emerald-500 transition-all"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold outline-none"
                            required
                          />
                       </div>
                    </div>
-                   <button type="submit" className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-emerald-100 dark:shadow-none hover:bg-emerald-700 transition-all">
-                      Authenticate Allocation
+                   <button type="submit" disabled={isSubmitting} className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl flex items-center justify-center space-x-2 hover:bg-black transition-all">
+                      {isSubmitting ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <span>Authenticate Allocation</span>}
                    </button>
                 </form>
              </motion.div>
@@ -165,12 +179,7 @@ const DutyRota: React.FC = () => {
                </div>
                <div className="grid grid-cols-7 gap-2">
                   {Array.from({ length: 30 }).map((_, i) => (
-                    <button 
-                      key={i} 
-                      className={`aspect-square flex items-center justify-center text-xs font-bold rounded-2xl transition-all duration-300 ${i + 1 === 7 ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-xl' : 'text-slate-400 hover:bg-[var(--bg-main)]'}`}
-                    >
-                      {i + 1}
-                    </button>
+                    <button key={i} className={`aspect-square flex items-center justify-center text-xs font-bold rounded-2xl transition-all duration-300 ${i + 1 === new Date().getDate() ? 'bg-slate-900 dark:bg-emerald-600 text-white shadow-xl' : 'text-slate-400 hover:bg-[var(--bg-main)]'}`}>{i + 1}</button>
                   ))}
                </div>
             </div>
@@ -180,18 +189,14 @@ const DutyRota: React.FC = () => {
          <div className="lg:col-span-8 space-y-10">
             {Object.keys(groupedShifts).length === 0 ? (
                <div className="bg-[var(--card-bg)] border border-[var(--border-main)] p-20 rounded-[3rem] text-center space-y-6">
-                  <div className="w-16 h-16 bg-[var(--bg-main)] rounded-2xl flex items-center justify-center mx-auto text-slate-300">
-                     <Clock size={32} />
-                  </div>
+                  <div className="w-16 h-16 bg-[var(--bg-main)] rounded-2xl flex items-center justify-center mx-auto text-slate-300"><Clock size={32} /></div>
                   <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">No Active Allocations Found</p>
                </div>
             ) : Object.entries(groupedShifts).map(([date, dayShifts]: any) => (
               <div key={date} className="space-y-6">
                  <div className="flex items-center space-x-4 px-4">
-                    <span className="text-2xl font-black text-[var(--text-main)] tracking-tighter">{date.split(',')[1]?.trim() || date}</span>
-                    <span className="text-sm font-bold text-slate-400 uppercase tracking-[0.2em]">{date.split(',')[0]}</span>
+                    <span className="text-2xl font-black text-[var(--text-main)] tracking-tighter">{date}</span>
                  </div>
-                 
                  <div className="grid grid-cols-1 gap-4">
                     {dayShifts.map((shift: any) => (
                       <div key={shift.id} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm flex items-center justify-between group hover:border-emerald-200 transition-all">
@@ -208,14 +213,9 @@ const DutyRota: React.FC = () => {
                                </div>
                             </div>
                          </div>
-                         <div className="flex items-center space-x-6">
-                            <div className="text-right hidden sm:block">
-                               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none">Security Hash</p>
-                               <p className="text-[10px] font-mono font-bold text-slate-300 mt-1">#{shift.id.toString().padStart(4, '0')}</p>
-                            </div>
-                            <button className="p-3 text-slate-300 hover:text-rose-600 transition-colors">
-                               <X size={18} />
-                            </button>
+                         <div className="text-right hidden sm:block">
+                            <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">ID: #{shift.id}</p>
+                            <p className="text-[10px] font-bold text-emerald-500 mt-1 uppercase tracking-widest">{shift.status}</p>
                          </div>
                       </div>
                     ))}

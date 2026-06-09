@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Beaker, CheckCircle2, ChevronRight, ChevronLeft, 
   AlertCircle, ShieldCheck, Pill, Search, User,
-  Clock, Info, FileText, Scale, RefreshCcw
+  Clock, Info, FileText, Scale, RefreshCcw, ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../services/api';
 
 const Calculators: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [selectedPatient, setSelectedPatient] = useState<any>(null);
   const [selectedDrug, setSelectedDrug] = useState<any>(null);
   const [dose, setDose] = useState('');
+  const [patients, setPatients] = useState<any[]>([]);
+  const [loadingPatients, setLoadingPatients] = useState(false);
 
   const steps = [
     { id: 1, name: 'Patient', short: 'Pat' },
@@ -20,16 +23,27 @@ const Calculators: React.FC = () => {
     { id: 5, name: 'Verify', short: 'Ver' },
   ];
 
-  const patients = [
-    { name: 'Baby Mary Jane', weight: '1.250kg', id: 'NBU-001', numericWeight: 1.250, age: '48h', ga: '32w' },
-    { name: 'Baby John Doe', weight: '2.100kg', id: 'NBU-002', numericWeight: 2.100, age: '12h', ga: '38w' },
-  ];
-
   const medications = [
     { name: 'Dopamine', concentration: '40mg/ml', unit: 'mcg/kg/min', defaultDose: 10 },
     { name: 'Gentamicin', concentration: '40mg/2ml', unit: 'mg/kg', defaultDose: 5 },
     { name: 'Morphine', concentration: '10mg/ml', unit: 'mcg/kg/hr', defaultDose: 10 },
   ];
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  const fetchPatients = async () => {
+    setLoadingPatients(true);
+    try {
+      const response = await api.get('/neonates');
+      setPatients(response.data.data);
+    } catch (err) {
+      console.error('Failed to fetch patients:', err);
+    } finally {
+      setLoadingPatients(false);
+    }
+  };
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
@@ -92,41 +106,56 @@ const Calculators: React.FC = () => {
                     exit={{ opacity: 0, x: -20 }}
                     className="space-y-10"
                   >
-                    <div className="space-y-1">
-                       <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Select Patient Context</h3>
-                       <p className="text-slate-500 font-medium">Foundation weight data is pulled automatically from the registry.</p>
+                    <div className="space-y-1 text-center">
+                       <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">Identify Patient Context</h3>
+                       <p className="text-slate-500 font-medium">Select a patient from the ward census dropdown below.</p>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      {patients.map((p) => (
-                        <button 
-                          key={p.id} 
-                          onClick={() => { setSelectedPatient(p); nextStep(); }}
-                          className={`p-6 rounded-[2rem] border transition-all text-left flex items-center justify-between group/btn ${selectedPatient?.id === p.id ? 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800' : 'bg-[var(--bg-main)] border-[var(--border-main)] hover:border-emerald-200'}`}
-                        >
-                          <div className="space-y-4">
-                              <div className="flex items-center space-x-3">
-                                 <div className="w-8 h-8 rounded-lg bg-[var(--card-bg)] flex items-center justify-center text-xs font-bold text-slate-400 border border-[var(--border-main)]">
-                                    {p.name.split(' ').map(n => n[0]).join('')}
-                                 </div>
-                                 <p className="font-bold text-[var(--text-main)] group-hover/btn:text-emerald-700 transition-colors">{p.name}</p>
-                              </div>
-                              <div className="flex items-center space-x-4">
-                                 <div className="space-y-0.5">
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Weight</p>
-                                    <p className="text-xs font-black text-[var(--text-main)] font-mono">{p.weight}</p>
-                                 </div>
-                                 <div className="w-px h-6 bg-[var(--border-main)]" />
-                                 <div className="space-y-0.5">
-                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">GA</p>
-                                    <p className="text-xs font-black text-[var(--text-main)] font-mono">{p.ga}</p>
-                                 </div>
-                              </div>
+
+                    <div className="max-w-md mx-auto w-full space-y-8">
+                       <div className="relative group">
+                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1 mb-2 block">Active Ward Registry</label>
+                          <div className="relative">
+                             <select 
+                               value={selectedPatient?.id || ''}
+                               onChange={(e) => {
+                                 const p = patients.find(pat => pat.id.toString() === e.target.value);
+                                 setSelectedPatient(p);
+                               }}
+                               className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-5 px-6 text-sm font-bold text-[var(--text-main)] appearance-none cursor-pointer focus:ring-2 focus:ring-emerald-500/10 transition-all outline-none"
+                             >
+                                <option value="" disabled>Choose Neonate...</option>
+                                {patients.map(p => (
+                                  <option key={p.id} value={p.id}>{p.name} ({p.hospital_number})</option>
+                                ))}
+                             </select>
+                             <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" size={18} />
                           </div>
-                          <ChevronRight size={20} className={`${selectedPatient?.id === p.id ? 'text-emerald-500' : 'text-slate-300'} group-hover/btn:translate-x-1 transition-all`} />
-                        </button>
-                      ))}
+                       </div>
+
+                       {selectedPatient && (
+                         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="p-6 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 rounded-3xl space-y-4">
+                            <div className="flex justify-between items-center">
+                               <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Live Registry Weight</p>
+                               <span className="text-xs font-black text-emerald-700">Verified</span>
+                            </div>
+                            <div className="flex items-baseline space-x-3">
+                               <span className="text-4xl font-black text-emerald-700">{(selectedPatient.current_weight || selectedPatient.weight).toFixed(3)}</span>
+                               <span className="text-lg font-bold text-emerald-600">kg</span>
+                            </div>
+                            <p className="text-[10px] text-emerald-600 font-medium italic">"Weight data pulled from census record: {selectedPatient.hospital_number}"</p>
+                         </motion.div>
+                       )}
+
+                       <button 
+                        disabled={!selectedPatient}
+                        onClick={nextStep}
+                        className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95 disabled:opacity-50"
+                       >
+                          Establish Patient Context
+                       </button>
                     </div>
-                    <div className="p-6 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-3xl flex items-start space-x-4 text-rose-700 dark:text-rose-300">
+
+                    <div className="p-6 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-3xl flex items-start space-x-4 text-rose-700 dark:text-rose-300 max-w-xl mx-auto">
                       <AlertCircle className="shrink-0 mt-0.5" size={20} />
                       <div className="space-y-1">
                         <p className="text-xs font-bold uppercase tracking-widest">Clinical Restriction</p>
@@ -203,8 +232,7 @@ const Calculators: React.FC = () => {
                           <span className="text-2xl font-black text-slate-300 uppercase tracking-tighter">{selectedDrug?.unit}</span>
                        </div>
                        <div className="flex items-center space-x-3 text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
-                          <Info size={14} />
-                          <span>Standard Therapeutic Range: 5.0 - 15.0</span>
+                          <span className="bg-[var(--bg-main)] px-3 py-1 rounded-md border border-[var(--border-main)]">Rec: {selectedDrug?.defaultDose} {selectedDrug?.unit}</span>
                        </div>
                     </div>
 
@@ -244,7 +272,7 @@ const Calculators: React.FC = () => {
                        <div className="p-8 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-[2rem] space-y-6">
                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Calculated Rate</p>
                           <div className="flex items-baseline space-x-2">
-                             <span className="text-5xl font-black text-[var(--text-main)]">1.0</span>
+                             <span className="text-5xl font-black text-[var(--text-main)]">{(parseFloat(dose) * (selectedPatient?.current_weight || selectedPatient?.weight || 0) * 0.024).toFixed(2)}</span>
                              <span className="text-xl font-bold text-slate-400">ml/hr</span>
                           </div>
                           <button 
@@ -280,7 +308,7 @@ const Calculators: React.FC = () => {
                        <div className="p-8 bg-slate-900 text-white flex justify-between items-center">
                           <div>
                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Infusion Rate</p>
-                             <p className="text-4xl font-black text-emerald-400">0.45 ml/hr</p>
+                             <p className="text-4xl font-black text-emerald-400">{(parseFloat(dose) * (selectedPatient?.current_weight || selectedPatient?.weight || 0) * 0.024).toFixed(2)} ml/hr</p>
                           </div>
                           <Beaker size={40} className="text-slate-700" />
                        </div>
@@ -288,11 +316,11 @@ const Calculators: React.FC = () => {
                           <div className="grid grid-cols-2 gap-8">
                              <div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Drug Amount</p>
-                                <p className="text-sm font-bold">1.25 mg</p>
+                                <p className="text-sm font-bold">{dose} {selectedDrug?.unit}</p>
                              </div>
                              <div>
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Diluent Volume</p>
-                                <p className="text-sm font-bold">23.75 ml</p>
+                                <p className="text-sm font-bold">QS to 24ml</p>
                              </div>
                           </div>
                           <div className="pt-6 border-t border-[var(--border-main)]">
@@ -301,14 +329,14 @@ const Calculators: React.FC = () => {
                                 <span>Double Check Mandatory</span>
                              </p>
                              <p className="text-xs text-slate-500 leading-relaxed italic">
-                                Ensure syringe is labeled with patient ID, drug name, total dose, and dilution volume before bedside deployment.
+                                Ensure syringe is labeled with patient ID ({selectedPatient?.hospital_number}), drug name ({selectedDrug?.name}), total dose, and dilution volume before bedside deployment.
                              </p>
                           </div>
                        </div>
                     </div>
 
                     <button 
-                      onClick={() => setCurrentStep(1)}
+                      onClick={() => { setCurrentStep(1); setSelectedPatient(null); setSelectedDrug(null); setDose(''); }}
                       className="w-full bg-[var(--card-bg)] border border-[var(--border-main)] text-slate-600 py-5 rounded-2xl font-bold hover:bg-slate-50 transition-all flex items-center justify-center space-x-3"
                     >
                        <RefreshCcw size={18} />
@@ -353,14 +381,14 @@ const Calculators: React.FC = () => {
                         <Scale size={12} />
                         <span>Weight</span>
                      </span>
-                     <span className="text-sm font-black text-emerald-600 font-mono">{selectedPatient?.weight || '---'}</span>
+                     <span className="text-sm font-black text-emerald-600 font-mono">{(selectedPatient?.current_weight || selectedPatient?.weight || 0).toFixed(3)} kg</span>
                   </div>
                   <div className="flex flex-col space-y-2">
                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
                         <Clock size={12} />
-                        <span>Hours Post</span>
+                        <span>GA</span>
                      </span>
-                     <span className="text-sm font-black text-[var(--text-main)] font-mono">{selectedPatient?.age || '---'}</span>
+                     <span className="text-sm font-black text-[var(--text-main)] font-mono">{selectedPatient?.gestational_age || selectedPatient?.ga || '--'}w</span>
                   </div>
                </div>
                <div className="h-px bg-[var(--border-main)]" />
@@ -370,13 +398,6 @@ const Calculators: React.FC = () => {
                      <span>Selected Agent</span>
                   </span>
                   <span className="text-base font-bold text-[var(--text-main)]">{selectedDrug?.name || 'Unspecified'}</span>
-               </div>
-               <div className="flex flex-col space-y-2">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-2">
-                     <Beaker size={12} />
-                     <span>Concentration</span>
-                  </span>
-                  <span className="text-sm font-black text-blue-600 font-mono">{selectedDrug?.concentration || '---'}</span>
                </div>
             </div>
           </div>
@@ -389,7 +410,7 @@ const Calculators: React.FC = () => {
              <div className="space-y-4 mb-10">
                 <p className="text-[11px] text-emerald-200 font-bold uppercase tracking-widest">Required Infusion Rate</p>
                 <div className="flex items-baseline space-x-3">
-                   <span className="text-[64px] font-black leading-none tracking-tighter">0.45</span>
+                   <span className="text-[64px] font-black leading-none tracking-tighter">{(parseFloat(dose) * (selectedPatient?.current_weight || selectedPatient?.weight || 0) * 0.024).toFixed(2)}</span>
                    <span className="text-xl font-bold opacity-60">ml/hr</span>
                 </div>
              </div>

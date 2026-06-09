@@ -1,17 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, UserPlus, Filter, MoreVertical, 
-  Calendar, Weight, Activity, ArrowRight, Heart, Droplets
+  Calendar, Weight, Activity, ArrowRight, Heart, Droplets, X, Save, Scale, Baby, Info
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 
 const Neonates: React.FC = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [neonates, setNeonates] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [formData, setFormData] = useState({
+    name: '',
+    hospital_number: '',
+    dob: new Date().toISOString().split('T')[0],
+    gender: 'Male',
+    birth_weight: '',
+    current_weight: '',
+    gestational_age: '',
+    status: 'Stable'
+  });
 
   useEffect(() => {
     fetchNeonates();
@@ -30,31 +44,46 @@ const Neonates: React.FC = () => {
     }
   };
 
+  const handleAdmission = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    try {
+      await api.post('/neonates', {
+        ...formData,
+        birth_weight: parseFloat(formData.birth_weight),
+        current_weight: parseFloat(formData.current_weight),
+        gestational_age: parseInt(formData.gestational_age)
+      });
+      setShowAddModal(false);
+      fetchNeonates();
+      setFormData({
+        name: '',
+        hospital_number: '',
+        dob: new Date().toISOString().split('T')[0],
+        gender: 'Male',
+        birth_weight: '',
+        current_weight: '',
+        gestational_age: '',
+        status: 'Stable'
+      });
+    } catch (err) {
+      console.error('Admission failed:', err);
+      alert('Failed to admit neonate. Check if Hospital ID is unique.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const filteredNeonates = neonates.filter(n => 
     n.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     n.hospital_number.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  if (loading) {
+  if (loading && neonates.length === 0) {
     return (
       <div className="h-[60vh] flex flex-col items-center justify-center space-y-4 text-slate-400">
         <div className="w-12 h-12 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin" />
         <p className="text-xs font-bold uppercase tracking-widest text-emerald-600">Accessing Ward Census...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-[60vh] flex flex-col items-center justify-center space-y-6 text-center">
-        <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/20 text-rose-500 rounded-2xl flex items-center justify-center">
-          <Activity size={32} />
-        </div>
-        <div>
-          <h3 className="text-xl font-bold text-[var(--text-main)]">Registry Sync Failed</h3>
-          <p className="text-slate-500 max-w-xs mx-auto mt-1 font-medium">{error}</p>
-        </div>
-        <button onClick={fetchNeonates} className="px-8 py-3 bg-slate-900 dark:bg-emerald-600 text-white rounded-xl font-bold text-sm shadow-xl active:scale-95 transition-all">Retry Connection</button>
       </div>
     );
   }
@@ -67,13 +96,148 @@ const Neonates: React.FC = () => {
           <h2 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">Ward Patient Registry</h2>
           <p className="text-slate-500 font-medium">Digital census of all active neonatal admissions and clinical status.</p>
         </div>
-        <button className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95">
+        <button 
+          onClick={() => setShowAddModal(true)}
+          className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
+        >
           <UserPlus size={18} strokeWidth={3} />
           <span>New Clinical Admission</span>
         </button>
       </div>
 
-      {/* Modern Filter & Search (Mobbin Style) */}
+      <AnimatePresence>
+        {showAddModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md">
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95 }}
+               animate={{ opacity: 1, scale: 1 }}
+               exit={{ opacity: 0, scale: 0.95 }}
+               className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] w-full max-w-2xl p-10 shadow-2xl space-y-8 overflow-y-auto max-h-[90vh] custom-scrollbar"
+             >
+                <div className="flex justify-between items-center">
+                   <h3 className="text-2xl font-bold tracking-tight">New Clinical Admission</h3>
+                   <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
+                </div>
+
+                <form onSubmit={handleAdmission} className="space-y-6">
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Patient Full Name</label>
+                      <input 
+                        value={formData.name}
+                        onChange={(e) => setFormData({...formData, name: e.target.value})}
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
+                        placeholder="e.g. Baby Liam"
+                        required
+                      />
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Hospital Number</label>
+                         <input 
+                           value={formData.hospital_number}
+                           onChange={(e) => setFormData({...formData, hospital_number: e.target.value})}
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           placeholder="HOSP-NBU-XXX"
+                           required
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Date of Birth</label>
+                         <input 
+                           type="date"
+                           value={formData.dob}
+                           onChange={(e) => setFormData({...formData, dob: e.target.value})}
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           required
+                         />
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Gender</label>
+                         <select 
+                           value={formData.gender}
+                           onChange={(e) => setFormData({...formData, gender: e.target.value})}
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                         >
+                            <option>Male</option>
+                            <option>Female</option>
+                         </select>
+                      </div>
+                      <div className="space-y-2 col-span-2">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Gestational Age (Weeks)</label>
+                         <input 
+                           type="number"
+                           value={formData.gestational_age}
+                           onChange={(e) => setFormData({...formData, gestational_age: e.target.value})}
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           placeholder="e.g. 32"
+                           required
+                         />
+                      </div>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Birth Weight (kg)</label>
+                         <input 
+                           type="number" step="0.001"
+                           value={formData.birth_weight}
+                           onChange={(e) => setFormData({...formData, birth_weight: e.target.value})}
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           placeholder="e.g. 1.250"
+                           required
+                         />
+                      </div>
+                      <div className="space-y-2">
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Current Weight (kg)</label>
+                         <input 
+                           type="number" step="0.001"
+                           value={formData.current_weight}
+                           onChange={(e) => setFormData({...formData, current_weight: e.target.value})}
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           placeholder="e.g. 1.250"
+                           required
+                         />
+                      </div>
+                   </div>
+
+                   <div className="space-y-2">
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Initial Status</label>
+                      <select 
+                        value={formData.status}
+                        onChange={(e) => setFormData({...formData, status: e.target.value})}
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                      >
+                         <option>Stable</option>
+                         <option>Serious</option>
+                         <option>Critical</option>
+                      </select>
+                   </div>
+
+                   <button 
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl flex items-center justify-center space-x-2 hover:bg-black dark:hover:bg-emerald-700 transition-all disabled:opacity-50"
+                   >
+                      {isSubmitting ? (
+                        <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Save size={18} />
+                          <span>Finalize Admission</span>
+                        </>
+                      )}
+                   </button>
+                </form>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Modern Filter & Search */}
       <div className="bg-[var(--card-bg)] border border-[var(--border-main)] p-2 rounded-2xl flex flex-col md:flex-row items-center gap-2 shadow-sm">
         <div className="relative flex-1 w-full">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
@@ -131,7 +295,7 @@ const Neonates: React.FC = () => {
                         <Weight size={12} />
                         <span className="text-[9px] font-black uppercase tracking-widest">Adm Weight</span>
                      </div>
-                     <p className="text-xs font-bold text-[var(--text-main)] font-mono">{(neonate.birth_weight || neonate.weight).toFixed(3)} kg</p>
+                     <p className="text-xs font-bold text-[var(--text-main)] font-mono">{(neonate.birth_weight || neonate.weight || 0).toFixed(3)} kg</p>
                   </div>
                </div>
 
@@ -175,7 +339,7 @@ const Neonates: React.FC = () => {
             </div>
             <div>
                <p className="text-2xl font-bold tracking-tight">Active Ward Census</p>
-               <p className="text-sm text-slate-400 font-medium">85% Occupancy • 12 Beds Remaining</p>
+               <p className="text-sm text-slate-400 font-medium">{neonates.length} Admissions • {30 - neonates.length} Beds Remaining</p>
             </div>
          </div>
          <div className="flex items-center space-x-3">

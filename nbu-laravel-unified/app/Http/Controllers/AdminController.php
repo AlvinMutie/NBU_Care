@@ -71,6 +71,22 @@ class AdminController extends Controller
         ]);
     }
 
+    public function resetPassword(Request $request, User $user)
+    {
+        $request->validate([
+            'password' => 'required|string|min:8',
+        ]);
+
+        $user->update([
+            'password' => \Hash::make($request->password)
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Password reset successfully for ' . $user->name
+        ]);
+    }
+
     public function users()
     {
         $users = User::all();

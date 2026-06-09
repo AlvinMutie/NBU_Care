@@ -6,10 +6,6 @@ import {
   GraduationCap, CheckCircle2, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart as RePieChart, Pie, Cell
-} from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
@@ -20,17 +16,12 @@ const Dashboard: React.FC = () => {
     live_cases: 0,
     doses_given: 0
   });
-  const [analytics, setAnalytics] = useState({
-    distribution: [],
-    staffing: []
-  });
   const [alerts, setAlerts] = useState<any[]>([]);
   const [recentLogs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const user = JSON.parse(localStorage.getItem('user_data') || '{}');
 
   const isStudent = user.role === 'Student';
-  const isAdmin = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || user.name === 'System Admin';
 
   useEffect(() => {
     fetchDashboardData();
@@ -39,20 +30,26 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsRes, analyticsRes, logsRes, alertsRes] = await Promise.all([
+      const [statsRes, logsRes, alertsRes] = await Promise.all([
         api.get('/admin/stats'),
-        api.get('/admin/analytics'),
         api.get('/logs/recent'),
         api.get('/admin/alerts')
       ]);
       setStats(statsRes.data.data);
-      setAnalytics(analyticsRes.data.data);
       setLogs(logsRes.data.data);
       setAlerts(alertsRes.data.data);
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleEndShift = () => {
+    if (window.confirm('Terminate active clinical session and log out?')) {
+       localStorage.removeItem('auth_token');
+       localStorage.removeItem('user_data');
+       navigate('/');
     }
   };
 
@@ -91,11 +88,12 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Core Operational Statistics */}
         <div className="lg:col-span-8 space-y-8">
-           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
+           <div className={`grid grid-cols-1 sm:grid-cols-2 ${isStudent ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
               {[
                 { label: isStudent ? 'Academy Modules' : 'Live Cases', value: isStudent ? '24' : stats.live_cases, icon: isStudent ? GraduationCap : Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                 { label: isStudent ? 'Study Hours' : 'Active Staff', value: isStudent ? '12.5' : stats.total_staff, icon: isStudent ? Clock : Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-                { label: isStudent ? 'Tests Taken' : 'Meds Audit', value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
+                ...(isStudent ? [{ label: 'Tests Taken', value: '8', icon: ClipboardCheck, color: 'text-rose-600', bg: 'bg-rose-50' }] : []),
+                { label: isStudent ? 'Safety Rank' : 'Meds Audit', value: isStudent ? 'Elite' : stats.doses_given, icon: isStudent ? ShieldCheck : Beaker, color: 'text-amber-600', bg: 'bg-amber-50' },
               ].map((stat, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -142,77 +140,41 @@ const Dashboard: React.FC = () => {
            ) : (
              /* Active Ward Alerts - Connected to real backend */
              <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] p-8 shadow-sm overflow-hidden">
-                <div className="flex flex-col md:flex-row justify-between gap-10">
-                   <div className="flex-1 space-y-6">
-                      <div className="space-y-1">
-                         <div className="flex items-center space-x-3 text-rose-600">
-                            <AlertCircle size={20} />
-                            <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
-                         </div>
-                         <p className="text-xs text-slate-500 font-medium">Real-time flags from current admissions.</p>
+                <div className="space-y-6">
+                   <div className="space-y-1">
+                      <div className="flex items-center space-x-3 text-rose-600">
+                         <AlertCircle size={20} />
+                         <h3 className="text-xl font-bold tracking-tight">Active Ward Alerts</h3>
                       </div>
-                      
-                      <div className="space-y-3">
-                         {alerts.length === 0 ? (
-                           <div className="p-8 text-center bg-[var(--bg-main)] rounded-2xl border border-dashed border-[var(--border-main)]">
-                              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No Active Critical Flags</p>
-                           </div>
-                         ) : alerts.map((alert, i) => (
-                           <div 
-                            key={i} 
-                            onClick={() => navigate(`/neonates/${alert.id}`)}
-                            className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between hover:border-rose-200 transition-all cursor-pointer group/alert"
-                           >
-                              <div className="flex items-center space-x-4">
-                                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] ${alert.type === 'Critical' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
-                                    {alert.baby.split(' ')[0][0]}
-                                 </div>
-                                 <div>
-                                    <p className="text-xs font-bold group-hover/alert:text-emerald-600 transition-colors">{alert.baby}</p>
-                                    <p className="text-[10px] text-slate-500 font-medium">{alert.alert}</p>
-                                 </div>
-                              </div>
-                              <div className="text-right">
-                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{alert.time}</p>
-                                 <ChevronRight size={14} className="text-slate-300 group-hover/alert:translate-x-1 transition-all ml-auto mt-1" />
-                              </div>
-                           </div>
-                         ))}
-                      </div>
+                      <p className="text-xs text-slate-500 font-medium">Real-time flags from current admissions.</p>
                    </div>
                    
-                   <div className="w-px bg-[var(--border-main)] hidden md:block" />
-
-                   <div className="flex-1 space-y-6">
-                      <div className="space-y-1">
-                         <div className="flex items-center space-x-3 text-emerald-600">
-                            <ShieldCheck size={20} />
-                            <h3 className="text-xl font-bold tracking-tight">Institutional Health</h3>
-                         </div>
-                         <p className="text-xs text-slate-500 font-medium">Aggregated ward health metrics.</p>
-                      </div>
-                      
-                      <div className="space-y-5 pt-2">
-                         {[
-                           { label: 'Calculation Accuracy', val: 100, color: 'bg-emerald-500' },
-                           { label: 'Training Compliance', val: 92, color: 'bg-blue-500' },
-                           { label: 'Protocol Adherence', val: 98, color: 'bg-amber-500' },
-                         ].map((metric) => (
-                           <div key={metric.label} className="space-y-2">
-                              <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest">
-                                 <span className="text-slate-400">{metric.label}</span>
-                                 <span className="text-[var(--text-main)]">{metric.val}%</span>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {alerts.length === 0 ? (
+                        <div className="col-span-full p-8 text-center bg-[var(--bg-main)] rounded-2xl border border-dashed border-[var(--border-main)]">
+                           <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">No Active Critical Flags</p>
+                        </div>
+                      ) : alerts.map((alert, i) => (
+                        <div 
+                         key={i} 
+                         onClick={() => navigate(`/neonates/${alert.id}`)}
+                         className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between hover:border-rose-200 transition-all cursor-pointer group/alert"
+                        >
+                           <div className="flex items-center space-x-4">
+                              <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-black text-[10px] ${alert.type === 'Critical' ? 'bg-rose-50 text-rose-600' : 'bg-amber-50 text-amber-600'}`}>
+                                 {alert.baby.split(' ')[0][0]}
                               </div>
-                              <div className="h-1.5 bg-[var(--bg-main)] rounded-full overflow-hidden">
-                                 <motion.div 
-                                   initial={{ width: 0 }}
-                                   animate={{ width: `${metric.val}%` }}
-                                   className={`h-full ${metric.color}`}
-                                 />
+                              <div>
+                                 <p className="text-xs font-bold group-hover/alert:text-emerald-600 transition-colors">{alert.baby}</p>
+                                 <p className="text-[10px] text-slate-500 font-medium">{alert.alert}</p>
                               </div>
                            </div>
-                         ))}
-                      </div>
+                           <div className="text-right">
+                              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{alert.time}</p>
+                              <ChevronRight size={14} className="text-slate-300 group-hover/alert:translate-x-1 transition-all ml-auto mt-1" />
+                           </div>
+                        </div>
+                      ))}
                    </div>
                 </div>
              </div>
@@ -236,60 +198,35 @@ const Dashboard: React.FC = () => {
                     Role: {user.role}
                  </p>
                  <div className="pt-2">
-                    <button className="px-6 py-2.5 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all">
+                    <button 
+                      onClick={handleEndShift}
+                      className="px-6 py-2.5 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
+                    >
                        {isStudent ? 'Update Study Goal' : 'End Active Shift'}
                     </button>
                  </div>
               </div>
            </div>
 
-           {isStudent ? (
-             <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
-                <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-6">Recent Assessments</h4>
-                <div className="space-y-5">
-                   {[
-                     { name: 'APGAR Evaluation', score: '90%', status: 'Passed' },
-                     { name: 'CPAP Initial.', score: '100%', status: 'Passed' },
-                     { name: 'Sepsis Screening', score: '75%', status: 'Retake' },
-                   ].map((test, i) => (
-                     <div key={i} className="flex items-center justify-between p-4 bg-[var(--bg-main)] rounded-2xl">
-                        <div className="space-y-1">
-                           <p className="text-xs font-bold">{test.name}</p>
-                           <p className={`text-[9px] font-black uppercase tracking-widest ${test.status === 'Passed' ? 'text-emerald-500' : 'text-rose-500'}`}>{test.status}</p>
-                        </div>
-                        <p className="text-sm font-black">{test.score}</p>
-                     </div>
-                   ))}
-                </div>
-                <Link to="/academy" className="w-full mt-8 py-4 flex items-center justify-center space-x-2 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-all">
-                   <span>View All Modules</span>
-                   <ChevronRight size={12} />
-                </Link>
-             </div>
-           ) : (
-             <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
-                <div className="flex justify-between items-center mb-6">
-                   <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
-                   <Clock size={16} className="text-slate-300" />
-                </div>
-                <div className="space-y-5">
-                   {recentLogs.slice(0, 4).map((log, i) => (
-                     <div key={i} className="flex items-start space-x-3">
-                        <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
-                           {log.action[0].toUpperCase()}
-                        </div>
-                        <div className="flex-1 space-y-0.5">
-                           <p className="text-xs font-bold capitalize">{log.action.replace('_', ' ')}</p>
-                           <p className="text-[10px] text-slate-400 font-medium">By {log.user?.name || 'System'}</p>
-                        </div>
-                     </div>
-                   ))}
-                </div>
-                <button className="w-full mt-8 py-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-emerald-600 transition-all">
-                   Full Audit Trail
-                </button>
-             </div>
-           )}
+           <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
+              <div className="flex justify-between items-center mb-6">
+                 <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
+                 <Clock size={16} className="text-slate-300" />
+              </div>
+              <div className="space-y-5">
+                 {recentLogs.slice(0, 4).map((log, i) => (
+                   <div key={i} className="flex items-start space-x-3">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
+                         {log.action[0].toUpperCase()}
+                      </div>
+                      <div className="flex-1 space-y-0.5">
+                         <p className="text-xs font-bold capitalize">{log.action.replace('_', ' ')}</p>
+                         <p className="text-[10px] text-slate-400 font-medium">By {log.user?.name || 'System'}</p>
+                      </div>
+                   </div>
+                 ))}
+              </div>
+           </div>
         </div>
       </div>
     </div>
