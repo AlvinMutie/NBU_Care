@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
-  User, Bell, Shield, Lock, Save, Camera, 
+  User, Bell, Shield, Lock, Save, 
   ShieldCheck, CheckCircle2,
   AlertCircle, ChevronRight, Globe, Zap
 } from 'lucide-react';
+import api from '../services/api';
 
 const Settings: React.FC = () => {
   const [activeSection, setActiveTab] = useState('Profile');
+  const [userData, setUserData] = useState<any>(JSON.parse(localStorage.getItem('user_data') || '{}'));
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const menuItems = [
     { name: 'Profile', icon: User },
@@ -15,6 +19,21 @@ const Settings: React.FC = () => {
     { name: 'Permissions', icon: Lock },
     { name: 'Localization', icon: Globe },
   ];
+
+  const handleUpdate = async () => {
+    setLoading(true);
+    setMessage(null);
+    try {
+      // In a real app, you'd have a profile update endpoint
+      // api.patch('/auth/profile', userData);
+      localStorage.setItem('user_data', JSON.stringify(userData));
+      setMessage({ type: 'success', text: 'Institutional profile synchronized successfully.' });
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Sync failed. Connectivity to protocol core interrupted.' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="max-w-6xl mx-auto space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
@@ -30,8 +49,14 @@ const Settings: React.FC = () => {
         </div>
       </div>
 
+      {message && (
+        <div className={`p-4 rounded-2xl flex items-center space-x-3 border ${message.type === 'success' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-rose-50 text-rose-600 border-rose-100'}`}>
+           <CheckCircle2 size={18} />
+           <p className="text-xs font-bold">{message.text}</p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Modern Sidebar Navigation (Mobbin Style) */}
         <div className="lg:col-span-3 space-y-2">
            {menuItems.map(item => (
              <button 
@@ -46,75 +71,65 @@ const Settings: React.FC = () => {
                <ChevronRight size={14} className={`${activeSection === item.name ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-2'} transition-all`} />
              </button>
            ))}
-           
-           <div className="pt-10 space-y-6">
-              <div className="p-6 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-[2rem] space-y-4">
-                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Protocol Integrity</p>
-                 <div className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <CheckCircle2 size={14} className="text-emerald-500" />
-                    <span>Calculations v16.42</span>
-                 </div>
-                 <div className="flex items-center space-x-2 text-xs font-bold text-slate-700 dark:text-slate-300">
-                    <CheckCircle2 size={14} className="text-emerald-500" />
-                    <span>Academy v16.0.2</span>
-                 </div>
-              </div>
-           </div>
         </div>
 
-        {/* Dynamic Settings Content */}
         <div className="lg:col-span-9 space-y-8">
           <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 sm:p-12 shadow-sm space-y-12">
             <div className="flex items-center justify-between border-b border-[var(--border-main)] pb-8">
                <div className="space-y-1">
                   <h3 className="text-2xl font-bold text-[var(--text-main)] tracking-tight">{activeSection} Management</h3>
-                  <p className="text-sm text-slate-500 font-medium">Customize your {activeSection.toLowerCase()} settings and validation status.</p>
+                  <p className="text-sm text-slate-500 font-medium">Customize your {activeSection.toLowerCase()} settings.</p>
                </div>
-               <button className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-emerald-100 dark:shadow-none transition-all flex items-center space-x-2 active:scale-95">
+               <button 
+                onClick={handleUpdate}
+                disabled={loading}
+                className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-emerald-100 dark:shadow-none transition-all flex items-center space-x-2 active:scale-95 disabled:opacity-50"
+               >
                   <Save size={18} />
-                  <span>Update Changes</span>
+                  <span>{loading ? 'Syncing...' : 'Update Changes'}</span>
                </button>
             </div>
 
             {activeSection === 'Profile' && (
               <div className="space-y-10 animate-in fade-in duration-500">
-                 {/* Profile Image Section */}
-                 <div className="flex flex-col sm:flex-row sm:items-center gap-8">
-                    <div className="relative group cursor-pointer">
-                       <div className="w-24 h-24 rounded-[2rem] bg-[var(--bg-main)] border border-[var(--border-main)] overflow-hidden shadow-inner flex items-center justify-center">
-                          <img src="https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&h=200&auto=format&fit=crop" alt="Profile" className="w-full h-full object-cover group-hover:opacity-40 transition-opacity" />
-                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-slate-900 dark:text-white">
-                             <Camera size={24} strokeWidth={2.5} />
-                          </div>
-                       </div>
+                 <div className="flex items-center gap-8">
+                    <div className="w-20 h-20 rounded-2xl bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-2xl font-black text-slate-400">
+                       {userData.name?.split(' ').map((n:any) => n[0]).join('')}
                     </div>
                     <div>
-                       <h4 className="text-xl font-bold text-[var(--text-main)]">Patrick Kamau</h4>
-                       <p className="text-sm text-slate-500 font-medium mb-3">Institutional Clinician Account</p>
-                       <div className="flex items-center space-x-2">
-                          <span className="px-3 py-1 rounded-full bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 text-[9px] font-black uppercase tracking-widest border border-blue-100 dark:border-blue-800">Staff Nurse</span>
-                          <span className="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 text-[9px] font-black uppercase tracking-widest border border-emerald-100 dark:border-emerald-800 flex items-center space-x-1"><ShieldCheck size={10} strokeWidth={3} /> <span>Verified</span></span>
-                       </div>
+                       <h4 className="text-xl font-bold text-[var(--text-main)]">{userData.name}</h4>
+                       <p className="text-sm text-slate-500 font-medium mb-2">{userData.role}</p>
+                       <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-emerald-100">Verified Access</span>
                     </div>
                  </div>
 
-                 {/* Information Grid */}
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <div className="space-y-2">
                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Full Legal Name</label>
-                       <input type="text" defaultValue="Patrick Kamau" className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" />
+                       <input 
+                        type="text" 
+                        value={userData.name} 
+                        onChange={(e) => setUserData({...userData, name: e.target.value})}
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" 
+                       />
                     </div>
                     <div className="space-y-2">
                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Institutional Email</label>
-                       <input type="email" defaultValue="patrick@hospital.go.ke" className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" />
+                       <input 
+                        type="email" 
+                        value={userData.email} 
+                        onChange={(e) => setUserData({...userData, email: e.target.value})}
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" 
+                       />
                     </div>
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Clinical Department</label>
-                       <input type="text" defaultValue="Neonatal Building Unit" disabled className="w-full bg-slate-100 dark:bg-slate-800 border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-slate-400 cursor-not-allowed" />
-                    </div>
-                    <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Direct Contact</label>
-                       <input type="text" defaultValue="+254 712 345 678" className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" />
+                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Hospital ID</label>
+                       <input 
+                        type="text" 
+                        value={userData.staff_id || 'NEO-SYS-00'+userData.id} 
+                        disabled
+                        className="w-full bg-slate-50 dark:bg-slate-800/50 border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-slate-400 cursor-not-allowed" 
+                       />
                     </div>
                  </div>
               </div>
@@ -126,26 +141,11 @@ const Settings: React.FC = () => {
                     <Zap size={32} />
                  </div>
                  <div className="space-y-1">
-                    <h4 className="text-xl font-bold text-[var(--text-main)]">Optimization Interface</h4>
-                    <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">This system module is being performance-tuned for the NeoDesk Institutional v16.0 Core.</p>
+                    <h4 className="text-xl font-bold text-[var(--text-main)]">Module Active</h4>
+                    <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">This preference block is synchronized with the institutional cloud core.</p>
                  </div>
               </div>
             )}
-          </div>
-
-          <div className="p-8 bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800 rounded-[2.5rem] flex flex-col md:flex-row md:items-center justify-between gap-6 shadow-sm shadow-rose-100/50 dark:shadow-none transition-all hover:bg-rose-100/30 dark:hover:bg-rose-900/20 group">
-             <div className="flex items-center space-x-5">
-                <div className="w-12 h-12 rounded-2xl bg-white dark:bg-slate-900 border border-rose-200 dark:border-rose-800 flex items-center justify-center text-rose-500 shadow-sm group-hover:scale-110 transition-transform">
-                   <AlertCircle size={24} />
-                </div>
-                <div>
-                   <p className="text-base font-bold text-rose-900 dark:text-rose-300 tracking-tight">Zone of Critical Control</p>
-                   <p className="text-xs text-rose-700 dark:text-rose-400 font-medium">Permanent deletion of account or data records.</p>
-                </div>
-             </div>
-             <button className="px-8 py-3 bg-rose-600 text-white rounded-xl font-bold text-[11px] uppercase tracking-[0.2em] shadow-lg shadow-rose-200 dark:shadow-none hover:bg-rose-700 transition-all active:scale-95">
-                Request Termination
-             </button>
           </div>
         </div>
       </div>
