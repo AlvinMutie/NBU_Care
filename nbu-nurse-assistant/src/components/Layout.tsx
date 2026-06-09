@@ -23,7 +23,7 @@ const Layout: React.FC = () => {
   ];
 
   const adminItems = [
-    { name: 'System Audit', icon: ShieldAlert, path: '/logs' },
+    { name: 'System Audit', icon: ShieldAlert, path: '/audit' },
     { name: 'Institutional Vetting', icon: UserCheck, path: '/verify' },
     { name: 'Workforce Rota', icon: CalendarDays, path: '/rota' },
   ];
