@@ -1,12 +1,16 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, User, Mail, Lock, IdCard, Camera, ChevronRight, Eye, EyeOff, CheckCircle2, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import api from '../services/api';
 
 const Register: React.FC = () => {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [showPassword, setShowPassword] = useState(false);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -26,6 +30,26 @@ const Register: React.FC = () => {
   const handleImageUpload = () => {
     // Simulate camera/upload
     setProfileImage('https://images.unsplash.com/photo-1612349317150-e413f6a5b16d?q=80&w=200&h=200&auto=format&fit=crop');
+  };
+
+  const handleRegistration = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    try {
+      await api.post('/auth/register', {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        role: formData.role,
+        hospitalId: formData.hospitalId
+      });
+      navigate('/login', { state: { message: 'Registration successful. Awaiting institutional approval.' } });
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Institutional registration failed. Please verify your credentials.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isStep1Complete = formData.fullName && formData.email && formData.password;
@@ -65,7 +89,13 @@ const Register: React.FC = () => {
             </div>
           </div>
 
-          <form className="space-y-8">
+          <form onSubmit={handleRegistration} className="space-y-8">
+            {error && (
+              <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-2xl flex items-center space-x-3 text-rose-600">
+                <AlertCircle size={18} />
+                <p className="text-xs font-bold">{error}</p>
+              </div>
+            )}
             <AnimatePresence mode="wait">
               {step === 1 ? (
                 <motion.div 
@@ -216,11 +246,12 @@ const Register: React.FC = () => {
                       Back
                     </button>
                     <button 
-                      type="button"
-                      disabled={!isStep2Complete}
-                      className="flex-[2] bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-emerald-100 dark:shadow-none transition-all hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed uppercase text-[11px] tracking-widest"
+                      type="submit"
+                      disabled={!isStep2Complete || loading}
+                      className="flex-[2] bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl shadow-emerald-100 dark:shadow-none transition-all hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed uppercase text-[11px] tracking-widest flex items-center justify-center space-x-2"
                     >
-                      Submit Registration
+                      {loading && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
+                      <span>{loading ? 'Processing...' : 'Submit Registration'}</span>
                     </button>
                   </div>
                 </motion.div>

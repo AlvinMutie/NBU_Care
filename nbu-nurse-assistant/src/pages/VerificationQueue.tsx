@@ -1,16 +1,51 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle, XCircle, IdCard, Clock, 
   ShieldAlert, FileText, ArrowRight, CheckCircle2,
   AlertCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 const VerificationQueue: React.FC = () => {
-  const pendingRequests = [
-    { id: 1, name: 'Dr. Cynthia Wekesa', role: 'Medical Officer', hospitalId: 'HOSP-2026-045', date: '2026-06-07', email: 'cynthia@hospital.go.ke' },
-    { id: 2, name: 'John Doe', role: 'Staff Nurse', hospitalId: 'NURSE-112-90', date: '2026-06-06', email: 'john.doe@hospital.go.ke' },
-  ];
+  const [pendingRequests, setRequests] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchPendingRequests();
+  }, []);
+
+  const fetchPendingRequests = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/auth/pending');
+      setRequests(response.data.data);
+    } catch (err) {
+      console.error('Failed to fetch pending requests:', err);
+      setError('Institutional link to vetting core failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleApprove = async (userId: number) => {
+    try {
+      await api.post(`/auth/verify/${userId}`);
+      setRequests(prev => prev.filter(r => r.id !== userId));
+    } catch (err) {
+      console.error('Approval failed:', err);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4 text-slate-400">
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Accessing Vetting Queue...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
@@ -58,7 +93,7 @@ const VerificationQueue: React.FC = () => {
                    <div className="flex items-start justify-between">
                       <div className="flex items-center space-x-5">
                          <div className="w-16 h-16 rounded-[1.2rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex items-center justify-center text-slate-400 font-black text-xl shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
-                            {request.name.split(' ').map(n => n[0]).join('')}
+                            {request.name.split(' ').map((n: any) => n[0]).join('')}
                          </div>
                          <div>
                             <h3 className="text-xl font-bold text-[var(--text-main)]">{request.name}</h3>
@@ -70,7 +105,7 @@ const VerificationQueue: React.FC = () => {
                       </div>
                       <div className="flex items-center space-x-1.5 text-slate-300 dark:text-slate-600 font-bold text-[10px] uppercase tracking-widest bg-[var(--bg-main)] px-3 py-1 rounded-lg">
                          <Clock size={12} />
-                         <span>{request.date}</span>
+                         <span>{new Date(request.created_at).toLocaleDateString()}</span>
                       </div>
                    </div>
 
@@ -83,7 +118,7 @@ const VerificationQueue: React.FC = () => {
                          <div className="h-px bg-[var(--border-main)]" />
                          <div className="flex justify-between items-center">
                             <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hospital ID</span>
-                            <span className="text-xs font-black text-[var(--text-main)] font-mono tracking-wider">{request.hospitalId}</span>
+                            <span className="text-xs font-black text-[var(--text-main)] font-mono tracking-wider">{request.staff_id || 'NOT_PROVIDED'}</span>
                          </div>
                          <div className="h-px bg-[var(--border-main)]" />
                          <div className="flex justify-between items-center">
@@ -104,7 +139,10 @@ const VerificationQueue: React.FC = () => {
                       <XCircle size={16} />
                       <span>Reject</span>
                    </button>
-                   <button className="flex-[2] flex items-center justify-center space-x-2 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-600 transition-all text-xs font-bold uppercase tracking-widest group-hover:bg-emerald-600 group-hover:shadow-emerald-100">
+                   <button 
+                    onClick={() => handleApprove(request.id)}
+                    className="flex-[2] flex items-center justify-center space-x-2 py-4 bg-slate-900 dark:bg-slate-800 text-white rounded-2xl shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-600 transition-all text-xs font-bold uppercase tracking-widest group-hover:bg-emerald-600 group-hover:shadow-emerald-100"
+                   >
                       <CheckCircle2 size={16} />
                       <span>Approve Institutional Access</span>
                    </button>

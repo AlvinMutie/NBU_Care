@@ -138,7 +138,7 @@ const Layout: React.FC = () => {
       {/* Main Framework Viewport */}
       <main className="flex-1 flex flex-col h-screen overflow-hidden relative">
         {/* Institutional Header */}
-        <header className="h-20 bg-[var(--bg-header)] border-b border-[var(--border-main)] flex items-center justify-between px-6 lg:px-12 z-50 transition-colors duration-300">
+        <header className="h-20 bg-[var(--bg-header)]/80 backdrop-blur-xl border-b border-[var(--border-main)] flex items-center justify-between px-6 lg:px-12 z-50 transition-colors duration-300 relative">
           <button 
             className="lg:hidden p-3 -ml-3 text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl transition-all"
             onClick={() => setIsSidebarOpen(true)}

@@ -3,7 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { 
   ChevronLeft, Heart, Thermometer, Droplets, 
   Activity, Baby, History, Stethoscope, Microscope, Pill, FileText,
-  TrendingUp, Calendar, Clock, MapPin, Scale, ShieldCheck, AlertCircle, Info, Zap
+  TrendingUp, Calendar, Clock, MapPin, Scale, ShieldCheck, AlertCircle, Info, Zap,
+  Wind, Users
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -209,6 +210,27 @@ const NeonateProfile: React.FC = () => {
                     ))}
                   </div>
                 </div>
+
+                <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                   <div className="flex items-center space-x-3 text-blue-600 border-b border-[var(--border-main)] pb-6">
+                      <Users size={20} />
+                      <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Clinical Assignment</h3>
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <div>
+                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Lead Consultant</p>
+                         <p className="text-sm font-bold">{displayData.bio.consultant}</p>
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Nursing Lead</p>
+                         <p className="text-sm font-bold">{displayData.bio.manager}</p>
+                      </div>
+                      <div>
+                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Primary Nurse</p>
+                         <p className="text-sm font-bold">{displayData.bio.assignedNurse}</p>
+                      </div>
+                   </div>
+                </div>
               </div>
               <div className="space-y-8">
                 <div className="bg-emerald-600 rounded-[2.5rem] p-8 text-white shadow-xl shadow-emerald-100 dark:shadow-none space-y-6">
@@ -222,7 +244,185 @@ const NeonateProfile: React.FC = () => {
                       ))}
                    </div>
                 </div>
+                <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white space-y-6">
+                   <div className="flex justify-between items-center">
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.3em]">Location</p>
+                      <MapPin size={16} className="text-emerald-500" />
+                   </div>
+                   <div className="space-y-1">
+                      <p className="text-2xl font-black">{displayData.bio.location.unit}</p>
+                      <p className="text-sm text-slate-400 font-bold uppercase tracking-widest">{displayData.bio.location.room} • {displayData.bio.location.bed}</p>
+                   </div>
+                </div>
               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'maternal' && (
+            <motion.div key="maternal" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+               <div className="lg:col-span-2 space-y-8">
+                  <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                     <div className="flex items-center space-x-3 text-rose-600 border-b border-[var(--border-main)] pb-6">
+                        <History size={20} />
+                        <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Maternal Overview</h3>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-6">
+                           <div className="space-y-1">
+                              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Full Name</p>
+                              <p className="text-lg font-bold">{displayData.maternal.name}</p>
+                           </div>
+                           <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1">
+                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Age</p>
+                                 <p className="text-sm font-bold">{displayData.maternal.age} Years</p>
+                              </div>
+                              <div className="space-y-1">
+                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Hospital No.</p>
+                                 <p className="text-sm font-bold font-mono">{displayData.maternal.hospitalNumber}</p>
+                              </div>
+                           </div>
+                        </div>
+                        <div className="p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)] space-y-4">
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Blood & Serology</p>
+                           <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium">Blood Group</span>
+                              <span className="text-sm font-black text-rose-600">{displayData.maternal.medical.bloodGroup}</span>
+                           </div>
+                           <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium">HIV Status</span>
+                              <span className="text-sm font-black text-emerald-600">{displayData.maternal.medical.hiv}</span>
+                           </div>
+                           <div className="flex justify-between items-center">
+                              <span className="text-sm font-medium">Rhesus</span>
+                              <span className="text-sm font-black">{displayData.maternal.medical.rhesus}</span>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
+                  <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                     <div className="flex items-center space-x-3 text-slate-900 dark:text-white border-b border-[var(--border-main)] pb-6">
+                        <Stethoscope size={20} />
+                        <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Obstetric & Antenatal History</h3>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div className="space-y-1">
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Parity</p>
+                           <p className="text-sm font-bold">{displayData.maternal.obstetric.parity}</p>
+                        </div>
+                        <div className="space-y-1">
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Gravidity</p>
+                           <p className="text-sm font-bold">{displayData.maternal.obstetric.gravidity}</p>
+                        </div>
+                        <div className="space-y-1">
+                           <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Preterm History</p>
+                           <p className="text-sm font-bold">{displayData.maternal.obstetric.preterm}</p>
+                        </div>
+                     </div>
+                     <div className="p-6 bg-slate-900 text-white rounded-2xl space-y-4">
+                        <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Pregnancy Complications</p>
+                        <div className="flex items-center space-x-4">
+                           <AlertCircle className="text-rose-400" size={20} />
+                           <p className="text-lg font-bold tracking-tight">{displayData.maternal.antenatal.complications}</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'assessment' && (
+            <motion.div key="assessment" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  {[
+                    { title: 'Neurological', icon: Zap, data: displayData.assessment.neurological, color: 'text-amber-500' },
+                    { title: 'Respiratory', icon: Wind, data: displayData.assessment.respiratory, color: 'text-blue-500' },
+                    { title: 'Cardiovascular', icon: Heart, data: displayData.assessment.cardiovascular, color: 'text-rose-500' },
+                    { title: 'Gastrointestinal', icon: Activity, data: displayData.assessment.gastrointestinal, color: 'text-emerald-500' },
+                    { title: 'Skin & Integumentary', icon: ShieldCheck, data: displayData.assessment.skin, color: 'text-slate-500' },
+                  ].map(section => (
+                    <div key={section.title} className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-6">
+                       <div className="flex items-center justify-between border-b border-[var(--border-main)] pb-4">
+                          <h4 className="text-[11px] font-black uppercase tracking-widest">{section.title}</h4>
+                          <section.icon className={section.color} size={18} />
+                       </div>
+                       <div className="space-y-4">
+                          {Object.entries(section.data).map(([key, val]) => (
+                            <div key={key} className="flex justify-between items-center">
+                               <span className="text-xs font-bold text-slate-400 capitalize">{key.replace(/([A-Z])/g, ' $1')}</span>
+                               <span className="text-xs font-black">{val as string}</span>
+                            </div>
+                          ))}
+                       </div>
+                    </div>
+                  ))}
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'investigations' && (
+            <motion.div key="investigations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+               <div className="lg:col-span-8 space-y-8">
+                  <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                     <div className="flex items-center space-x-3 text-blue-600 border-b border-[var(--border-main)] pb-6">
+                        <Microscope size={20} />
+                        <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Laboratory Diagnostics</h3>
+                     </div>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div className="space-y-6">
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-l-2 border-emerald-500 pl-3">Full Blood Count</p>
+                           <div className="space-y-4">
+                              <div className="flex justify-between">
+                                 <span className="text-sm font-medium">Hemoglobin (Hb)</span>
+                                 <span className="text-sm font-black">{displayData.investigations.labs.fbc.hb} g/dL</span>
+                              </div>
+                              <div className="flex justify-between">
+                                 <span className="text-sm font-medium">WBC Count</span>
+                                 <span className="text-sm font-black">{displayData.investigations.labs.fbc.wbc} x10⁹/L</span>
+                              </div>
+                              <div className="flex justify-between">
+                                 <span className="text-sm font-medium">Platelets</span>
+                                 <span className="text-sm font-black">{displayData.investigations.labs.fbc.platelets} x10⁹/L</span>
+                              </div>
+                           </div>
+                        </div>
+                        <div className="space-y-6">
+                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest border-l-2 border-rose-500 pl-3">Biochemistry & Sepsis</p>
+                           <div className="space-y-4">
+                              <div className="flex justify-between">
+                                 <span className="text-sm font-medium">C-Reactive Protein</span>
+                                 <span className="text-sm font-black text-rose-600">{displayData.investigations.labs.infection.crp} mg/L</span>
+                              </div>
+                              <div className="flex justify-between">
+                                 <span className="text-sm font-medium">Blood Glucose</span>
+                                 <span className="text-sm font-black">{displayData.investigations.labs.sugar} mmol/L</span>
+                              </div>
+                              <div className="flex justify-between">
+                                 <span className="text-sm font-medium">Total Bilirubin</span>
+                                 <span className="text-sm font-black text-amber-600">{displayData.investigations.labs.bilirubin} μmol/L</span>
+                              </div>
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               <div className="lg:col-span-4 space-y-8">
+                  <div className="bg-slate-900 rounded-[2rem] p-8 text-white space-y-8">
+                     <h4 className="text-[11px] font-black text-emerald-400 uppercase tracking-widest">Imaging Reports</h4>
+                     <div className="space-y-6">
+                        <div className="space-y-2">
+                           <p className="text-[10px] font-bold text-slate-500 uppercase">Chest X-Ray</p>
+                           <p className="text-sm leading-relaxed">{displayData.investigations.imaging.cxr}</p>
+                        </div>
+                        <div className="h-px bg-white/10" />
+                        <div className="space-y-2">
+                           <p className="text-[10px] font-bold text-slate-500 uppercase">Cranial Ultrasound</p>
+                           <p className="text-sm leading-relaxed">{displayData.investigations.imaging.ultrasound}</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </motion.div>
           )}
 
