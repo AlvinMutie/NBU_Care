@@ -4,7 +4,7 @@ import {
   ChevronLeft, Heart, Thermometer, Droplets, 
   Activity, Baby, History, Stethoscope, Microscope, Pill, FileText,
   TrendingUp, Calendar, Clock, MapPin, Scale, ShieldCheck, AlertCircle, Info, Zap,
-  Wind, Users
+  Wind, Users, Calculator
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';

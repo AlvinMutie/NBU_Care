@@ -14,11 +14,17 @@ const Academy: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [user] = useState<any>(JSON.parse(localStorage.getItem('user_data') || '{}'));
+  const [user] = useState<any>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('user_data') || '{}');
+    } catch {
+      return {};
+    }
+  });
   const [challenge, setChallenge] = useState<any>(null);
   
-  const isAdmin = user.role === 'Nursing In-Charge' || user.name === 'System Admin';
-  const isStudent = user.role === 'Student';
+  const isAdmin = user?.role === 'Nursing In-Charge' || user?.name === 'System Admin';
+  const isStudent = user?.role === 'Student';
 
   const [formData, setFormData] = useState({
     type: 'flashcard',
@@ -44,14 +50,17 @@ const Academy: React.FC = () => {
         api.get('/learning/scenarios')
       ]);
       
+      const flashcards = flashRes.data?.data || [];
+      const scenarios = scenariosRes.data?.data || [];
+
       const mappedModules = [
-        ...flashRes.data.data.map((f: any) => ({ 
+        ...flashcards.map((f: any) => ({ 
           ...f, 
           type: 'flashcard',
           icon: Zap, 
           level: f.category === 'Critical' ? 'Advanced' : 'Essential'
         })),
-        ...scenariosRes.data.data.map((s: any) => ({ 
+        ...scenarios.map((s: any) => ({ 
           ...s, 
           type: 'scenario',
           category: 'Bedside Simulation', 
@@ -172,7 +181,7 @@ const Academy: React.FC = () => {
                       </div>
                       <div>
                          <p className={`text-xs font-bold ${step.c ? 'text-slate-400 line-through' : 'text-[var(--text-main)]'}`}>{step.t}</p>
-                         <p className="text-[10px] text-slate-400 font-medium">{step.desc}</p>
+                         <p className="text-[10px] text-slate-400 font-medium">{step.d}</p>
                       </div>
                    </div>
                  ))}
@@ -191,28 +200,31 @@ const Academy: React.FC = () => {
          </div>
 
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {modules.map((m, idx) => (
-              <div key={idx} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm hover:border-emerald-200 transition-all cursor-pointer group">
-                 <div className="flex justify-between items-start mb-4">
-                    <div className="p-2.5 rounded-xl bg-[var(--bg-main)] text-slate-400 group-hover:text-emerald-600 transition-colors">
-                       <m.icon size={20} />
-                    </div>
-                    <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">{m.level}</span>
-                 </div>
-                 <h4 className="text-base font-bold mb-1">{m.title}</h4>
-                 <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3">{m.category}</p>
-                 <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed mb-4">
-                    {m.content || m.description}
-                 </p>
-                 <div className="pt-4 border-t border-[var(--border-main)] flex items-center justify-between text-slate-400">
-                    <div className="flex items-center space-x-2 text-[10px] font-bold uppercase">
-                       <Clock size={12} />
-                       <span>{m.type === 'flashcard' ? '2m' : '10m'}</span>
-                    </div>
-                    <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
-                 </div>
-              </div>
-            ))}
+            {modules.map((m, idx) => {
+              const Icon = m.icon || BookOpen;
+              return (
+                <div key={idx} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm hover:border-emerald-200 transition-all cursor-pointer group">
+                   <div className="flex justify-between items-start mb-4">
+                      <div className="p-2.5 rounded-xl bg-[var(--bg-main)] text-slate-400 group-hover:text-emerald-600 transition-colors">
+                         <Icon size={20} />
+                      </div>
+                      <span className="text-[9px] font-black uppercase tracking-widest text-slate-300">{m.level}</span>
+                   </div>
+                   <h4 className="text-base font-bold mb-1">{m.title}</h4>
+                   <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3">{m.category}</p>
+                   <p className="text-xs text-slate-500 font-medium line-clamp-2 leading-relaxed mb-4">
+                      {m.content || m.description}
+                   </p>
+                   <div className="pt-4 border-t border-[var(--border-main)] flex items-center justify-between text-slate-400">
+                      <div className="flex items-center space-x-2 text-[10px] font-bold uppercase">
+                         <Clock size={12} />
+                         <span>{m.type === 'flashcard' ? '2m' : '10m'}</span>
+                      </div>
+                      <ChevronRight size={14} className="group-hover:translate-x-1 transition-transform" />
+                   </div>
+                </div>
+              );
+            })}
          </div>
       </div>
 
