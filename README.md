@@ -68,6 +68,18 @@ docker run -p 8000:10000 neodesk-backend
    npm run dev
    ```
 
+## Testing & Login Credentials
+
+Use the following pre-seeded credentials to access the platform during review. The default password for all accounts is **`password`**.
+
+| Role | Email Address | Access Level |
+| :--- | :--- | :--- |
+| **System Admin** | `admin@neodesk.org` | Full Institutional Oversight |
+| **Consultant** | `angela.omwansa@hospital.go.ke` | Clinical Advisory & Case Review |
+| **Nursing In-Charge** | `teresa.njoroge@hospital.go.ke` | Ward Management & Rota Allocation |
+| **Staff Nurse** | `patrick.kamau@hospital.go.ke` | Bedside Documentation & Vitals |
+| **Medical Officer** | `cynthia.wekesa@hospital.go.ke` | Clinical Interventions & Orders |
+
 ## Hosting on Render
 
 This project is pre-configured for deployment on [Render](https://render.com).
@@ -75,11 +87,11 @@ This project is pre-configured for deployment on [Render](https://render.com).
 1. **Connect your GitHub repository** to Render.
 2. Render will automatically detect the `render.yaml` file.
 3. **Deploy the Services:**
-   - `nbu-laravel-unified`: The PHP backend will deploy first.
-   - `nbu-nurse-assistant`: The static frontend will deploy.
+   - `neodesk-back-v301`: The Dockerized PHP backend.
+   - `neodesk-front-v301`: The static frontend.
 4. **Configuration:**
-   - After the backend is deployed, copy its URL (e.g., `https://nbu-laravel-unified.onrender.com`).
-   - In the Render dashboard for the `nbu-nurse-assistant` service, update the `VITE_API_BASE_URL` environment variable to `YOUR_BACKEND_URL/api`.
+   - Copy the live URL of your backend (e.g., `https://neodesk-back-v301.onrender.com`).
+   - In the Render dashboard for the `neodesk-front-v301` service, ensure the `VITE_API_BASE_URL` environment variable is set to `YOUR_BACKEND_URL/api`.
    - Re-deploy the frontend to apply the change.
 
 ## Clinical Safety Disclaimer
