@@ -1,20 +1,19 @@
 services:
   - type: web
-    name: neodesk-front-v200
+    name: neodesk-front-v301
     env: static
-    rootDir: nbu-nurse-assistant
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    buildCommand: cd nbu-nurse-assistant && npm install && npm run build
+    staticPublishPath: nbu-nurse-assistant/dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://neodesk-back-v200.onrender.com/api
+        value: https://neodesk-back-v301.onrender.com/api
 
   - type: web
-    name: neodesk-back-v200
+    name: neodesk-back-v301
     env: docker
     plan: free
     rootDir: nbu-laravel-unified
