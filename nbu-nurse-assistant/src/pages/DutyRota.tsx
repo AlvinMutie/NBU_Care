@@ -139,8 +139,8 @@ const DutyRota: React.FC = () => {
                       <div className="space-y-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Shift Type</label>
                          <select 
-                           value={newShift.shift_type}
-                           onChange={(e) => setNewShift({...newShift, shift_type: e.target.value})}
+                           value={newShift.shift}
+                           onChange={(e) => setNewShift({...newShift, shift: e.target.value})}
                            className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-xl text-sm font-bold outline-none"
                          >
                             <option value="Morning">Morning</option>

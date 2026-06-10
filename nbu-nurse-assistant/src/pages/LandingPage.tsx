@@ -7,8 +7,9 @@ import {
   Heart, CheckCircle2, Shield,
   Mail, MapPin, Stethoscope, Database,
   Zap, Share2, Globe, MessageSquare, Send,
-  Phone, Clock, Facebook, Twitter, Instagram, Linkedin,
-  ChevronRight, ArrowRight, UserPlus, Calendar, Plus
+  Phone, Clock,
+  ChevronRight, ArrowRight, UserPlus, Calendar, Plus,
+  BarChart3, BookOpen, ClipboardList, Droplets
 } from 'lucide-react';
 import babyImage from '../assets/baby2.jpg';
 import logo from '../assets/logo.png';
@@ -54,10 +55,10 @@ const LandingPage: React.FC = () => {
               </div>
            </div>
            <div className="flex items-center space-x-4">
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Facebook size={14} /></a>
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Twitter size={14} /></a>
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Instagram size={14} /></a>
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Linkedin size={14} /></a>
+              <a href="#" className="hover:text-emerald-500 transition-colors"><Globe size={14} /></a>
+              <a href="#" className="hover:text-emerald-500 transition-colors"><Share2 size={14} /></a>
+              <a href="#" className="hover:text-emerald-500 transition-colors"><MessageSquare size={14} /></a>
+              <a href="#" className="hover:text-emerald-500 transition-colors"><Mail size={14} /></a>
            </div>
         </div>
       </div>
@@ -323,9 +324,9 @@ const LandingPage: React.FC = () => {
                         <img src={d.i} alt={d.n} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" />
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
                            <div className="flex space-x-4 text-white">
-                              <Facebook size={16} />
-                              <Twitter size={16} />
-                              <Linkedin size={16} />
+                              <Globe size={16} />
+                              <Share2 size={16} />
+                              <Mail size={16} />
                            </div>
                         </div>
                      </div>
@@ -415,10 +416,10 @@ const LandingPage: React.FC = () => {
                 Standardizing neonatal care through surgical precision and premium healthcare technology. Established to save lives through data integrity.
               </p>
               <div className="flex items-center space-x-6 text-slate-400">
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Facebook size={24} /></a>
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Twitter size={24} /></a>
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Linkedin size={24} /></a>
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Instagram size={24} /></a>
+                <a href="#" className="hover:text-emerald-500 transition-colors"><Globe size={24} /></a>
+                <a href="#" className="hover:text-emerald-500 transition-colors"><Share2 size={24} /></a>
+                <a href="#" className="hover:text-emerald-500 transition-colors"><MessageSquare size={24} /></a>
+                <a href="#" className="hover:text-emerald-500 transition-colors"><Mail size={24} /></a>
               </div>
             </div>
 
