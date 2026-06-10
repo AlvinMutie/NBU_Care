@@ -72,3 +72,27 @@
 .theme-transition {
   @apply transition-all duration-300;
 }
+
+@utility nav-glow {
+  @apply transition-all duration-300;
+  &:hover {
+    @apply text-emerald-400;
+    text-shadow: 0 0 10px rgba(52, 211, 153, 0.6);
+  }
+}
+
+@utility perspective-1000 {
+  perspective: 1000px;
+}
+
+@utility preserve-3d {
+  transform-style: preserve-3d;
+}
+
+@utility backface-hidden {
+  backface-visibility: hidden;
+}
+
+@utility rotate-y-180 {
+  transform: rotateY(180deg);
+}

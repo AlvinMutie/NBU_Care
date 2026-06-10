@@ -14,6 +14,50 @@ import {
 import babyImage from '../assets/baby2.jpg';
 import logo from '../assets/logo.png';
 
+const FlipCard = ({ title, desc, details, icon: Icon, backColor }: any) => {
+  const [isFlipped, setIsFlipped] = useState(false);
+
+  return (
+    <div 
+      className="relative h-[400px] w-full perspective-1000 group cursor-pointer"
+      onMouseEnter={() => setIsFlipped(true)}
+      onMouseLeave={() => setIsFlipped(false)}
+    >
+      <motion.div 
+        className="relative w-full h-full transition-all duration-700 preserve-3d"
+        animate={{ rotateY: isFlipped ? 180 : 0 }}
+      >
+        {/* Front */}
+        <div className="absolute inset-0 backface-hidden p-10 rounded-[3rem] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm flex flex-col justify-between">
+           <div>
+              <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center text-emerald-600 mb-10">
+                 <Icon size={28} />
+              </div>
+              <h4 className="text-2xl font-bold mb-4">{title}</h4>
+              <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">{desc}</p>
+           </div>
+           <div className="flex items-center text-[10px] font-black uppercase tracking-widest text-emerald-500">
+              <span>Deep Dive</span>
+              <Plus size={12} className="ml-2" />
+           </div>
+        </div>
+
+        {/* Back */}
+        <div className={`absolute inset-0 backface-hidden rotate-y-180 p-10 rounded-[3rem] ${backColor} text-white shadow-2xl flex flex-col justify-center text-center items-center space-y-6`}>
+           <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-4">
+              <Icon size={32} />
+           </div>
+           <h4 className="text-2xl font-black tracking-tight">{title}</h4>
+           <div className="w-12 h-1 h-white/30 rounded-full" />
+           <p className="text-white/90 text-sm font-bold leading-relaxed">
+              {details}
+           </p>
+        </div>
+      </motion.div>
+    </div>
+  );
+};
+
 const LandingPage: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', email: '', institution: '' });
 
@@ -55,10 +99,10 @@ const LandingPage: React.FC = () => {
               </div>
            </div>
            <div className="flex items-center space-x-4">
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Globe size={14} /></a>
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Share2 size={14} /></a>
-              <a href="#" className="hover:text-emerald-500 transition-colors"><MessageSquare size={14} /></a>
-              <a href="#" className="hover:text-emerald-500 transition-colors"><Mail size={14} /></a>
+              <a href="#" className="nav-glow transition-colors"><Globe size={14} /></a>
+              <a href="#" className="nav-glow transition-colors"><Share2 size={14} /></a>
+              <a href="#" className="nav-glow transition-colors"><MessageSquare size={14} /></a>
+              <a href="#" className="nav-glow transition-colors"><Mail size={14} /></a>
            </div>
         </div>
       </div>
@@ -74,11 +118,10 @@ const LandingPage: React.FC = () => {
           </Link>
           
           <div className="hidden md:flex items-center space-x-10 text-[11px] font-black uppercase tracking-widest text-slate-500 dark:text-slate-400">
-            <a href="#about" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Who We Are</a>
-            <a href="#services" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Services</a>
-            <a href="#team" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Clinicians</a>
-            <a href="#events" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Events</a>
-            <a href="#contact" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Contact</a>
+            <a href="#about" className="nav-glow transition-colors">Who We Are</a>
+            <a href="#services" className="nav-glow transition-colors">Services</a>
+            <a href="#events" className="nav-glow transition-colors">Events</a>
+            <a href="#contact" className="nav-glow transition-colors">Contact</a>
           </div>
 
           <div className="flex items-center space-x-4">
@@ -110,10 +153,6 @@ const LandingPage: React.FC = () => {
             variants={containerVariants}
             className="max-w-3xl space-y-8"
           >
-            <motion.div variants={itemFadeUp} className="inline-flex items-center space-x-3 px-4 py-2 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-400">
-               <Shield size={14} fill="currentColor" />
-               <span className="text-[10px] font-black uppercase tracking-[0.2em]">Institutional Grade Safety</span>
-            </motion.div>
             <motion.h1 variants={itemFadeUp} className="text-6xl lg:text-[80px] font-black tracking-tighter text-white leading-[0.9]">
               Precision <br />
               <span className="text-emerald-500 text-[1.1em]">Neonatal Care.</span>
@@ -180,9 +219,17 @@ const LandingPage: React.FC = () => {
                         Advancing <br /> Clinical Safety.
                      </h3>
                   </div>
-                  <p className="text-xl text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
-                     NeoDesk is not just a platform; it is a clinical standard. We provide the digital infrastructure required to eliminate medical variables and ensure every neonate receives institutional-grade care.
-                  </p>
+                  <div className="space-y-6 text-xl text-slate-600 dark:text-slate-400 font-medium leading-relaxed">
+                     <p>
+                        NeoDesk is a pioneered clinical intelligence ecosystem specifically engineered for the high-acuity environment of neonatal care. Our mission is to bridge the gap between complex medical requirements and seamless digital execution, ensuring that every second in the NBU is backed by data-driven precision.
+                     </p>
+                     <p>
+                        We understand that in neonatal medicine, there is zero margin for error. That's why we've built a platform that doesn't just store data, but actively protects patients through automated clinical validation, real-time vital tracking, and an immutable audit trail that sets a new global standard for institutional accountability.
+                     </p>
+                     <p>
+                        Our team of clinicians and engineers work at the intersection of healthcare and technology to deliver a sophisticated operating system that empowers nursing staff, consultants, and students alike. From precision medication dosing to seamless shift transitions, NeoDesk is the heartbeat of the modern neonatal ward.
+                     </p>
+                  </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 pt-6">
                      {[
                         { t: 'Safety First', d: 'Protocols validated by clinical boards.', i: ShieldCheck },
@@ -218,30 +265,57 @@ const LandingPage: React.FC = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                {[
-                  { t: 'Fluid Intelligence', d: 'Automated calculation for TFI and GIR to prevent electrolyte imbalances.', i: Droplets },
-                  { t: 'Vetting Pipeline', d: 'Forensic credentialing of medical staff before ward access.', i: UserPlus },
-                  { t: 'Shift Continuity', d: 'Professional SBAR handover generation for seamless care transitions.', i: ClipboardList },
-                  { t: 'Audit Trail', d: 'Immutable clinical history logging for legal and medical review.', i: Database },
-                  { t: 'Ward Analytics', d: 'Real-time performance metrics for nursing in-charges.', i: BarChart3 },
-                  { t: 'Mobile Command', d: 'Fully responsive cloud interface for bedside tablet use.', i: Globe },
-               ].map((s, i) => {
-                  const Icon = s.i || Activity;
-                  return (
-                     <div key={i} className="group p-10 rounded-[3rem] bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 hover:shadow-2xl transition-all hover:border-emerald-200">
-                        <div className="w-14 h-14 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl flex items-center justify-center text-emerald-600 mb-10 group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all">
-                           <Icon size={28} />
-                        </div>
-                        <h4 className="text-2xl font-bold mb-4">{s.t}</h4>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-medium leading-relaxed">{s.d}</p>
-                     </div>
-                  );
-               })}
+                  { 
+                    t: 'Fluid Intelligence', 
+                    d: 'Automated calculation for TFI and GIR to prevent electrolyte imbalances.', 
+                    details: 'NeoDesk utilizes weight-indexed clinical math to automate complex fluid requirements. This eliminates human error in GIR/TFI transitions, ensuring critical metabolic stability for high-acuity neonates.',
+                    i: Droplets,
+                    c: 'bg-emerald-600'
+                  },
+                  { 
+                    t: 'Vetting Pipeline', 
+                    d: 'Forensic credentialing of medical staff before ward access.', 
+                    details: 'Our multi-layer verification system ensures only authorized, clinically vetted personnel access patient data. We integrate with institutional HR to maintain a secure, forensic-level ledger of all practitioners.',
+                    i: UserPlus,
+                    c: 'bg-slate-900'
+                  },
+                  { 
+                    t: 'Shift Continuity', 
+                    d: 'Professional SBAR handover generation for seamless care transitions.', 
+                    details: 'Standardizing communication via automated SBAR reports. NeoDesk captures all vital trends and clinical events during a shift, packaging them into a structured digital handover that leaves no room for ambiguity.',
+                    i: ClipboardList,
+                    c: 'bg-emerald-700'
+                  },
+                  { 
+                    t: 'Audit Trail', 
+                    d: 'Immutable clinical history logging for legal and medical review.', 
+                    details: 'Every action taken within the NeoDesk ecosystem is timestamped and attributed to a verified clinician. This creates a permanent, tamper-proof record of care that is essential for legal compliance and clinical audits.',
+                    i: Database,
+                    c: 'bg-slate-800'
+                  },
+                  { 
+                    t: 'Ward Analytics', 
+                    d: 'Real-time performance metrics for nursing in-charges.', 
+                    details: 'Live dashboards provide nursing in-charges with instant visibility into ward status, staff workload, and patient acuity trends. Data-driven orchestration leads to better resource allocation and improved patient outcomes.',
+                    i: BarChart3,
+                    c: 'bg-emerald-900'
+                  },
+                  { 
+                    t: 'Mobile Command', 
+                    d: 'Fully responsive cloud interface for bedside tablet use.', 
+                    details: 'Engineered for the bedside. NeoDesk is optimized for rapid input on tablets and mobile devices, allowing clinicians to document care in real-time without leaving the neonate\'s side, ensuring zero-latency data entry.',
+                    i: Globe,
+                    c: 'bg-slate-950'
+                  },
+               ].map((s, i) => (
+                  <FlipCard key={i} title={s.t} desc={s.d} details={s.details} icon={s.i} backColor={s.c} />
+               ))}
             </div>
          </div>
       </section>
 
       {/* 📝 7. APPOINTMENT / INQUIRY SECTION */}
-      <section className="py-32 bg-slate-900 relative overflow-hidden">
+      <section id="contact" className="py-32 bg-slate-900 relative overflow-hidden">
          <div className="absolute top-0 right-0 p-40 opacity-5 text-white pointer-events-none">
             <Stethoscope size={600} />
          </div>
@@ -268,74 +342,38 @@ const LandingPage: React.FC = () => {
                </div>
             </div>
 
-            <div className="bg-white rounded-[3rem] p-12 shadow-2xl space-y-8">
+            <div className="bg-white dark:bg-slate-800 rounded-[3rem] p-12 shadow-2xl space-y-8">
                <div className="space-y-2">
-                  <h4 className="text-3xl font-black tracking-tight text-slate-900">Get in Touch</h4>
-                  <p className="text-sm text-slate-500 font-medium">Initialize institutional link today.</p>
+                  <h4 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Get in Touch</h4>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 font-medium">Initialize institutional link today.</p>
                </div>
                <form className="grid grid-cols-1 gap-4">
                   <input 
                    type="text" 
                    placeholder="Clinician / Administrator Name" 
-                   className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all"
+                   className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all text-slate-900 dark:text-white"
                   />
                   <div className="grid grid-cols-2 gap-4">
                      <input 
                       type="email" 
                       placeholder="Official Email" 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all text-slate-900 dark:text-white"
                      />
                      <input 
                       type="text" 
                       placeholder="Department" 
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all"
+                      className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all text-slate-900 dark:text-white"
                      />
                   </div>
                   <textarea 
                    placeholder="Institutional Requirements / Message" 
                    rows={4}
-                   className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all resize-none"
+                   className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-700 rounded-2xl px-6 py-4 text-sm font-bold focus:outline-none focus:border-emerald-500 transition-all resize-none text-slate-900 dark:text-white"
                   />
                   <button className="w-full bg-emerald-600 text-white py-5 rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-emerald-600/20 hover:bg-emerald-700 transition-all">
                      Initiate Institutional Vetting
                   </button>
                </form>
-            </div>
-         </div>
-      </section>
-
-      {/* 👨‍⚕️ 8. DOCTOR TEAM SECTION */}
-      <section id="team" className="py-32 bg-white dark:bg-[#0f172a]">
-         <div className="max-w-7xl mx-auto px-6 lg:px-12">
-            <div className="text-center max-w-3xl mx-auto mb-24 space-y-4">
-               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-emerald-500">Our Clinicians</p>
-               <h3 className="text-4xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white">Specialized Expertise.</h3>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-               {[
-                  { n: 'Dr. Alvin Mutie', r: 'Chief Clinical Officer', i: 'https://i.pravatar.cc/300?u=alvin' },
-                  { n: 'Sarah Jenkins', r: 'Nursing In-Charge', i: 'https://i.pravatar.cc/300?u=sarah' },
-                  { n: 'Dr. Michael Chen', r: 'Lead Pediatrician', i: 'https://i.pravatar.cc/300?u=michael' },
-                  { n: 'Emma Wilson', r: 'Clinical Coordinator', i: 'https://i.pravatar.cc/300?u=emma' },
-               ].map((d, i) => (
-                  <div key={i} className="group space-y-6">
-                     <div className="relative overflow-hidden rounded-[3rem] bg-slate-100 aspect-square">
-                        <img src={d.i} alt={d.n} className="w-full h-full object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-1000" />
-                        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-8">
-                           <div className="flex space-x-4 text-white">
-                              <Globe size={16} />
-                              <Share2 size={16} />
-                              <Mail size={16} />
-                           </div>
-                        </div>
-                     </div>
-                     <div className="text-center">
-                        <h5 className="text-xl font-bold text-slate-900 dark:text-white">{d.n}</h5>
-                        <p className="text-[10px] font-black text-emerald-500 uppercase tracking-widest mt-1">{d.r}</p>
-                     </div>
-                  </div>
-               ))}
             </div>
          </div>
       </section>
@@ -416,20 +454,19 @@ const LandingPage: React.FC = () => {
                 Standardizing neonatal care through surgical precision and premium healthcare technology. Established to save lives through data integrity.
               </p>
               <div className="flex items-center space-x-6 text-slate-400">
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Globe size={24} /></a>
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Share2 size={24} /></a>
-                <a href="#" className="hover:text-emerald-500 transition-colors"><MessageSquare size={24} /></a>
-                <a href="#" className="hover:text-emerald-500 transition-colors"><Mail size={24} /></a>
+                <a href="#" className="nav-glow transition-colors"><Globe size={24} /></a>
+                <a href="#" className="nav-glow transition-colors"><Share2 size={24} /></a>
+                <a href="#" className="nav-glow transition-colors"><MessageSquare size={24} /></a>
+                <a href="#" className="nav-glow transition-colors"><Mail size={24} /></a>
               </div>
             </div>
 
             <div className="lg:col-span-2 space-y-8">
               <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">Quick Links</h4>
               <ul className="space-y-4 text-sm font-bold text-slate-500 dark:text-slate-400">
-                <li><a href="#about" className="hover:text-emerald-600 transition-colors">Who We Are</a></li>
-                <li><a href="#services" className="hover:text-emerald-600 transition-colors">Our Services</a></li>
-                <li><a href="#team" className="hover:text-emerald-600 transition-colors">Specialists</a></li>
-                <li><a href="#events" className="hover:text-emerald-600 transition-colors">Institutional News</a></li>
+                <li><a href="#about" className="nav-glow transition-colors">Who We Are</a></li>
+                <li><a href="#services" className="nav-glow transition-colors">Our Services</a></li>
+                <li><a href="#events" className="nav-glow transition-colors">Institutional News</a></li>
               </ul>
             </div>
 
@@ -452,31 +489,12 @@ const LandingPage: React.FC = () => {
                  </div>
               </div>
             </div>
-
-            <div className="lg:col-span-3 space-y-8">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.4em] text-emerald-500">Location</h4>
-              <div className="space-y-6 text-sm font-bold text-slate-500 dark:text-slate-400">
-                <div className="flex items-start space-x-4">
-                   <MapPin size={20} className="text-emerald-500 shrink-0" />
-                   <p>Clinical Intelligence Node, <br /> Upper Hill, Nairobi, Kenya.</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                   <Phone size={20} className="text-emerald-500 shrink-0" />
-                   <p>+254 700 000 000</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                   <Mail size={20} className="text-emerald-500 shrink-0" />
-                   <p>info@neodesk.org</p>
-                </div>
-              </div>
-            </div>
           </div>
 
           <div className="pt-12 border-t border-slate-200 dark:border-slate-800 flex flex-col md:flex-row justify-between items-center gap-10">
              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
                 &copy; 2026 NeoDesk Clinical Systems. Secure Institutional Ledger.
              </div>
-             <div className="text-[10px] font-black text-emerald-600/50 uppercase tracking-[0.2em]">Designed by AlvinMutie</div>
           </div>
         </div>
       </footer>

@@ -1,1 +1,4 @@
-is there anyway we can implement the lnding page to use a similar structure the same as the following: https://html.kamleshyadav.com/html/healthcare/bootstrap5/one_page.html
+remove the following: Institutional Grade Safety, Designed by AlvinMutie
+Add an animation where when the cursor point to sth either at the top navigation bar or the footer, there is this glowing animation. Like it changes the color of the text to a lighter version of the original color.
+also the contact us page is white, fix that so that its readable. And populate the about section with a lot of words about the. Remove the Our Clinicians section.
+Add a feature where when you hover on the Institutional Services section, the cards flip and explain more on it and the cards when they flip they are in another color and when you stop hovering, they do a smooth flip animation back to its original state.
