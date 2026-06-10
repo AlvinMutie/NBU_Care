@@ -1,6 +1,7 @@
 services:
-  - type: static
+  - type: web
     name: neodesk-frontend-prod-77
+    env: static
     rootDir: nbu-nurse-assistant
     buildCommand: npm install && npm run build
     staticPublishPath: dist
