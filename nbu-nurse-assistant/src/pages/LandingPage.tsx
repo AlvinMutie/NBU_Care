@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import type { Variants } from 'framer-motion';
 import { 
-  ShieldCheck, Activity, Bell, Users, FileText, 
-  Heart, CheckCircle2, Shield,
+  ShieldCheck, 
+  Heart, 
   Mail, MapPin, Stethoscope, Database,
-  Zap, Share2, Globe, MessageSquare, Send,
+  Zap, Share2, Globe, MessageSquare,
   Phone, Clock,
-  ChevronRight, ArrowRight, UserPlus, Calendar, Plus,
+  ChevronRight, ArrowRight, UserPlus, Plus,
   BarChart3, BookOpen, ClipboardList, Droplets
 } from 'lucide-react';
 import babyImage from '../assets/baby2.jpg';
@@ -59,8 +59,6 @@ const FlipCard = ({ title, desc, details, icon: Icon, backColor }: any) => {
 };
 
 const LandingPage: React.FC = () => {
-  const [formData, setFormData] = useState({ name: '', email: '', institution: '' });
-
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     visible: {

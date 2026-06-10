@@ -52,15 +52,14 @@ E:\Projects\NBU_Care-main\
 
 ### Installation
 
-1. **Backend Setup:**
-   ```bash
-   cd nbu-laravel-unified
-   composer install
-   cp .env.example .env
-   php artisan key:generate
-   php artisan migrate --seed
-   php artisan serve
-   ```
+### Backend Setup:
+The backend is Dockerized for consistency and ease of deployment.
+```bash
+cd nbu-laravel-unified
+# Ensure you have Docker installed
+docker build -t neodesk-backend .
+docker run -p 8000:10000 neodesk-backend
+```
 
 2. **Frontend Setup:**
    ```bash
