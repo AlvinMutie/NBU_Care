@@ -409,3 +409,27 @@ const Academy: React.FC = () => {
         )}
 
         {showAddModal && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-xl p-10 border border-[var(--border-main)] space-y-8 shadow-2xl">
+                <div className="flex justify-between items-center">
+                   <h3 className="text-2xl font-bold tracking-tight">New Knowledge Module</h3>
+                   <button onClick={() => setShowAddModal(false)} className="p-2"><X size={20} /></button>
+                </div>
+                <form onSubmit={handleSave} className="space-y-6">
+                   <div className="flex p-1 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)]">
+                      <button type="button" onClick={() => setFormData({...formData, type: 'flashcard'})} className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${formData.type === 'flashcard' ? 'bg-[var(--card-bg)] shadow-sm text-emerald-600' : 'text-slate-400'}`}>Flashcard</button>
+                      <button type="button" onClick={() => setFormData({...formData, type: 'scenario'})} className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${formData.type === 'scenario' ? 'bg-[var(--card-bg)] shadow-sm text-emerald-600' : 'text-slate-400'}`}>Simulation</button>
+                   </div>
+                   <input value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold" placeholder="Title" required />
+                   <textarea rows={4} value={formData.content || formData.description} onChange={(e) => setFormData({...formData, content: e.target.value, description: e.target.value})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-medium" placeholder="Content..." required />
+                   <button type="submit" className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold hover:bg-emerald-700 transition-all shadow-lg active:scale-95">Deploy Module</button>
+                </form>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default Academy;
