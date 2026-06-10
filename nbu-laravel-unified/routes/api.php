@@ -21,10 +21,12 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('/handovers/{neonateId?}', [HandoverController::class, 'index']);
     Route::post('/handovers', [HandoverController::class, 'store']);
+    Route::get('/handovers/{handover}/download', [HandoverController::class, 'downloadPDF']);
     
     Route::post('/vitals', [VitalController::class, 'store']);
     Route::get('/vitals/history/{neonateId}', [VitalController::class, 'history']);
 
+    Route::get('/learning/challenge', [LearningController::class, 'currentChallenge']);
     Route::get('/learning/flashcards', [LearningController::class, 'flashcards']);
     Route::post('/learning/flashcards', [LearningController::class, 'storeFlashcard']);
     Route::patch('/learning/flashcards/{flashcard}', [LearningController::class, 'updateFlashcard']);
@@ -41,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/stats', [AdminController::class, 'stats']);
     Route::get('/admin/alerts', [AdminController::class, 'alerts']);
     Route::get('/admin/analytics', [AdminController::class, 'analytics']);
+    Route::get('/admin/academy-analytics', [AdminController::class, 'academyAnalytics']);
     Route::post('/admin/users/{user}/reset-password', [AdminController::class, 'resetPassword']);
     Route::get('/admin/users', [AdminController::class, 'users']);
     Route::get('/auth/pending', [AdminController::class, 'pendingUsers']);

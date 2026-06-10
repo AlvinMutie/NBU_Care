@@ -8,6 +8,37 @@ use Illuminate\Http\Request;
 
 class LearningController extends Controller
 {
+    public function currentChallenge(Request $request)
+    {
+        $user = $request->user();
+        
+        // Determine current day based on streak or some other logic
+        $currentDay = $user->quiz_streak + 1;
+        
+        // Find scenario for this day (cycle through 5 scenarios if needed, or have 30 scenarios)
+        // For now, let's assume we have 5 core scenarios as requested
+        $scenarioIndex = ($currentDay - 1) % 5;
+        $scenarios = [
+            ['type' => 'Extreme Prematurity', 'day' => 1],
+            ['type' => 'Neonatal Jaundice', 'day' => 2],
+            ['type' => 'Sepsis', 'day' => 3],
+            ['type' => 'Respiratory Distress Syndrome', 'day' => 4],
+            ['type' => 'Infant of a Diabetic Mother', 'day' => 5],
+        ];
+        
+        $challenge = $scenarios[$scenarioIndex];
+        
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'day' => $currentDay,
+                'challenge' => $challenge,
+                'streak' => $user->quiz_streak,
+                'accuracy' => $user->calculation_accuracy
+            ]
+        ]);
+    }
+
     public function flashcards()
     {
         $flashcards = Flashcard::all();

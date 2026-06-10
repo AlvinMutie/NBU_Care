@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Users, Activity, Beaker, ShieldCheck, TrendingUp, 
-  Phone, ArrowRight, ClipboardCheck,
-  Clock, Zap, BookOpen, BarChart3, PieChart, RefreshCcw, AlertCircle,
-  GraduationCap, CheckCircle2, ChevronRight
+  ArrowRight, ClipboardCheck,
+  Clock, Zap, BookOpen, RefreshCcw, AlertCircle,
+  GraduationCap, ChevronRight, Calculator, FileText, Flame
 } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, PieChart as RePieChart, Pie, Cell
+  AreaChart, Area, ResponsiveContainer
 } from 'recharts';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
@@ -18,14 +17,20 @@ const Dashboard: React.FC = () => {
   const [stats, setStats] = useState({
     total_staff: 0,
     live_cases: 0,
-    doses_given: 0
+    doses_given: 0,
+    quiz_streak: 0,
+    calculation_accuracy: 0,
+    case_load: 0,
+    handovers_completed: 0
   });
   const [alerts, setAlerts] = useState<any[]>([]);
   const [recentLogs, setLogs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [challenge, setChallenge] = useState<any>(null);
   
   const user = JSON.parse(localStorage.getItem('user_data') || '{}');
   const isStudent = user.role === 'Student';
+  const isAdminOrNurse = user.role === 'Nursing In-Charge' || user.name === 'System Admin';
 
   useEffect(() => {
     fetchDashboardData();
@@ -34,14 +39,33 @@ const Dashboard: React.FC = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [statsRes, logsRes, alertsRes] = await Promise.all([
-        api.get('/admin/stats'),
-        api.get('/logs/recent'),
-        api.get('/admin/alerts')
-      ]);
-      setStats(statsRes.data.data);
-      setLogs(logsRes.data.data);
-      setAlerts(alertsRes.data.data);
+      if (isStudent) {
+        const [profileRes, challengeRes, neonatesRes, handoversRes] = await Promise.all([
+          api.get('/auth/profile'),
+          api.get('/learning/challenge'),
+          api.get('/neonates'),
+          api.get('/handovers')
+        ]);
+        
+        const profile = profileRes.data.data;
+        setStats(prev => ({
+          ...prev,
+          quiz_streak: profile.quiz_streak,
+          calculation_accuracy: profile.calculation_accuracy,
+          case_load: neonatesRes.data.data.length,
+          handovers_completed: handoversRes.data.data.length
+        }));
+        setChallenge(challengeRes.data.data);
+      } else {
+        const [statsRes, logsRes, alertsRes] = await Promise.all([
+          api.get('/admin/stats'),
+          api.get('/logs/recent'),
+          api.get('/admin/alerts')
+        ]);
+        setStats(statsRes.data.data);
+        setLogs(logsRes.data.data);
+        setAlerts(alertsRes.data.data);
+      }
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
     } finally {
@@ -50,14 +74,14 @@ const Dashboard: React.FC = () => {
   };
 
   const handleEndShift = () => {
-    if (window.confirm('Terminate active clinical session and log out?')) {
+    if (window.confirm('Terminate active session and log out?')) {
        localStorage.removeItem('auth_token');
        localStorage.removeItem('user_data');
        navigate('/');
     }
   };
 
-  if (loading && stats.total_staff === 0) {
+  if (loading && !stats.quiz_streak && !stats.total_staff) {
      return (
         <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
            <div className="w-10 h-10 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin" />
@@ -75,20 +99,20 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
-      {/* Header with New Ward Load Infographic */}
+      {/* Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">{isStudent ? 'Learning Command' : 'Command Center'}</h2>
+          <h2 className="text-3xl font-bold tracking-tight">{isStudent ? 'Student Dashboard' : 'Command Center'}</h2>
           <p className="text-slate-500 font-medium tracking-tight">
-             {isStudent ? 'Your clinical competency and study progress overview.' : 'Real-time clinical orchestration and ward monitoring.'}
+             {isStudent ? 'Track your clinical rotation progress and competency.' : 'Real-time clinical orchestration and ward monitoring.'}
           </p>
         </div>
         
         <div className="flex items-center gap-6 bg-[var(--card-bg)] border border-[var(--border-main)] p-3 px-6 rounded-3xl shadow-sm">
            <div className="flex flex-col">
-              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Ward Load Index</p>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">System Status</p>
               <div className="flex items-center space-x-3">
-                 <span className="text-xl font-black text-[var(--text-main)]">67.4%</span>
+                 <span className="text-xl font-black text-[var(--text-main)]">Operational</span>
                  <div className="w-24 h-8">
                     <ResponsiveContainer width="100%" height="100%">
                        <AreaChart data={unitActivityData}>
@@ -107,51 +131,85 @@ const Dashboard: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         <div className="lg:col-span-8 space-y-8">
-           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6`}>
-              {[
-                { label: isStudent ? 'Academy Modules' : 'Live Cases', value: isStudent ? '24' : stats.live_cases, icon: isStudent ? GraduationCap : Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-                { label: isStudent ? 'Study Hours' : 'Active Staff', value: isStudent ? '12.5' : stats.total_staff, icon: isStudent ? Clock : Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-                { label: isStudent ? 'Tests Taken' : (user.role === 'Nursing In-Charge' ? 'Doses Given' : 'Meds Audit'), value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
-              ].map((stat, idx) => (
-                <motion.div 
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.1 }}
-                  key={stat.label} 
-                  className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm group hover:border-emerald-200 transition-all"
-                >
-                   <div className="flex justify-between items-start mb-4">
-                      <div className={`p-3 rounded-2xl ${stat.bg} dark:bg-slate-800 ${stat.color} transition-colors duration-500`}>
-                         <stat.icon size={20} />
-                      </div>
-                      <TrendingUp size={16} className="text-slate-300" />
-                   </div>
-                   <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
-                   <p className="text-2xl font-black">{stat.value}</p>
-                </motion.div>
-              ))}
+           <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6`}>
+              {isStudent ? (
+                <>
+                  {[
+                    { label: 'Quiz Streak', value: `${stats.quiz_streak} Days`, icon: Flame, color: 'text-orange-600', bg: 'bg-orange-50' },
+                    { label: 'Calculation Accuracy', value: `${stats.calculation_accuracy}%`, icon: Calculator, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                    { label: 'Active Case Load', value: `${stats.case_load} / 5`, icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+                    { label: 'Handovers Done', value: stats.handovers_completed, icon: FileText, color: 'text-rose-600', bg: 'bg-rose-50' },
+                  ].map((stat, idx) => (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      key={stat.label} 
+                      className="bg-[var(--card-bg)] border border-[var(--border-main)] p-5 rounded-3xl shadow-sm group hover:border-emerald-200 transition-all"
+                    >
+                       <div className="flex justify-between items-start mb-3">
+                          <div className={`p-2.5 rounded-xl ${stat.bg} dark:bg-slate-800 ${stat.color} transition-colors duration-500`}>
+                             <stat.icon size={18} />
+                          </div>
+                       </div>
+                       <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                       <p className="text-xl font-black">{stat.value}</p>
+                    </motion.div>
+                  ))}
+                </>
+              ) : (
+                <>
+                  {[
+                    { label: 'Live Cases', value: stats.live_cases, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+                    { label: 'Active Staff', value: stats.total_staff, icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
+                    { label: 'Doses Given', value: stats.doses_given, icon: Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
+                  ].map((stat, idx) => (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.1 }}
+                      key={stat.label} 
+                      className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm group hover:border-emerald-200 transition-all"
+                    >
+                       <div className="flex justify-between items-start mb-4">
+                          <div className={`p-3 rounded-2xl ${stat.bg} dark:bg-slate-800 ${stat.color} transition-colors duration-500`}>
+                             <stat.icon size={20} />
+                          </div>
+                          <TrendingUp size={16} className="text-slate-300" />
+                       </div>
+                       <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                       <p className="text-2xl font-black">{stat.value}</p>
+                    </motion.div>
+                  ))}
+                </>
+              )}
            </div>
 
            {isStudent ? (
              <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden group shadow-2xl">
                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
-                   <BookOpen size={300} />
+                   <Zap size={300} />
                 </div>
                 <div className="relative z-10 space-y-8">
                    <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-md bg-emerald-500/20 border border-emerald-500/30 text-emerald-400">
                       <Zap size={12} fill="currentColor" />
-                      <span className="text-[10px] font-black uppercase tracking-widest">Recommended Study Module</span>
+                      <span className="text-[10px] font-black uppercase tracking-widest">Today's Challenge</span>
                    </div>
                    <div className="space-y-3">
-                      <h3 className="text-3xl font-bold tracking-tight">Neonatal Resuscitation <br /> Protocols (v16.0)</h3>
+                      <h3 className="text-4xl font-black tracking-tight">Day {challenge?.day || 1}: {challenge?.challenge?.type || 'Loading...'}</h3>
                       <p className="text-slate-400 text-sm max-w-lg font-medium leading-relaxed">
-                         Master the latest evidence-based resuscitation guidelines for extremely preterm neonates.
+                         Progress your virtual ward. Create and manage a simulated patient with {challenge?.challenge?.type || 'clinical specificities'}.
                       </p>
                    </div>
-                   <Link to="/academy" className="inline-flex items-center space-x-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
-                      <span>Enter Academy</span>
-                      <ArrowRight size={18} />
-                   </Link>
+                   <div className="flex space-x-4">
+                      <Link to="/academy" className="inline-flex items-center space-x-3 bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3.5 rounded-xl font-bold transition-all shadow-xl shadow-emerald-500/20 active:scale-95">
+                         <span>Start Challenge</span>
+                         <ArrowRight size={18} />
+                      </Link>
+                      <Link to="/neonates" className="inline-flex items-center space-x-3 bg-white/10 hover:bg-white/20 text-white px-8 py-3.5 rounded-xl font-bold transition-all backdrop-blur-md">
+                         <span>Virtual Ward</span>
+                      </Link>
+                   </div>
                 </div>
              </div>
            ) : (
@@ -196,15 +254,15 @@ const Dashboard: React.FC = () => {
         <div className="lg:col-span-4 space-y-8">
            <div className={`bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl relative overflow-hidden group`}>
               <div className="absolute top-0 right-0 p-8 text-white/5 group-hover:rotate-12 transition-transform duration-700">
-                 {isStudent ? <GraduationCap size={140} /> : <Zap size={140} />}
+                 {isStudent ? <GraduationCap size={140} /> : <ShieldCheck size={140} />}
               </div>
               <div className="space-y-6 relative z-10">
                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.3em]">{isStudent ? 'Current Objective' : 'Current Assignment'}</p>
-                    <h4 className="text-2xl font-black tracking-tight">{isStudent ? 'Clinical Intern' : 'Unit Command'}</h4>
+                    <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.3em]">{isStudent ? 'Academy Profile' : 'Unit Command'}</p>
+                    <h4 className="text-2xl font-black tracking-tight">{user.name}</h4>
                  </div>
                  <p className="text-xs text-slate-400 font-medium leading-relaxed">
-                    Account: {user.name}<br/>
+                    Institutional ID: {user.staff_id}<br/>
                     Role: {user.role}
                  </p>
                  <div className="pt-2">
@@ -212,20 +270,20 @@ const Dashboard: React.FC = () => {
                       onClick={handleEndShift}
                       className="px-6 py-2.5 bg-white/10 hover:bg-white/30 backdrop-blur-md rounded-xl text-[10px] font-black uppercase tracking-widest transition-all"
                     >
-                       {isStudent ? 'Update Study Goal' : 'End Active Shift'}
+                       Sign Out Session
                     </button>
                  </div>
               </div>
            </div>
 
-           {user.role !== 'Nursing In-Charge' && (
+           {isAdminOrNurse && (
              <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
                 <div className="flex justify-between items-center mb-6">
-                   <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
+                   <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">System Activity</h4>
                    <Clock size={16} className="text-slate-300" />
                 </div>
                 <div className="space-y-5">
-                   {recentLogs.slice(0, 4).map((log, i) => (
+                   {recentLogs.slice(0, 5).map((log, i) => (
                      <div key={i} className="flex items-start space-x-3">
                         <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
                            {log.action[0].toUpperCase()}
@@ -237,6 +295,9 @@ const Dashboard: React.FC = () => {
                      </div>
                    ))}
                 </div>
+                <Link to="/audit" className="mt-6 block text-center text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline">
+                   View All Logs
+                </Link>
              </div>
            )}
         </div>

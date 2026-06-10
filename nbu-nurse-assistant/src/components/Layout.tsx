@@ -26,12 +26,15 @@ const Layout: React.FC = () => {
 
   const user = getUserData();
 
+  const isStudent = user.role === 'Student';
+  const isAdmin = user.role === 'Nursing In-Charge' || user.name === 'System Admin';
+
   const navItems = [
     { name: 'Command Center', icon: LayoutDashboard, path: '/dashboard' },
-    { name: 'Neonate Registry', icon: Users, path: '/neonates' },
+    ...(!isStudent ? [{ name: 'Neonate Registry', icon: Users, path: '/neonates' }] : []),
+    { name: 'Clinical Academy', icon: BookOpen, path: '/academy' },
     { name: 'Medication Pipeline', icon: Calculator, path: '/calculators' },
     { name: 'Handovers', icon: ClipboardList, path: '/handovers' },
-    { name: 'Clinical Academy', icon: BookOpen, path: '/academy' },
     { name: 'Settings', icon: SettingsIcon, path: '/settings' },
   ];
 
@@ -40,6 +43,7 @@ const Layout: React.FC = () => {
     ...(user.role !== 'Nursing In-Charge' ? [{ name: 'System Audit', icon: ShieldAlert, path: '/audit' }] : []),
     { name: 'Institutional Vetting', icon: Users2, path: '/verify' },
     { name: 'Workforce Rota', icon: CalendarDays, path: '/rota' },
+    { name: 'Academy Analytics', icon: ShieldCheck, path: '/academy-analytics' },
   ];
 
   const isManagement = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || user.name === 'System Admin';

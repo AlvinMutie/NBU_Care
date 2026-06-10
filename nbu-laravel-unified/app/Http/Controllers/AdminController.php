@@ -71,6 +71,32 @@ class AdminController extends Controller
         ]);
     }
 
+    public function academyAnalytics()
+    {
+        $students = User::where('role', 'Student')->get()->map(function($student) {
+            $simulatedCount = $student->simulatedNeonates()->count();
+            return [
+                'id' => $student->id,
+                'name' => $student->name,
+                'email' => $student->email,
+                'streak' => $student->quiz_streak,
+                'accuracy' => $student->calculation_accuracy,
+                'cases_completed' => $simulatedCount,
+                'progress' => ($simulatedCount / 5) * 100, // Assuming 5 cases total
+                'struggling' => $student->calculation_accuracy < 70 && $student->total_calculations > 5
+            ];
+        });
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'students' => $students,
+                'cohort_average_accuracy' => $students->avg('accuracy'),
+                'total_simulations_completed' => $students->sum('cases_completed'),
+            ]
+        ]);
+    }
+
     public function resetPassword(Request $request, User $user)
     {
         $request->validate([

@@ -27,7 +27,23 @@ class User extends Authenticatable
         'isVerified',
         'verifiedBy',
         'staff_id',
+        'quiz_streak',
+        'last_quiz_date',
+        'calculation_accuracy',
+        'total_calculations',
+        'correct_calculations',
+        'clinical_rotation_year',
     ];
+
+    public function simulatedNeonates()
+    {
+        return $this->hasMany(Neonate::class)->where('is_simulated', true);
+    }
+
+    public function auditLogs()
+    {
+        return $this->hasMany(AuditLog::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

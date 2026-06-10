@@ -9,11 +9,13 @@ class Handover extends Model
 {
     protected $fillable = [
         'neonate_id', 'nurse_id', 'clinical_status', 'vitals_snapshot', 
-        'investigations', 'treatment_plan', 'shift_type'
+        'investigations', 'treatment_plan', 'shift_type',
+        'situation', 'background', 'assessment', 'recommendation', 'is_guided', 'guided_responses'
     ];
 
     protected $casts = [
         'vitals_snapshot' => 'json',
+        'guided_responses' => 'json',
     ];
 
     public function neonate(): BelongsTo

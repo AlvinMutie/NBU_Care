@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Clock, ArrowRight, Plus, Activity, Heart, 
-  Thermometer, Droplets, User, Baby, ShieldCheck, 
-  ChevronRight, Beaker, Info, ClipboardList, X, Save
+  Clock, Plus, ShieldCheck, 
+  ChevronRight, X, Download, FileText, Info, HelpCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -18,14 +17,19 @@ const Handovers: React.FC = () => {
 
   const [formData, setFormData] = useState({
     neonate_id: '',
-    clinical_status: '',
+    shift_type: 'Morning',
+    situation: '',
+    background: '',
+    assessment: '',
+    recommendation: '',
+    is_guided: false,
     vitals_snapshot: { hr: '', spo2: '', temp: '' },
-    investigations: '',
-    treatment_plan: '',
-    shift_type: 'Morning'
+    treatment_plan: '', // Legacy support
+    clinical_status: '' // Legacy support
   });
 
   const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+  const isStudent = user.role === 'Student';
 
   useEffect(() => {
     fetchData();
@@ -51,22 +55,49 @@ const Handovers: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await api.post('/handovers', formData);
+      await api.post('/handovers', {
+        ...formData,
+        is_guided: isStudent
+      });
       setIsModalOpen(false);
       fetchData();
-      setFormData({
-        neonate_id: '',
-        clinical_status: '',
-        vitals_snapshot: { hr: '', spo2: '', temp: '' },
-        investigations: '',
-        treatment_plan: '',
-        shift_type: 'Morning'
-      });
+      resetForm();
     } catch (err) {
       console.error('Save failed:', err);
-      alert('Failed to record handover. Ensure all required fields are filled.');
+      alert('Failed to record handover.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      neonate_id: '',
+      shift_type: 'Morning',
+      situation: '',
+      background: '',
+      assessment: '',
+      recommendation: '',
+      is_guided: false,
+      vitals_snapshot: { hr: '', spo2: '', temp: '' },
+      treatment_plan: '',
+      clinical_status: ''
+    });
+  };
+
+  const downloadPDF = async (id: number) => {
+    try {
+      const response = await api.get(`/handovers/${id}/download`, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `handover_${id}.pdf`);
+      document.body.appendChild(link);
+      link.click();
+    } catch (err) {
+      console.error('Download failed:', err);
     }
   };
 
@@ -84,33 +115,26 @@ const Handovers: React.FC = () => {
       {/* Structural Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">Shift Handovers</h2>
-          <p className="text-slate-500 font-medium max-w-lg">Managed clinical transitions ensuring zero data gaps between medical teams.</p>
+          <h2 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">Clinical Handovers</h2>
+          <p className="text-slate-500 font-medium max-w-lg">Professional transition of care using SBAR protocol.</p>
         </div>
         <button 
-          onClick={() => setIsModalOpen(true)}
-          className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3 rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
+          onClick={() => { resetForm(); setIsModalOpen(true); }}
+          className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3 rounded-2xl font-bold text-sm shadow-xl hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
         >
           <Plus size={18} strokeWidth={3} />
-          <span>Generate Handover Report</span>
+          <span>{isStudent ? 'Start Guided Handover' : 'New SBAR Report'}</span>
         </button>
       </div>
 
-      {/* Active Continuity Status */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
          <div className="md:col-span-8 bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="space-y-5">
                <div className="flex items-center space-x-3 text-emerald-600">
-                  <Clock size={20} />
-                  <span className="text-[11px] font-black uppercase tracking-[0.2em]">Active Transition Cycle: 24h Ledger</span>
+                  <ShieldCheck size={20} />
+                  <span className="text-[11px] font-black uppercase tracking-[0.2em]">Institutional Continuity Ledger</span>
                </div>
                <div className="flex items-center space-x-4">
-                  <div className="flex -space-x-3">
-                     {[1, 2, 3].map(i => (
-                       <div key={i} className="w-12 h-12 rounded-[1.2rem] bg-[var(--bg-main)] border-4 border-[var(--card-bg)] flex items-center justify-center text-[10px] font-bold text-slate-400 shadow-sm">SN</div>
-                     ))}
-                  </div>
-                  <div className="h-8 w-px bg-[var(--border-main)]" />
                   <div>
                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none mb-1">Active Clinician</p>
                      <p className="text-sm font-bold">{user.name}</p>
@@ -132,71 +156,62 @@ const Handovers: React.FC = () => {
          </div>
 
          <div className="md:col-span-4 bg-slate-900 rounded-[2.5rem] p-8 text-white shadow-xl flex flex-col justify-center text-center space-y-2">
-            <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.3em]">Institutional Node</p>
-            <p className="text-3xl font-black tracking-tight">ND-HQ-MAIN</p>
-            <div className="flex items-center justify-center space-x-2 text-[10px] font-bold text-slate-500 uppercase">
-               <ShieldCheck size={12} />
-               <span>Protocol v16.0 Verified</span>
-            </div>
+            <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-[0.3em]">Protocol</p>
+            <p className="text-3xl font-black tracking-tight">SBAR / I-PASS</p>
          </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 pt-4">
-        {/* Transition History */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
         <div className="lg:col-span-2 space-y-6">
           <div className="flex items-center justify-between px-2">
-            <h3 className="text-xl font-bold tracking-tight">Handover Ledger</h3>
+            <h3 className="text-xl font-bold tracking-tight">Handover History</h3>
             <div className="text-xs font-bold text-slate-400 uppercase tracking-widest">{handovers.length} Total Reports</div>
           </div>
           
           <div className="space-y-4">
              {handovers.length === 0 ? (
                 <div className="p-20 text-center bg-[var(--card-bg)] border border-dashed border-[var(--border-main)] rounded-[3rem]">
-                   <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No Handover Reports Found</p>
+                   <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No reports archived</p>
                 </div>
              ) : handovers.filter(i => activeShiftFilter === 'All' || i.shift_type === activeShiftFilter).map(item => (
                <div key={item.id} onClick={() => setDetailHandover(item)} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] flex items-center justify-between group hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer">
                   <div className="flex items-center space-x-6">
-                    <div className="w-16 h-16 rounded-[1.5rem] bg-[var(--bg-main)] border border-[var(--border-main)] flex flex-col items-center justify-center group-hover:bg-emerald-50 dark:group-hover:bg-emerald-900/20 group-hover:border-emerald-100 dark:group-hover:border-emerald-800 transition-all duration-500">
-                       <span className="text-[9px] font-black text-slate-400 group-hover:text-emerald-500 uppercase tracking-widest">{item.shift_type}</span>
-                       <span className="text-lg font-black group-hover:text-emerald-700">{new Date(item.created_at).getHours()}:{new Date(item.created_at).getMinutes().toString().padStart(2, '0')}</span>
+                    <div className="w-14 h-14 rounded-2xl bg-[var(--bg-main)] border border-[var(--border-main)] flex flex-col items-center justify-center">
+                       <span className="text-[8px] font-black text-slate-400 uppercase">{item.shift_type}</span>
+                       <FileText size={18} className="text-emerald-600 mt-1" />
                     </div>
                     <div>
                       <div className="text-base font-bold text-[var(--text-main)]">
-                        {item.nurse?.name || 'Unknown Clinician'}
+                        Handover for {item.neonate?.name || 'Patient'}
                       </div>
-                      <div className="flex items-center space-x-3 mt-1.5">
-                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest bg-[var(--bg-main)] px-2 py-0.5 rounded-md">#{item.id}</span>
-                         <div className="w-1 h-1 rounded-full bg-slate-200" />
-                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{new Date(item.created_at).toLocaleDateString()}</span>
+                      <div className="flex items-center space-x-3 mt-1">
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">By {item.nurse?.name}</span>
+                         <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">• {new Date(item.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
-                  <button className="p-3 text-slate-200 hover:text-emerald-600 transition-colors">
-                     <ChevronRight size={20} />
-                  </button>
+                  <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-600 transition-colors" />
                </div>
              ))}
           </div>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-8">
-           <div className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 rounded-[2.5rem] shadow-sm space-y-8">
-              <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] border-b border-[var(--border-main)] pb-4">Standardized Protocol</h4>
-              <div className="space-y-6">
+           <div className="bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 p-8 rounded-[2.5rem] space-y-6">
+              <div className="flex items-center space-x-3 text-emerald-600">
+                 <Info size={20} />
+                 <h4 className="text-[11px] font-black uppercase tracking-[0.2em]">What is SBAR?</h4>
+              </div>
+              <div className="space-y-4">
                  {[
-                   { label: 'Identify Patient', desc: 'Verify Hospital ID' },
-                   { label: 'Clinical Status', desc: 'Acuity and primary diagnosis' },
-                   { label: 'Vital Snapshot', desc: 'HR, SpO2, and Thermal logs' },
-                   { label: 'Plan of Care', desc: 'Meds, feeds, and nursing orders' },
-                 ].map((step, i) => (
-                   <div key={i} className="flex items-start space-x-4">
-                      <div className="w-6 h-6 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-[10px] font-black">{i+1}</div>
-                      <div>
-                         <p className="text-xs font-bold text-[var(--text-main)]">{step.label}</p>
-                         <p className="text-[10px] text-slate-400 font-medium">{step.desc}</p>
-                      </div>
+                   { t: 'Situation', d: 'What is happening right now?' },
+                   { t: 'Background', d: 'What is the clinical context?' },
+                   { t: 'Assessment', d: 'What do I think the problem is?' },
+                   { t: 'Recommendation', d: 'What should we do to correct it?' },
+                 ].map((s, i) => (
+                   <div key={i} className="space-y-1">
+                      <p className="text-xs font-bold text-[var(--text-main)]">{s.t}</p>
+                      <p className="text-[10px] text-slate-500 font-medium leading-relaxed">{s.d}</p>
                    </div>
                  ))}
               </div>
@@ -208,92 +223,87 @@ const Handovers: React.FC = () => {
       <AnimatePresence>
          {detailHandover && (
             <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-3xl p-10 shadow-2xl space-y-8 border border-[var(--border-main)]">
-                  <div className="flex justify-between items-center border-b border-[var(--border-main)] pb-6">
-                     <div>
-                        <h3 className="text-2xl font-bold tracking-tight">Handover Report Details</h3>
-                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Ref ID: #{detailHandover.id} • {new Date(detailHandover.created_at).toLocaleString()}</p>
-                     </div>
+               <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-2xl p-8 shadow-2xl space-y-6 border border-[var(--border-main)]">
+                  <div className="flex justify-between items-center">
+                     <h3 className="text-2xl font-bold tracking-tight">Handover Details</h3>
                      <button onClick={() => setDetailHandover(null)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
                   </div>
                   
-                  <div className="space-y-8">
-                     <div className="grid grid-cols-2 gap-8">
-                        <div>
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Clinician</p>
+                  <div className="space-y-6 overflow-y-auto max-h-[70vh] pr-2 custom-scrollbar">
+                     <div className="grid grid-cols-2 gap-4">
+                        <div className="p-4 bg-[var(--bg-main)] rounded-2xl">
+                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Patient</p>
+                           <p className="text-sm font-bold">{detailHandover.neonate?.name}</p>
+                        </div>
+                        <div className="p-4 bg-[var(--bg-main)] rounded-2xl">
+                           <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Nurse</p>
                            <p className="text-sm font-bold">{detailHandover.nurse?.name}</p>
                         </div>
-                        <div>
-                           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Shift</p>
-                           <p className="text-sm font-bold">{detailHandover.shift_type}</p>
-                        </div>
                      </div>
 
-                     <div className="p-6 bg-[var(--bg-main)] rounded-2xl space-y-4">
-                        <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Clinical Status</p>
-                        <p className="text-sm font-medium leading-relaxed italic">"{detailHandover.clinical_status}"</p>
-                     </div>
-
-                     <div className="space-y-2">
-                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Treatment Plan & Orders</p>
-                        <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap">{detailHandover.treatment_plan}</p>
-                     </div>
-
-                     <div className="grid grid-cols-3 gap-4">
-                        {[
-                           { label: 'HR', val: detailHandover.vitals_snapshot?.hr, unit: 'bpm' },
-                           { label: 'SpO2', val: detailHandover.vitals_snapshot?.spo2, unit: '%' },
-                           { label: 'Temp', val: detailHandover.vitals_snapshot?.temp, unit: '°C' },
-                        ].map(v => (
-                           <div key={v.label} className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-xl text-center">
-                              <p className="text-[9px] font-black text-slate-400 uppercase">{v.label}</p>
-                              <p className="text-base font-black">{v.val}{v.unit}</p>
-                           </div>
-                        ))}
-                     </div>
+                     {['situation', 'background', 'assessment', 'recommendation'].map(key => (
+                       <div key={key} className="space-y-2">
+                          <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{key}</p>
+                          <div className="p-4 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-sm font-medium leading-relaxed">
+                             {detailHandover[key] || 'Not specified'}
+                          </div>
+                       </div>
+                     ))}
                   </div>
                   
-                  <button onClick={() => setDetailHandover(null)} className="w-full py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold uppercase text-xs tracking-widest hover:bg-black transition-all mt-4">Close Report</button>
+                  <div className="flex space-x-3 pt-4 border-t border-[var(--border-main)]">
+                    <button 
+                      onClick={() => downloadPDF(detailHandover.id)}
+                      className="flex-1 py-4 bg-emerald-600 text-white rounded-2xl font-bold flex items-center justify-center space-x-2 shadow-lg hover:bg-emerald-700 transition-all"
+                    >
+                       <Download size={18} />
+                       <span>Export PDF</span>
+                    </button>
+                    <button 
+                      onClick={() => setDetailHandover(null)} 
+                      className="flex-1 py-4 border border-[var(--border-main)] rounded-2xl font-bold text-slate-500 hover:bg-[var(--bg-main)] transition-all"
+                    >
+                       Close
+                    </button>
+                  </div>
                </motion.div>
             </div>
          )}
       </AnimatePresence>
 
-      {/* Handover Modal */}
+      {/* New Handover Modal */}
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-             <motion.div initial={{ opacity: 0, y: 50, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 50, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-5xl max-h-[90vh] overflow-hidden relative z-10 shadow-2xl flex flex-col border border-[var(--border-main)] text-[var(--text-main)]">
-                <div className="p-8 sm:p-12 border-b border-[var(--border-main)] flex flex-col sm:flex-row sm:items-center justify-between gap-6 bg-[var(--bg-main)]/50">
-                   <div className="space-y-1">
-                      <h3 className="text-3xl font-bold tracking-tight">Structured Transition Report</h3>
-                      <p className="text-sm text-slate-500 font-medium italic">Protocol-driven shift continuity and clinical sign-off.</p>
+             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-[var(--border-main)]">
+                <div className="p-8 border-b border-[var(--border-main)] flex items-center justify-between">
+                   <div>
+                      <h3 className="text-2xl font-bold tracking-tight">{isStudent ? 'Guided Clinical Handover' : 'Structured SBAR Handover'}</h3>
+                      <p className="text-xs text-slate-500 font-medium">Follow the clinical transition protocol.</p>
                    </div>
-                   <button onClick={() => setIsModalOpen(false)} className="p-3 hover:bg-[var(--bg-main)] rounded-2xl transition-all">
-                      <X size={24} />
-                   </button>
+                   <button onClick={() => setIsModalOpen(false)} className="p-3 hover:bg-[var(--bg-main)] rounded-2xl"><X size={24} /></button>
                 </div>
                 
-                <form onSubmit={handleSaveHandover} className="flex-1 overflow-y-auto p-8 sm:p-12 space-y-10">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <form onSubmit={handleSaveHandover} className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
+                   <div className="grid grid-cols-2 gap-6">
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Target Neonate</label>
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Patient</label>
                          <select 
                            value={formData.neonate_id}
                            onChange={(e) => setFormData({...formData, neonate_id: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                            required
                          >
-                            <option value="">Select Patient...</option>
+                            <option value="">Choose Patient...</option>
                             {neonates.map(n => <option key={n.id} value={n.id}>{n.name} ({n.hospital_number})</option>)}
                          </select>
                       </div>
                       <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift Period</label>
+                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Shift</label>
                          <select 
                            value={formData.shift_type}
                            onChange={(e) => setFormData({...formData, shift_type: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                          >
                             <option>Morning</option>
                             <option>Afternoon</option>
@@ -302,54 +312,48 @@ const Handovers: React.FC = () => {
                       </div>
                    </div>
 
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinical Status Overview</label>
-                      <textarea 
-                        value={formData.clinical_status}
-                        onChange={(e) => setFormData({...formData, clinical_status: e.target.value})}
-                        rows={3} 
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl p-5 text-sm font-medium" 
-                        placeholder="Current acuity, stability, and high-level assessment..."
-                        required
-                      />
-                   </div>
-
-                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">HR (bpm)</label>
-                         <input type="text" value={formData.vitals_snapshot.hr} onChange={(e) => setFormData({...formData, vitals_snapshot: {...formData.vitals_snapshot, hr: e.target.value}})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold" required />
-                      </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">SpO2 (%)</label>
-                         <input type="text" value={formData.vitals_snapshot.spo2} onChange={(e) => setFormData({...formData, vitals_snapshot: {...formData.vitals_snapshot, spo2: e.target.value}})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold" required />
-                      </div>
-                      <div className="space-y-2">
-                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Temp (°C)</label>
-                         <input type="text" value={formData.vitals_snapshot.temp} onChange={(e) => setFormData({...formData, vitals_snapshot: {...formData.vitals_snapshot, temp: e.target.value}})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold" required />
-                      </div>
-                   </div>
-
-                   <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Treatment Plan & Instructions</label>
-                      <textarea 
-                        value={formData.treatment_plan}
-                        onChange={(e) => setFormData({...formData, treatment_plan: e.target.value})}
-                        rows={5} 
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl p-5 text-sm font-medium" 
-                        placeholder="Meds, feeds, and specific nursing orders for the next shift..."
-                        required
-                      />
+                   <div className="space-y-6">
+                      {[
+                        { key: 'situation', label: 'S - Situation', guide: 'What is happening right now? State the patient and current acuity.' },
+                        { key: 'background', label: 'B - Background', guide: 'Brief history, admission details, and clinical context.' },
+                        { key: 'assessment', label: 'A - Assessment', guide: 'What are the current vitals and high-level findings? What do you think is going on?' },
+                        { key: 'recommendation', label: 'R - Recommendation', guide: 'What are the immediate next steps? What do you need from the next shift?' },
+                      ].map(section => (
+                        <div key={section.key} className="space-y-3 p-6 bg-[var(--bg-main)] rounded-[2rem] border border-[var(--border-main)] relative">
+                           <div className="flex items-center justify-between mb-1">
+                              <label className="text-xs font-black text-emerald-600 uppercase tracking-widest">{section.label}</label>
+                              {isStudent && (
+                                <div className="flex items-center space-x-2 text-[10px] font-bold text-slate-400 italic">
+                                   <HelpCircle size={12} />
+                                   <span>Guided Hint</span>
+                                </div>
+                              )}
+                           </div>
+                           <textarea 
+                             value={(formData as any)[section.key]}
+                             onChange={(e) => setFormData({...formData, [section.key]: e.target.value})}
+                             placeholder={isStudent ? section.guide : `Enter ${section.key}...`}
+                             className="w-full bg-transparent border-none p-0 text-sm font-medium focus:ring-0 placeholder:text-slate-300 min-h-[80px] resize-none"
+                             required
+                           />
+                           {isStudent && (formData as any)[section.key] === '' && (
+                              <p className="text-[10px] text-emerald-600/60 font-medium mt-2 leading-relaxed">
+                                 {section.guide}
+                              </p>
+                           )}
+                        </div>
+                      ))}
                    </div>
 
                    <div className="pt-8 border-t border-[var(--border-main)] flex items-center justify-between">
-                      <button type="button" onClick={() => setIsModalOpen(false)} className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] hover:text-rose-600 transition-colors">Discard Report</button>
+                      <button type="button" onClick={() => setIsModalOpen(false)} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-rose-600 transition-colors">Discard</button>
                       <button 
                         type="submit" 
                         disabled={isSubmitting}
                         className="bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-4 rounded-2xl font-black text-sm shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center space-x-2"
                       >
                          {isSubmitting && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
-                         <span>Authenticate & Save Transition</span>
+                         <span>{isStudent ? 'Submit Training Report' : 'Save SBAR Handover'}</span>
                       </button>
                    </div>
                 </form>

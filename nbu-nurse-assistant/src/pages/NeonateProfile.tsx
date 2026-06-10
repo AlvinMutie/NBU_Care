@@ -117,6 +117,7 @@ const NeonateProfile: React.FC = () => {
 
   const tabs = [
     { id: 'biodata', name: 'Identity & Bio', icon: Baby },
+    ...(isStudent ? [{ id: 'calculations', name: 'Guided Calculations', icon: Calculator }] : []),
     { id: 'maternal', name: 'Maternal History', icon: History },
     { id: 'assessment', name: 'Clinical Evaluation', icon: Stethoscope },
     { id: 'investigations', name: 'Labs & Imaging', icon: Microscope },
@@ -184,6 +185,81 @@ const NeonateProfile: React.FC = () => {
       {/* Content Area */}
       <div className="min-h-[600px]">
         <AnimatePresence mode="wait">
+          {activeTab === 'calculations' && isStudent && (
+            <motion.div key="calculations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+               <div className="lg:col-span-8 space-y-8">
+                  <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] p-10 shadow-sm space-y-10">
+                     <div className="space-y-2">
+                        <h3 className="text-2xl font-bold tracking-tight">Clinical Fluid Calculation</h3>
+                        <p className="text-sm text-slate-500 font-medium leading-relaxed">Guide for determining Total Fluid Intake (TFI) and hourly infusion rates.</p>
+                     </div>
+
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div className="space-y-6">
+                           <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-[var(--border-main)]">
+                              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Step 1: Determine TFI Goal</p>
+                              <div className="space-y-4">
+                                 <div className="flex justify-between items-center">
+                                    <span className="text-xs font-bold">Weight (kg)</span>
+                                    <span className="text-sm font-black">{neonate.current_weight}</span>
+                                 </div>
+                                 <div className="flex justify-between items-center">
+                                    <span className="text-xs font-bold">TFI Rate (ml/kg/day)</span>
+                                    <input type="number" defaultValue="80" className="w-20 bg-white dark:bg-slate-900 border border-[var(--border-main)] p-2 rounded-lg text-right text-xs font-bold" />
+                                 </div>
+                              </div>
+                           </div>
+                           
+                           <div className="p-6 bg-emerald-50 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-800">
+                              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-4">Mathematical Formula</p>
+                              <div className="font-mono text-sm space-y-2">
+                                 <p className="text-emerald-700 dark:text-emerald-400 font-bold">Total Daily Fluid = Weight × TFI</p>
+                                 <p className="text-slate-400">Example: {neonate.current_weight}kg × 80ml = {(neonate.current_weight * 80).toFixed(1)} ml/day</p>
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="space-y-6">
+                           <div className="p-6 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-100 dark:border-blue-800">
+                              <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest mb-4">Step 2: Hourly Rate</p>
+                              <div className="font-mono text-sm space-y-2">
+                                 <p className="text-blue-700 dark:text-blue-400 font-bold">Hourly Rate = Total Daily / 24</p>
+                                 <p className="text-slate-400">Example: {(neonate.current_weight * 80).toFixed(1)}ml / 24h = {((neonate.current_weight * 80) / 24).toFixed(1)} ml/h</p>
+                              </div>
+                           </div>
+
+                           <button className="w-full py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest hover:bg-black transition-all shadow-xl">
+                              Verify Calculation Accuracy
+                           </button>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               
+               <div className="lg:col-span-4 space-y-8">
+                  <div className="bg-slate-900 rounded-[2.5rem] p-8 text-white space-y-6">
+                     <div className="flex items-center space-x-3 text-emerald-400">
+                        <Zap size={20} />
+                        <h4 className="text-[11px] font-black uppercase tracking-widest">Protocol Guidance</h4>
+                     </div>
+                     <ul className="space-y-4">
+                        {[
+                          'Day 1 TFI: 60-80 ml/kg/day',
+                          'Day 2 TFI: 80-100 ml/kg/day',
+                          'Extreme Preterms may need higher rates',
+                          'Monitor urine output (Target 1-3 ml/kg/h)'
+                        ].map((rule, i) => (
+                          <li key={i} className="flex items-start space-x-3 text-xs font-medium text-slate-400 leading-relaxed">
+                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                             <span>{rule}</span>
+                          </li>
+                        ))}
+                     </ul>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
           {activeTab === 'biodata' && (
             <motion.div key="biodata" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-8">

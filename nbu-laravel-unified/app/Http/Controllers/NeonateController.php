@@ -7,9 +7,18 @@ use Illuminate\Http\Request;
 
 class NeonateController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $neonates = Neonate::all();
+        $user = $request->user();
+        
+        if ($user->role === 'Student') {
+            $neonates = Neonate::where('user_id', $user->id)
+                               ->where('is_simulated', true)
+                               ->get();
+        } else {
+            $neonates = Neonate::where('is_simulated', false)->get();
+        }
+
         return response()->json([
             'success' => true,
             'data' => $neonates
@@ -18,6 +27,8 @@ class NeonateController extends Controller
 
     public function store(Request $request)
     {
+        $user = $request->user();
+        
         $request->validate([
             'hospital_number' => 'required|string|unique:neonates',
             'name' => 'required|string|max:255',
@@ -28,7 +39,16 @@ class NeonateController extends Controller
             'gestational_age' => 'required|integer',
         ]);
 
-        $neonate = Neonate::create($request->all());
+        $data = $request->all();
+        
+        if ($user->role === 'Student') {
+            $data['user_id'] = $user->id;
+            $data['is_simulated'] = true;
+        } else {
+            $data['is_simulated'] = false;
+        }
+
+        $neonate = Neonate::create($data);
 
         return response()->json([
             'success' => true,

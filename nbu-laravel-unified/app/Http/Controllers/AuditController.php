@@ -9,6 +9,14 @@ class AuditController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
+        if ($user->role !== 'Nursing In-Charge' && $user->name !== 'System Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access to audit logs.'
+            ], 403);
+        }
+
         $query = AuditLog::with('user');
 
         if ($request->filled('search')) {
@@ -30,8 +38,16 @@ class AuditController extends Controller
         ]);
     }
 
-    public function recent()
+    public function recent(Request $request)
     {
+        $user = $request->user();
+        if ($user->role !== 'Nursing In-Charge' && $user->name !== 'System Admin') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Unauthorized access.'
+            ], 403);
+        }
+
         $logs = AuditLog::with('user')->latest()->take(10)->get();
         return response()->json([
             'success' => true,

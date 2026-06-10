@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   User, Bell, Shield, Lock, Save, 
   ShieldCheck, CheckCircle2,
-  AlertCircle, ChevronRight, Globe, Zap
+  ChevronRight, Globe, Zap
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -12,7 +12,12 @@ const Settings: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
-  const menuItems = [
+  const isStudent = userData.role === 'Student';
+
+  const menuItems = isStudent ? [
+    { name: 'Profile', icon: User },
+    { name: 'Security', icon: Shield },
+  ] : [
     { name: 'Profile', icon: User },
     { name: 'Notifications', icon: Bell },
     { name: 'Security', icon: Shield },
@@ -25,7 +30,7 @@ const Settings: React.FC = () => {
     setMessage(null);
     try {
       // In a real app, you'd have a profile update endpoint
-      // api.patch('/auth/profile', userData);
+      await api.get('/auth/profile'); // Just to verify connection
       localStorage.setItem('user_data', JSON.stringify(userData));
       setMessage({ type: 'success', text: 'Institutional profile synchronized successfully.' });
     } catch (err) {
@@ -40,12 +45,12 @@ const Settings: React.FC = () => {
       {/* Structural Page Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-[var(--text-main)]">System Configurations</h2>
-          <p className="text-slate-500 font-medium">Orchestrate your clinical profile and institutional preferences.</p>
+          <h2 className="text-3xl font-bold tracking-tight text-[var(--text-main)]">{isStudent ? 'Profile Settings' : 'System Configurations'}</h2>
+          <p className="text-slate-500 font-medium">{isStudent ? 'Manage your clinical intern profile and credentials.' : 'Orchestrate your clinical profile and institutional preferences.'}</p>
         </div>
         <div className="flex items-center space-x-3 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-800 p-2 px-4 rounded-xl">
            <ShieldCheck className="text-emerald-600" size={18} />
-           <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest leading-none">Security Cleared: v16.0</span>
+           <span className="text-[10px] font-black text-emerald-700 dark:text-emerald-400 uppercase tracking-widest leading-none">Access: {userData.role}</span>
         </div>
       </div>
 
@@ -99,7 +104,7 @@ const Settings: React.FC = () => {
                     <div>
                        <h4 className="text-xl font-bold text-[var(--text-main)]">{userData.name}</h4>
                        <p className="text-sm text-slate-500 font-medium mb-2">{userData.role}</p>
-                       <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-emerald-100">Verified Access</span>
+                       <span className="px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 text-[9px] font-black uppercase tracking-widest border border-emerald-100">Institutional Access Verified</span>
                     </div>
                  </div>
 
@@ -122,11 +127,26 @@ const Settings: React.FC = () => {
                         className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all" 
                        />
                     </div>
+                    {isStudent && (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Clinical Rotation Year</label>
+                        <select 
+                          value={userData.clinical_rotation_year || 'Year 1'}
+                          onChange={(e) => setUserData({...userData, clinical_rotation_year: e.target.value})}
+                          className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-[var(--text-main)] focus:ring-2 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all"
+                        >
+                          <option>Year 1</option>
+                          <option>Year 2</option>
+                          <option>Year 3</option>
+                          <option>Internship</option>
+                        </select>
+                      </div>
+                    )}
                     <div className="space-y-2">
-                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Hospital ID</label>
+                       <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest px-1">Institutional ID</label>
                        <input 
                         type="text" 
-                        value={userData.staff_id || 'NEO-SYS-00'+userData.id} 
+                        value={userData.staff_id || 'ID-'+userData.id} 
                         disabled
                         className="w-full bg-slate-50 dark:bg-slate-800/50 border border-[var(--border-main)] rounded-2xl py-4 px-5 text-sm font-bold text-slate-400 cursor-not-allowed" 
                        />
@@ -141,8 +161,8 @@ const Settings: React.FC = () => {
                     <Zap size={32} />
                  </div>
                  <div className="space-y-1">
-                    <h4 className="text-xl font-bold text-[var(--text-main)]">Module Active</h4>
-                    <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">This preference block is synchronized with the institutional cloud core.</p>
+                    <h4 className="text-xl font-bold text-[var(--text-main)]">Module Synchronized</h4>
+                    <p className="text-sm text-slate-500 max-w-xs mx-auto leading-relaxed">These configurations are managed at the institutional level.</p>
                  </div>
               </div>
             )}

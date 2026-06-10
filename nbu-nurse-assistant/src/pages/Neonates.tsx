@@ -88,20 +88,23 @@ const Neonates: React.FC = () => {
     );
   }
 
+  const user = JSON.parse(localStorage.getItem('user_data') || '{}');
+  const isStudent = user.role === 'Student';
+
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
       {/* Structural Header */}
       <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
         <div>
-          <h2 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">Ward Patient Registry</h2>
-          <p className="text-slate-500 font-medium">Digital census of all active neonatal admissions and clinical status.</p>
+          <h2 className="text-3xl font-bold text-[var(--text-main)] tracking-tight">{isStudent ? 'Virtual Ward' : 'Ward Patient Registry'}</h2>
+          <p className="text-slate-500 font-medium">{isStudent ? 'Your simulated patient environment for clinical training.' : 'Digital census of all active neonatal admissions and clinical status.'}</p>
         </div>
         <button 
           onClick={() => setShowAddModal(true)}
           className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
         >
           <UserPlus size={18} strokeWidth={3} />
-          <span>New Clinical Admission</span>
+          <span>{isStudent ? 'Create Simulated Case' : 'New Clinical Admission'}</span>
         </button>
       </div>
 

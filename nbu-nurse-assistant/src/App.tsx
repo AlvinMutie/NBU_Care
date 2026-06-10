@@ -14,6 +14,7 @@ import AuditLogs from './pages/AuditLogs';
 import ManageStaff from './pages/ManageStaff';
 import VerificationQueue from './pages/VerificationQueue';
 import DutyRota from './pages/DutyRota';
+import AcademyAnalytics from './pages/AcademyAnalytics';
 import Layout from './components/Layout';
 
 const App: React.FC = () => {
@@ -30,6 +31,7 @@ const App: React.FC = () => {
           <Route path="/calculators" element={<Calculators />} />
           <Route path="/handovers" element={<Handovers />} />
           <Route path="/academy" element={<Academy />} />
+          <Route path="/academy-analytics" element={<AcademyAnalytics />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="/audit" element={<AuditLogs />} />
           <Route path="/staff" element={<ManageStaff />} />
