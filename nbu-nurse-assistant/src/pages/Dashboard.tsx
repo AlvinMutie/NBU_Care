@@ -37,8 +37,8 @@ const Dashboard: React.FC = () => {
   };
 
   const user = getUserData();
-  const isStudent = user?.role === 'Student';
-  const isAdminOrNurse = user?.role === 'Nursing In-Charge' || user?.name === 'System Admin';
+  const isStudent = (user?.role || '').toLowerCase() === 'student';
+  const isAdminOrNurse = (user?.role || '').toLowerCase() === 'nursing in-charge' || user?.name === 'System Admin';
 
   const fetchDashboardData = async () => {
     setLoading(true);

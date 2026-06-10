@@ -20,14 +20,16 @@ const NeonateProfile: React.FC = () => {
 
   const getUserData = () => {
     try {
-      return JSON.parse(localStorage.getItem('user_data') || '{}');
+      const stored = localStorage.getItem('user_data');
+      if (stored) return JSON.parse(stored);
+      return { name: 'Clinician', role: 'Staff' };
     } catch {
-      return {};
+      return { name: 'Clinician', role: 'Staff' };
     }
   };
 
   const user = getUserData();
-  const isStudent = user?.role === 'Student';
+  const isStudent = (user?.role || '').toLowerCase() === 'student';
 
   const handleVerifyCalculation = async () => {
     setIsVerifying(true);

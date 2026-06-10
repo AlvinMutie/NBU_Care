@@ -54,8 +54,8 @@ const Register: React.FC = () => {
     <div className="min-h-screen bg-[var(--bg-main)] flex flex-col justify-center py-12 px-6 lg:px-8 animate-in fade-in duration-1000">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-6">
         <Link to="/" className="inline-flex items-center space-x-3 group">
-          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
-            <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
+          <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 overflow-hidden p-1">
+            <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-contain" />
           </div>
           <span className="text-2xl font-black tracking-tighter text-[var(--text-main)]">NeoDesk<span className="text-emerald-600">.</span></span>
         </Link>

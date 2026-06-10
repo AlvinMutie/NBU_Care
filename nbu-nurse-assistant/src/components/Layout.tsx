@@ -66,8 +66,8 @@ const Layout: React.FC = () => {
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center justify-between mb-12">
             <Link to="/dashboard" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
-                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
+              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500 overflow-hidden border-2 border-emerald-50">
+                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover scale-150" />
               </div>
               <span className="text-xl font-black tracking-tighter">NeoDesk<span className="text-emerald-600">.</span></span>
             </Link>

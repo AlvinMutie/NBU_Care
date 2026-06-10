@@ -48,8 +48,8 @@ const LandingPage: React.FC = () => {
       <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800 transition-all duration-300">
         <div className="max-w-7xl mx-auto h-full flex items-center justify-between px-6 lg:px-12">
           <Link to="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-lg shadow-emerald-600/20 group-hover:scale-105 transition-all overflow-hidden border border-slate-100 dark:border-slate-800">
-              <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
+            <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-600/20 group-hover:scale-105 transition-all overflow-hidden border border-slate-100 dark:border-slate-800">
+              <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover scale-150" />
             </div>
             <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">NeoDesk</span>
           </Link>
@@ -372,8 +372,8 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
             <div className="lg:col-span-6 space-y-10 text-left">
               <div className="flex items-center space-x-4">
-                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-slate-200 dark:shadow-none overflow-hidden">
-                  <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
+                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-slate-200 dark:shadow-none overflow-hidden p-1">
+                  <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="text-3xl font-bold tracking-tighter uppercase">NeoDesk</span>
               </div>

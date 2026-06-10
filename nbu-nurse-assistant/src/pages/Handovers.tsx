@@ -28,8 +28,19 @@ const Handovers: React.FC = () => {
     clinical_status: '' // Legacy support
   });
 
-  const user = JSON.parse(localStorage.getItem('user_data') || '{}');
-  const isStudent = user.role === 'Student';
+  const getUserData = () => {
+    try {
+      const stored = localStorage.getItem('user_data');
+      if (stored) return JSON.parse(stored);
+      return { name: 'Clinician', role: 'Staff' };
+    } catch {
+      return { name: 'Clinician', role: 'Staff' };
+    }
+  };
+
+  const user = getUserData();
+  const isStudent = (user?.role || '').toLowerCase() === 'student';
+  const isAdminOrInCharge = (user?.role || '').toLowerCase() === 'nursing in-charge' || user?.name === 'System Admin';
 
   const fetchData = async () => {
     setLoading(true);

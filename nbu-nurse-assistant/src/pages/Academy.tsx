@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   GraduationCap, Search, ShieldCheck, Zap, 
   Activity, Clock, ArrowRight,
@@ -6,26 +6,40 @@ import {
 } from 'lucide-react';
 import { ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 
 const Academy: React.FC = () => {
+  const navigate = useNavigate();
+  const libraryRef = useRef<HTMLDivElement>(null);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [modules, setModules] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [user] = useState<any>(() => {
+  const [selectedModule, setSelectedModule] = useState<any>(null);
+  
+  // Synchronized user data retrieval
+  const getUserData = () => {
     try {
-      return JSON.parse(localStorage.getItem('user_data') || '{}');
+      const stored = localStorage.getItem('user_data');
+      if (stored) return JSON.parse(stored);
+      
+      return {
+        name: localStorage.getItem('user_name') || 'Clinician',
+        role: localStorage.getItem('user_role') || 'Staff'
+      };
     } catch {
       return {};
     }
-  });
+  };
+
+  const [user] = useState<any>(getUserData());
   const [challenge, setChallenge] = useState<any>(null);
   
-  const isAdmin = user?.role === 'Nursing In-Charge' || user?.name === 'System Admin';
-  const isStudent = user?.role === 'Student';
+  const isStudent = (user?.role || '').toLowerCase() === 'student';
+  const isAdmin = (user?.role || '').toLowerCase() === 'nursing in-charge' || user?.name === 'System Admin';
 
   const [formData, setFormData] = useState({
     type: 'flashcard',
@@ -39,7 +53,6 @@ const Academy: React.FC = () => {
   });
 
   const fetchModules = async () => {
-    setLoading(true);
     try {
       const [flashRes, scenariosRes] = await Promise.all([
         api.get('/learning/flashcards'),
@@ -67,8 +80,6 @@ const Academy: React.FC = () => {
       setModules(mappedModules);
     } catch (err) {
       console.error('Failed to fetch modules:', err);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -81,9 +92,17 @@ const Academy: React.FC = () => {
     }
   };
 
+  const initializeAcademy = async () => {
+    setLoading(true);
+    await Promise.all([
+      fetchModules(),
+      isStudent ? fetchChallenge() : Promise.resolve()
+    ]);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetchModules();
-    if (isStudent) fetchChallenge();
+    initializeAcademy();
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
@@ -98,7 +117,32 @@ const Academy: React.FC = () => {
     }
   };
 
+  const scrollToLibrary = () => {
+    libraryRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  if (loading) {
+    return (
+      <div className="h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <div className="w-10 h-10 border-4 border-slate-200 border-t-emerald-500 rounded-full animate-spin" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Initializing Academy Core...</p>
+      </div>
+    );
+  }
+
   const categories = ['All', 'Clinical', 'Routine', 'Critical', 'Bedside Simulation'];
+  const filteredModules = (modules || []).filter(m => {
+     if (!m) return false;
+     const title = (m.title || '').toLowerCase();
+     const content = (m.content || m.description || '').toLowerCase();
+     const search = (searchTerm || '').toLowerCase();
+     
+     const matchesSearch = title.includes(search) || content.includes(search);
+     const matchesCategory = selectedCategory === 'All' || 
+                            m.category === selectedCategory || 
+                            (m.type === 'scenario' && selectedCategory === 'Bedside Simulation');
+     return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
@@ -119,7 +163,7 @@ const Academy: React.FC = () => {
                 </div>
                 <div>
                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Challenge Progress</p>
-                   <p className="text-sm font-bold">Day {challenge.day} of 30</p>
+                   <p className="text-sm font-bold">Day {challenge.day || 1} of 30</p>
                 </div>
              </div>
              <div className="w-px h-10 bg-[var(--border-main)]" />
@@ -129,7 +173,7 @@ const Academy: React.FC = () => {
                 </div>
                 <div>
                    <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Accuracy</p>
-                   <p className="text-sm font-bold">{challenge.accuracy}%</p>
+                   <p className="text-sm font-bold">{challenge.accuracy || 0}%</p>
                 </div>
              </div>
           </div>
@@ -148,21 +192,27 @@ const Academy: React.FC = () => {
                     <span className="text-[10px] font-black uppercase tracking-widest">Today's Simulation Challenge</span>
                  </div>
                  <div className="space-y-4">
-                    <h3 className="text-4xl font-black tracking-tight">{challenge?.challenge?.type || 'Loading Challenge...'}</h3>
+                    <h3 className="text-4xl font-black tracking-tight">{challenge?.challenge?.type || 'Standard Care Simulation'}</h3>
                     <p className="text-slate-400 text-base max-w-2xl font-medium leading-relaxed">
-                       In today's simulation, you are required to admit and manage a neonate with {challenge?.challenge?.type}. 
+                       In today's simulation, you are required to admit and manage a neonate with {challenge?.challenge?.type || 'routine assessment needs'}. 
                        You must perform accurate fluid calculations and generate a professional handover by shift-end.
                     </p>
                  </div>
                  <div className="flex flex-wrap gap-4 pt-2">
-                    <div className="flex items-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 rounded-2xl">
+                    <button 
+                      onClick={() => navigate('/neonates')}
+                      className="flex items-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 rounded-2xl hover:bg-white/10 transition-colors"
+                    >
                        <Plus size={18} className="text-emerald-400" />
                        <span className="text-sm font-bold">Add Simulated Patient</span>
-                    </div>
-                    <div className="flex items-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 rounded-2xl">
+                    </button>
+                    <button 
+                      onClick={scrollToLibrary}
+                      className="flex items-center space-x-3 bg-white/5 border border-white/10 px-5 py-3 rounded-2xl hover:bg-white/10 transition-colors"
+                    >
                        <BookOpen size={18} className="text-blue-400" />
                        <span className="text-sm font-bold">View Case Protocol</span>
-                    </div>
+                    </button>
                  </div>
               </div>
            </div>
@@ -192,19 +242,51 @@ const Academy: React.FC = () => {
       )}
 
       {/* Protocol Library */}
-      <div className="space-y-6">
-         <div className="flex items-center justify-between">
+      <div className="space-y-6" ref={libraryRef}>
+         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h3 className="text-xl font-bold tracking-tight">Institutional Protocol Library</h3>
-            {isAdmin && (
-              <button onClick={() => setShowAddModal(true)} className="text-xs font-black text-emerald-600 uppercase tracking-widest hover:underline">Add Protocol</button>
-            )}
+            <div className="flex items-center gap-4">
+               <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={14} />
+                  <input 
+                    type="text"
+                    placeholder="Search protocols..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="bg-[var(--bg-main)] border border-[var(--border-main)] pl-9 pr-4 py-2 rounded-xl text-xs font-medium outline-none focus:border-emerald-500 transition-all w-48 md:w-64"
+                  />
+               </div>
+               {isAdmin && (
+                 <button onClick={() => setShowAddModal(true)} className="text-xs font-black text-emerald-600 uppercase tracking-widest hover:underline flex items-center space-x-2">
+                    <Plus size={14} />
+                    <span>Add Protocol</span>
+                 </button>
+               )}
+            </div>
+         </div>
+
+         {/* Category Tabs */}
+         <div className="flex items-center space-x-2 overflow-x-auto no-scrollbar pb-2">
+            {categories.map(cat => (
+              <button 
+                key={cat} 
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-5 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all whitespace-nowrap ${selectedCategory === cat ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-100' : 'bg-[var(--card-bg)] text-slate-400 hover:text-slate-600'}`}
+              >
+                {cat}
+              </button>
+            ))}
          </div>
 
          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {modules.map((m, idx) => {
+            {filteredModules.map((m, idx) => {
               const Icon = m.icon || BookOpen;
               return (
-                <div key={idx} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm hover:border-emerald-200 transition-all cursor-pointer group">
+                <div 
+                  key={idx} 
+                  onClick={() => setSelectedModule(m)}
+                  className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] shadow-sm hover:border-emerald-200 transition-all cursor-pointer group"
+                >
                    <div className="flex justify-between items-start mb-4">
                       <div className="p-2.5 rounded-xl bg-[var(--bg-main)] text-slate-400 group-hover:text-emerald-600 transition-colors">
                          <Icon size={20} />
@@ -226,32 +308,87 @@ const Academy: React.FC = () => {
                 </div>
               );
             })}
+            {filteredModules.length === 0 && (
+               <div className="col-span-full py-20 text-center bg-[var(--bg-main)] rounded-[2rem] border-2 border-dashed border-[var(--border-main)]">
+                  <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No protocols found matching your search</p>
+               </div>
+            )}
          </div>
       </div>
 
       <AnimatePresence>
-        {showAddModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-xl p-10 border border-[var(--border-main)] space-y-8">
-                <div className="flex justify-between items-center">
-                   <h3 className="text-2xl font-bold tracking-tight">New Knowledge Module</h3>
-                   <button onClick={() => setShowAddModal(false)} className="p-2"><X size={20} /></button>
-                </div>
-                <form onSubmit={handleSave} className="space-y-6">
-                   <div className="flex p-1 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)]">
-                      <button type="button" onClick={() => setFormData({...formData, type: 'flashcard'})} className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${formData.type === 'flashcard' ? 'bg-[var(--card-bg)] shadow-sm' : 'text-slate-400'}`}>Flashcard</button>
-                      <button type="button" onClick={() => setFormData({...formData, type: 'scenario'})} className={`flex-1 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all ${formData.type === 'scenario' ? 'bg-[var(--card-bg)] shadow-sm' : 'text-slate-400'}`}>Simulation</button>
+        {selectedModule && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+             <motion.div 
+               initial={{ opacity: 0, y: 20 }} 
+               animate={{ opacity: 1, y: 0 }} 
+               exit={{ opacity: 0, y: 20 }} 
+               className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-2xl max-h-[90vh] overflow-y-auto border border-[var(--border-main)] shadow-2xl relative custom-scrollbar"
+             >
+                <div className="sticky top-0 bg-[var(--card-bg)]/80 backdrop-blur-md p-8 border-b border-[var(--border-main)] flex justify-between items-center z-10">
+                   <div className="space-y-1">
+                      <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em]">{selectedModule.category}</p>
+                      <h3 className="text-2xl font-bold tracking-tight">{selectedModule.title}</h3>
                    </div>
-                   <input value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold" placeholder="Title" required />
-                   <textarea rows={4} value={formData.content || formData.description} onChange={(e) => setFormData({...formData, content: e.target.value, description: e.target.value})} className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-medium" placeholder="Content..." required />
-                   <button type="submit" className="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold">Deploy Module</button>
-                </form>
+                   <button onClick={() => setSelectedModule(null)} className="p-3 bg-[var(--bg-main)] rounded-2xl hover:bg-rose-50 hover:text-rose-600 transition-all"><X size={20} /></button>
+                </div>
+                
+                <div className="p-10 space-y-8">
+                   <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)]">
+                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Compliance Level</p>
+                         <p className="text-sm font-bold">{selectedModule.level}</p>
+                      </div>
+                      <div className="p-4 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)]">
+                         <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Estimated Review</p>
+                         <p className="text-sm font-bold">{selectedModule.type === 'flashcard' ? '2-5 Minutes' : '15-20 Minutes'}</p>
+                      </div>
+                   </div>
+
+                   <div className="space-y-4">
+                      <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center space-x-2">
+                         <ShieldCheck size={14} className="text-emerald-500" />
+                         <span>Institutional Directive</span>
+                      </h4>
+                      <div className="prose prose-slate dark:prose-invert max-w-none">
+                         <p className="text-[15px] leading-relaxed text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[2rem] border border-[var(--border-main)]">
+                            {selectedModule.content || selectedModule.description}
+                         </p>
+                      </div>
+                   </div>
+
+                   {selectedModule.type === 'scenario' && (
+                     <div className="space-y-8">
+                        <div className="space-y-4">
+                           <h4 className="text-[11px] font-black text-rose-500 uppercase tracking-widest">Clinical Problem</h4>
+                           <div className="p-6 bg-rose-50/50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-800 rounded-[2rem] text-sm font-bold leading-relaxed">
+                              {selectedModule.problem}
+                           </div>
+                        </div>
+                        <div className="space-y-4">
+                           <h4 className="text-[11px] font-black text-emerald-600 uppercase tracking-widest">Institutional Solution</h4>
+                           <div className="p-6 bg-emerald-50/50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-800 rounded-[2rem] text-sm font-bold leading-relaxed">
+                              {selectedModule.solution}
+                           </div>
+                        </div>
+                     </div>
+                   )}
+
+                   <div className="pt-8 border-t border-[var(--border-main)] flex justify-between items-center text-slate-400">
+                      <div className="flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest">
+                         <GraduationCap size={14} />
+                         <span>Clinical Academy validated</span>
+                      </div>
+                      <button 
+                        onClick={() => setSelectedModule(null)}
+                        className="px-8 py-3 bg-slate-900 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-black transition-all"
+                      >
+                         Acknowledge Protocol
+                      </button>
+                   </div>
+                </div>
              </motion.div>
           </div>
         )}
-      </AnimatePresence>
-    </div>
-  );
-};
 
-export default Academy;
+        {showAddModal && (

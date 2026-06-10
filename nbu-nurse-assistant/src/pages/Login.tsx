@@ -56,8 +56,8 @@ const Login: React.FC = () => {
 
           <div className="text-center space-y-3">
             <Link to="/" className="inline-flex items-center space-x-2.5 mb-4 group">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform overflow-hidden">
-                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
+              <div className="w-24 h-24 bg-white rounded-[2.5rem] flex items-center justify-center shadow-2xl group-hover:scale-105 transition-transform overflow-hidden border-4 border-emerald-50">
+                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover scale-[1.75]" />
               </div>
             </Link>
             <h1 className="text-4xl font-black tracking-tighter">Welcome back.</h1>
