@@ -18,6 +18,7 @@ services:
     plan: free
     rootDir: nbu-laravel-unified
     dockerfilePath: Dockerfile
+    buildCommand: composer install --no-dev --no-interaction --prefer-dist
     envVars:
       - key: APP_KEY
         value: "base64:Ym9sdG9uaXNoZXJlYW5kd2VsbG9mY291cnNlaGVsbG8xMg=="

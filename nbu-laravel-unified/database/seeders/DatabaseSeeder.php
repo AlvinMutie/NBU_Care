@@ -63,7 +63,7 @@ class DatabaseSeeder extends Seeder
         ];
 
         foreach ($users as $userData) {
-            User::create($userData);
+            User::updateOrCreate(['email' => $userData['email']], $userData);
         }
 
         // Seed Neonates
