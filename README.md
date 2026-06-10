@@ -69,6 +69,20 @@ E:\Projects\NBU_Care-main\
    npm run dev
    ```
 
+## Hosting on Render
+
+This project is pre-configured for deployment on [Render](https://render.com).
+
+1. **Connect your GitHub repository** to Render.
+2. Render will automatically detect the `render.yaml` file.
+3. **Deploy the Services:**
+   - `nbu-laravel-unified`: The PHP backend will deploy first.
+   - `nbu-nurse-assistant`: The static frontend will deploy.
+4. **Configuration:**
+   - After the backend is deployed, copy its URL (e.g., `https://nbu-laravel-unified.onrender.com`).
+   - In the Render dashboard for the `nbu-nurse-assistant` service, update the `VITE_API_BASE_URL` environment variable to `YOUR_BACKEND_URL/api`.
+   - Re-deploy the frontend to apply the change.
+
 ## Clinical Safety Disclaimer
 
 NeoDesk is a decision-support tool designed to enhance clinical precision. It is not a substitute for professional clinical judgment. All software-generated calculations must be verified by a secondary clinician in accordance with standard neonatal ward protocols and institutional guidelines.

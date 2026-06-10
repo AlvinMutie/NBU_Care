@@ -326,15 +326,6 @@ const LandingPage: React.FC = () => {
                   Request a clinical demonstration of the NeoDesk ecosystem for your neonatal department.
                </p>
                <div className="space-y-6">
-                  <div className="flex items-center space-x-4">
-                     <div className="w-12 h-12 bg-emerald-600/20 rounded-2xl flex items-center justify-center text-emerald-500">
-                        <MapPin size={24} />
-                     </div>
-                     <div>
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Headquarters</p>
-                        <p className="font-bold">NeoDesk Clinical Core, Nairobi</p>
-                     </div>
-                  </div>
                   <div className="flex items-center space-x-4 text-emerald-500">
                      <Clock size={24} />
                      <p className="font-bold">24/7 Clinical Support Operational</p>

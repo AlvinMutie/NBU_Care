@@ -2,22 +2,31 @@ services:
   - type: web
     name: nbu-nurse-assistant
     env: static
-    buildCommand: cd nbu-nurse-assistant && npm install && npm run build
-    staticPublishPath: nbu-nurse-assistant/dist
+    rootDir: nbu-nurse-assistant
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://nbu-laravel-unified.onrender.com/api
+        # Replace the above value with your actual backend URL after the first deployment.
+        # Render static sites require environment variables at build time.
 
   - type: web
     name: nbu-laravel-unified
     env: php
     plan: free
-    buildCommand: cd nbu-laravel-unified && composer install --no-dev --no-interaction --prefer-dist && php artisan config:cache && php artisan route:cache
-    startCommand: cd nbu-laravel-unified && php artisan serve --host=0.0.0.0 --port=$PORT
+    rootDir: nbu-laravel-unified
+    buildCommand: composer install --no-dev --no-interaction --prefer-dist && php artisan config:cache && php artisan route:cache && touch database/database.sqlite && php artisan migrate --force
+    # For Render PHP, the default start command is usually fine if it detects Laravel, 
+    # but we can be explicit. Render uses Apache/Nginx. 
+    # The default document root for Laravel should be public/
     envVars:
       - key: APP_KEY
-        sync: false
+        generateValue: true
       - key: APP_ENV
         value: production
       - key: APP_DEBUG
@@ -26,3 +35,5 @@ services:
         value: sqlite
       - key: DB_DATABASE
         value: database/database.sqlite
+      - key: LOG_CHANNEL
+        value: stderr
