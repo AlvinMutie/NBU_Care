@@ -12,10 +12,6 @@ const VerificationQueue: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchPendingRequests();
-  }, []);
-
   const fetchPendingRequests = async () => {
     setLoading(true);
     try {
@@ -28,6 +24,10 @@ const VerificationQueue: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchPendingRequests();
+  }, []);
 
   const handleApprove = async (userId: number) => {
     try {

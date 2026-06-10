@@ -15,10 +15,6 @@ const ManageStaff: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [isResetting, setIsResetting] = useState(false);
 
-  useEffect(() => {
-    fetchStaff();
-  }, []);
-
   const fetchStaff = async () => {
     setLoading(true);
     try {
@@ -30,6 +26,10 @@ const ManageStaff: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchStaff();
+  }, []);
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();

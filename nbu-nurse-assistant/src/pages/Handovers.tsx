@@ -31,10 +31,6 @@ const Handovers: React.FC = () => {
   const user = JSON.parse(localStorage.getItem('user_data') || '{}');
   const isStudent = user.role === 'Student';
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -50,6 +46,10 @@ const Handovers: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleSaveHandover = async (e: React.FormEvent) => {
     e.preventDefault();

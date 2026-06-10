@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users, BarChart3, TrendingUp, AlertTriangle, 
   CheckCircle2, Clock, Search, Filter, ChevronRight,
-  GraduationCap, ClipboardList, Target
+  GraduationCap, ClipboardList, Target, X
 } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import api from '../services/api';
 
 const AcademyAnalytics: React.FC = () => {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
+  const [selectedStudent, setSelectedStudent] = useState<any>(null);
 
   const fetchAnalytics = async () => {
     setLoading(true);
@@ -27,6 +25,10 @@ const AcademyAnalytics: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, []);
 
   if (loading || !data) {
     return (
@@ -192,7 +194,10 @@ const AcademyAnalytics: React.FC = () => {
                            )}
                         </td>
                         <td className="px-8 py-6 text-right">
-                           <button className="p-2 text-slate-400 hover:text-emerald-600 transition-all hover:bg-emerald-50 rounded-xl">
+                           <button 
+                             onClick={() => setSelectedStudent(student)}
+                             className="p-2 text-slate-400 hover:text-emerald-600 transition-all hover:bg-emerald-50 rounded-xl"
+                           >
                               <ChevronRight size={18} />
                            </button>
                         </td>
@@ -225,6 +230,86 @@ const AcademyAnalytics: React.FC = () => {
             </div>
          </div>
       </div>
+
+      {/* Student Detail Modal */}
+      <AnimatePresence>
+        {selectedStudent && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
+             <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-[var(--border-main)]">
+                <div className="p-8 border-b border-[var(--border-main)] flex items-center justify-between">
+                   <div className="flex items-center space-x-4">
+                      <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black">
+                         {selectedStudent.name.split(' ').map((n:any)=>n[0]).join('')}
+                      </div>
+                      <div>
+                         <h3 className="text-2xl font-bold tracking-tight">{selectedStudent.name}</h3>
+                         <p className="text-xs text-slate-500 font-medium">Virtual Ward Oversight Portal</p>
+                      </div>
+                   </div>
+                   <button onClick={() => setSelectedStudent(null)} className="p-3 hover:bg-[var(--bg-main)] rounded-2xl">
+                      <X size={24} className="text-slate-400" />
+                   </button>
+                </div>
+
+                <div className="flex-1 overflow-y-auto p-8 space-y-10 custom-scrollbar">
+                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="bg-[var(--bg-main)] p-6 rounded-[2rem] border border-[var(--border-main)] space-y-1">
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Clinical Accuracy</p>
+                         <p className="text-2xl font-black text-emerald-600">{selectedStudent.accuracy.toFixed(1)}%</p>
+                      </div>
+                      <div className="bg-[var(--bg-main)] p-6 rounded-[2rem] border border-[var(--border-main)] space-y-1">
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Current Streak</p>
+                         <p className="text-2xl font-black text-orange-600">{selectedStudent.streak} Days</p>
+                      </div>
+                      <div className="bg-[var(--bg-main)] p-6 rounded-[2rem] border border-[var(--border-main)] space-y-1">
+                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Virtual Patients</p>
+                         <p className="text-2xl font-black text-blue-600">{selectedStudent.cases_completed} / 5</p>
+                      </div>
+                   </div>
+
+                   <div className="space-y-6">
+                      <div className="flex items-center justify-between">
+                         <h4 className="text-lg font-bold tracking-tight">Virtual Patient Registry</h4>
+                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Active Simulations</span>
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                         {/* This would ideally fetch the student's actual neonates. For now, placeholders based on count */}
+                         {Array.from({ length: selectedStudent.cases_completed }).map((_, i) => (
+                           <div key={i} className="p-5 bg-[var(--card-bg)] border border-[var(--border-main)] rounded-2xl flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                 <div className="w-10 h-10 rounded-xl bg-slate-50 dark:bg-slate-800 flex items-center justify-center">
+                                    <Users size={18} className="text-slate-400" />
+                                 </div>
+                                 <div>
+                                    <p className="text-sm font-bold">Simulated Patient #{i+1}</p>
+                                    <p className="text-[10px] text-slate-400 font-medium">Training Scenario Active</p>
+                                 </div>
+                              </div>
+                              <CheckCircle2 size={18} className="text-emerald-500" />
+                           </div>
+                         ))}
+                         {selectedStudent.cases_completed === 0 && (
+                            <div className="col-span-full p-10 text-center border-2 border-dashed border-[var(--border-main)] rounded-[2rem]">
+                               <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No patients admitted yet</p>
+                            </div>
+                         )}
+                      </div>
+                   </div>
+                </div>
+
+                <div className="p-8 border-t border-[var(--border-main)] bg-[var(--bg-main)]/50 flex justify-end">
+                   <button 
+                     onClick={() => setSelectedStudent(null)}
+                     className="px-8 py-3 bg-slate-900 text-white rounded-xl font-bold text-sm shadow-xl active:scale-95 transition-all"
+                   >
+                      Close Oversight
+                   </button>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

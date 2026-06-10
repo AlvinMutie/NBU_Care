@@ -12,10 +12,6 @@ const AuditLogs: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [pagination, setPagination] = useState<any>(null);
 
-  useEffect(() => {
-    fetchLogs();
-  }, []);
-
   const fetchLogs = async (page = 1) => {
     setLoading(true);
     try {
@@ -28,6 +24,10 @@ const AuditLogs: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();

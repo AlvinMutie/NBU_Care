@@ -29,10 +29,6 @@ const Calculators: React.FC = () => {
     { name: 'Morphine', concentration: '10mg/ml', unit: 'mcg/kg/hr', defaultDose: 10 },
   ];
 
-  useEffect(() => {
-    fetchPatients();
-  }, []);
-
   const fetchPatients = async () => {
     setLoadingPatients(true);
     try {
@@ -44,6 +40,10 @@ const Calculators: React.FC = () => {
       setLoadingPatients(false);
     }
   };
+
+  useEffect(() => {
+    fetchPatients();
+  }, []);
 
   const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, 5));
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));

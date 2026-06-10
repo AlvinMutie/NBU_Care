@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { 
   GraduationCap, Search, ShieldCheck, Zap, 
   Activity, Clock, ArrowRight,
-  Info, Plus, Edit2, Trash2, X, Save, ChevronDown, CheckCircle2, Flame, Target, BookOpen, ChevronRight
+  Info, Plus, Edit2, Trash2, X, Save, ChevronDown, CheckCircle2, Flame, Target, BookOpen
 } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
 
@@ -36,11 +37,6 @@ const Academy: React.FC = () => {
     solution: '',
     difficulty: 'Intermediate'
   });
-
-  useEffect(() => {
-    fetchModules();
-    if (isStudent) fetchChallenge();
-  }, []);
 
   const fetchModules = async () => {
     setLoading(true);
@@ -84,6 +80,11 @@ const Academy: React.FC = () => {
       console.error('Failed to fetch challenge:', err);
     }
   };
+
+  useEffect(() => {
+    fetchModules();
+    if (isStudent) fetchChallenge();
+  }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();

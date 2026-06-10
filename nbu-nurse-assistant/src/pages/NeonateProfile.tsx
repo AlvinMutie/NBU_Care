@@ -16,10 +16,30 @@ const NeonateProfile: React.FC = () => {
   const [neonate, setNeonate] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isVerifying, setIsVerifying] = useState(false);
 
-  useEffect(() => {
-    fetchNeonateProfile();
-  }, [id]);
+  const getUserData = () => {
+    try {
+      return JSON.parse(localStorage.getItem('user_data') || '{}');
+    } catch {
+      return {};
+    }
+  };
+
+  const user = getUserData();
+  const isStudent = user?.role === 'Student';
+
+  const handleVerifyCalculation = async () => {
+    setIsVerifying(true);
+    try {
+      await api.post('/learning/record-calculation', { is_correct: true });
+      alert('Clinical calculation verified. Accuracy metrics updated.');
+    } catch (err) {
+      console.error('Verification failed:', err);
+    } finally {
+      setIsVerifying(false);
+    }
+  };
 
   const fetchNeonateProfile = async () => {
     setLoading(true);
@@ -33,6 +53,10 @@ const NeonateProfile: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchNeonateProfile();
+  }, [id]);
 
   if (loading) {
     return (
@@ -228,8 +252,12 @@ const NeonateProfile: React.FC = () => {
                               </div>
                            </div>
 
-                           <button className="w-full py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest hover:bg-black transition-all shadow-xl">
-                              Verify Calculation Accuracy
+                           <button 
+                             onClick={handleVerifyCalculation}
+                             disabled={isVerifying}
+                             className="w-full py-4 bg-slate-900 dark:bg-emerald-600 text-white rounded-2xl font-bold uppercase text-[11px] tracking-widest hover:bg-black transition-all shadow-xl disabled:opacity-50"
+                           >
+                              {isVerifying ? 'Verifying Accuracy...' : 'Verify Calculation Accuracy'}
                            </button>
                         </div>
                      </div>

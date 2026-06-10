@@ -28,13 +28,17 @@ const Dashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [challenge, setChallenge] = useState<any>(null);
   
-  const user = JSON.parse(localStorage.getItem('user_data') || '{}');
-  const isStudent = user.role === 'Student';
-  const isAdminOrNurse = user.role === 'Nursing In-Charge' || user.name === 'System Admin';
+  const getUserData = () => {
+    try {
+      return JSON.parse(localStorage.getItem('user_data') || '{}');
+    } catch {
+      return {};
+    }
+  };
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
+  const user = getUserData();
+  const isStudent = user?.role === 'Student';
+  const isAdminOrNurse = user?.role === 'Nursing In-Charge' || user?.name === 'System Admin';
 
   const fetchDashboardData = async () => {
     setLoading(true);
@@ -47,24 +51,24 @@ const Dashboard: React.FC = () => {
           api.get('/handovers')
         ]);
         
-        const profile = profileRes.data.data;
+        const profile = profileRes.data?.data || {};
         setStats(prev => ({
           ...prev,
-          quiz_streak: profile.quiz_streak,
-          calculation_accuracy: profile.calculation_accuracy,
-          case_load: neonatesRes.data.data.length,
-          handovers_completed: handoversRes.data.data.length
+          quiz_streak: profile.quiz_streak || 0,
+          calculation_accuracy: profile.calculation_accuracy || 0,
+          case_load: neonatesRes.data?.data?.length || 0,
+          handovers_completed: handoversRes.data?.data?.length || 0
         }));
-        setChallenge(challengeRes.data.data);
+        setChallenge(challengeRes.data?.data);
       } else {
         const [statsRes, logsRes, alertsRes] = await Promise.all([
           api.get('/admin/stats'),
           api.get('/logs/recent'),
           api.get('/admin/alerts')
         ]);
-        setStats(statsRes.data.data);
-        setLogs(logsRes.data.data);
-        setAlerts(alertsRes.data.data);
+        setStats(statsRes.data?.data || {});
+        setLogs(logsRes.data?.data || []);
+        setAlerts(alertsRes.data?.data || []);
       }
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
@@ -72,6 +76,10 @@ const Dashboard: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const handleEndShift = () => {
     if (window.confirm('Terminate active session and log out?')) {
@@ -114,7 +122,7 @@ const Dashboard: React.FC = () => {
               <div className="flex items-center space-x-3">
                  <span className="text-xl font-black text-[var(--text-main)]">Operational</span>
                  <div className="w-24 h-8">
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={90} minHeight={30}>
                        <AreaChart data={unitActivityData}>
                           <Area type="monotone" dataKey="load" stroke="#10b981" fill="#10b981" fillOpacity={0.1} strokeWidth={2} />
                        </AreaChart>

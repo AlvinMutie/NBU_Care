@@ -16,6 +16,17 @@ const Neonates: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const getUserData = () => {
+    try {
+      return JSON.parse(localStorage.getItem('user_data') || '{}');
+    } catch {
+      return {};
+    }
+  };
+
+  const user = getUserData();
+  const isStudent = user?.role === 'Student';
+
   const [formData, setFormData] = useState({
     name: '',
     hospital_number: '',
@@ -26,10 +37,6 @@ const Neonates: React.FC = () => {
     gestational_age: '',
     status: 'Stable'
   });
-
-  useEffect(() => {
-    fetchNeonates();
-  }, []);
 
   const fetchNeonates = async () => {
     setLoading(true);
@@ -43,6 +50,10 @@ const Neonates: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchNeonates();
+  }, []);
 
   const handleAdmission = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,10 +86,9 @@ const Neonates: React.FC = () => {
   };
 
   const filteredNeonates = (neonates || []).filter(n => {
-    const matchesSearch = n.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          n.hospital_number?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (n.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (n.hospital_number || '').toLowerCase().includes(searchTerm.toLowerCase());
     
-    // Additional server-side alignment check (optional but safer)
     if (isStudent) return matchesSearch && n.is_simulated;
     return matchesSearch;
   });
@@ -91,17 +101,6 @@ const Neonates: React.FC = () => {
       </div>
     );
   }
-
-  const getUserData = () => {
-    try {
-      return JSON.parse(localStorage.getItem('user_data') || '{}');
-    } catch {
-      return {};
-    }
-  };
-
-  const user = getUserData();
-  const isStudent = user?.role === 'Student';
 
   const handleViewProfile = (id: any) => {
     if (!id) {

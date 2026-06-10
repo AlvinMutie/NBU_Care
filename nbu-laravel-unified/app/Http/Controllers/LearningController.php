@@ -8,6 +8,30 @@ use Illuminate\Http\Request;
 
 class LearningController extends Controller
 {
+    public function recordCalculation(Request $request)
+    {
+        $user = $request->user();
+        $request->validate([
+            'is_correct' => 'required|boolean'
+        ]);
+
+        $user->total_calculations += 1;
+        if ($request->is_correct) {
+            $user->correct_calculations += 1;
+        }
+
+        $user->calculation_accuracy = ($user->correct_calculations / $user->total_calculations) * 100;
+        $user->save();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'accuracy' => $user->calculation_accuracy,
+                'total' => $user->total_calculations
+            ]
+        ]);
+    }
+
     public function currentChallenge(Request $request)
     {
         $user = $request->user();

@@ -23,10 +23,6 @@ const DutyRota: React.FC = () => {
     role_assigned: 'Clinician',
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -42,6 +38,10 @@ const DutyRota: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleAssignShift = async (e: React.FormEvent) => {
     e.preventDefault();
