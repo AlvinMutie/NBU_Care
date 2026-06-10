@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: neodesk-frontend-prod-77
+    name: neodesk-frontend-prod-88
     env: static
     rootDir: nbu-nurse-assistant
     buildCommand: npm install && npm run build
@@ -11,14 +11,15 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://neodesk-backend-prod-77.onrender.com/api
+        value: https://neodesk-backend-prod-88.onrender.com/api
 
   - type: web
-    name: neodesk-backend-prod-77
+    name: neodesk-backend-prod-88
     env: php
     plan: free
     rootDir: nbu-laravel-unified
     buildCommand: touch database/database.sqlite && composer install --no-dev --no-interaction --prefer-dist && php artisan migrate --force && php artisan config:cache && php artisan route:cache
+    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
     envVars:
       - key: APP_KEY
         value: "base64:uP3vUqZ6Q5qZ6Q5qZ6Q5qZ6Q5qZ6Q5qZ6Q5qZ6Q5qZ6="
