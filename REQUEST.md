@@ -1,1 +1,1 @@
-We usijali hii fike ni ya nini, pita tu
+We usijali hii file ni ya nini, pita tu
