@@ -6,6 +6,7 @@ import {
   Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays, Users2
 } from 'lucide-react';
 import AIChatbot from './AIChatbot';
+import logo from '../assets/logo.png';
 
 const Layout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -65,8 +66,8 @@ const Layout: React.FC = () => {
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center justify-between mb-12">
             <Link to="/dashboard" className="flex items-center space-x-3 group">
-              <div className="w-10 h-10 bg-slate-900 dark:bg-emerald-600 rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500">
-                <ShieldCheck className="text-white" size={24} />
+              <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
               </div>
               <span className="text-xl font-black tracking-tighter">NeoDesk<span className="text-emerald-600">.</span></span>
             </Link>
@@ -157,9 +158,9 @@ const Layout: React.FC = () => {
                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-[var(--border-main)] flex items-center justify-center text-xs font-black text-slate-500 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                    {user?.name?.split(' ').map((n:any) => n[0]).join('') || 'CU'}
                 </div>
-                <div className="hidden sm:block text-left">
-                   <p className="text-xs font-black text-[var(--text-main)] tracking-tight">{user?.name || 'Clinician'}</p>
-                   <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{user?.role || 'Staff'}</p>
+                <div className="flex flex-col text-right">
+                   <p className="text-sm font-black text-[var(--text-main)] tracking-tight">{user?.name || 'Clinician'}</p>
+                   <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">{user?.role || 'Staff'}</p>
                 </div>
              </button>
           </div>
@@ -174,20 +175,22 @@ const Layout: React.FC = () => {
         
         {/* Secondary Validation Portal (Floating) */}
         <nav className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-slate-900/90 dark:bg-slate-800/90 backdrop-blur-xl border border-white/10 p-2 rounded-[2rem] shadow-2xl flex items-center space-x-1 z-[60] lg:hidden">
-          <button className="p-4 bg-emerald-600 text-white rounded-[1.5rem] shadow-lg shadow-emerald-500/20 active:scale-95 transition-all">
+          <Link to="/dashboard" className={`p-4 rounded-[1.5rem] transition-all ${location.pathname === '/dashboard' ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
             <LayoutDashboard size={20} />
-          </button>
-          <button className="p-4 text-slate-400 hover:text-white transition-colors">
+          </Link>
+          <Link to="/neonates" className={`p-4 rounded-[1.5rem] transition-all ${location.pathname === '/neonates' ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
             <Users size={20} />
-          </button>
-          <button className="p-4 text-slate-400 hover:text-white transition-colors">
+          </Link>
+          <Link to="/calculators" className={`p-4 rounded-[1.5rem] transition-all ${location.pathname === '/calculators' ? 'bg-emerald-600 text-white' : 'text-slate-400'}`}>
             <Calculator size={20} />
-          </button>
+          </Link>
           <div className="w-px h-6 bg-white/10 mx-2" />
-          <button className="bg-white/5 p-3 pr-6 rounded-[1.5rem] flex items-center space-x-3 text-white/50 hover:text-white transition-all">
-            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">CU</div>
+          <Link to="/settings" className="bg-white/5 p-3 pr-6 rounded-[1.5rem] flex items-center space-x-3 text-white/50 hover:text-white transition-all">
+            <div className="w-8 h-8 rounded-full bg-slate-700 flex items-center justify-center text-[10px] font-bold">
+               {user?.name?.split(' ').map((n:any) => n[0]).join('') || 'CU'}
+            </div>
             <span className="text-[9px] font-black uppercase tracking-widest">Portal</span>
-          </button>
+          </Link>
         </nav>
       </main>
       

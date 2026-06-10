@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Lock, Mail, ArrowRight, ChevronLeft } from 'lucide-react';
 import api from '../services/api';
+import logo from '../assets/logo.png';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -55,8 +56,8 @@ const Login: React.FC = () => {
 
           <div className="text-center space-y-3">
             <Link to="/" className="inline-flex items-center space-x-2.5 mb-4 group">
-              <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
-                <ShieldCheck className="text-white" size={28} />
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform overflow-hidden">
+                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
               </div>
             </Link>
             <h1 className="text-4xl font-black tracking-tighter">Welcome back.</h1>

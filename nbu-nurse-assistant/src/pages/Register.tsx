@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, User, Mail, Lock, IdCard, ChevronRight, Eye, EyeOff, CheckCircle2, ChevronLeft, AlertCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
+import logo from '../assets/logo.png';
 
 const Register: React.FC = () => {
   const navigate = useNavigate();
@@ -53,8 +54,8 @@ const Register: React.FC = () => {
     <div className="min-h-screen bg-[var(--bg-main)] flex flex-col justify-center py-12 px-6 lg:px-8 animate-in fade-in duration-1000">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center space-y-6">
         <Link to="/" className="inline-flex items-center space-x-3 group">
-          <div className="w-12 h-12 bg-slate-900 dark:bg-emerald-600 rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500">
-            <ShieldCheck className="text-white" size={28} />
+          <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl group-hover:scale-110 transition-transform duration-500 overflow-hidden">
+            <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover" />
           </div>
           <span className="text-2xl font-black tracking-tighter text-[var(--text-main)]">NeoDesk<span className="text-emerald-600">.</span></span>
         </Link>

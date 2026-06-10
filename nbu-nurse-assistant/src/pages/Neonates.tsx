@@ -74,10 +74,14 @@ const Neonates: React.FC = () => {
     }
   };
 
-  const filteredNeonates = neonates.filter(n => 
-    n.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    n.hospital_number.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredNeonates = (neonates || []).filter(n => {
+    const matchesSearch = n.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          n.hospital_number?.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Additional server-side alignment check (optional but safer)
+    if (isStudent) return matchesSearch && n.is_simulated;
+    return matchesSearch;
+  });
 
   if (loading && neonates.length === 0) {
     return (
@@ -88,8 +92,25 @@ const Neonates: React.FC = () => {
     );
   }
 
-  const user = JSON.parse(localStorage.getItem('user_data') || '{}');
-  const isStudent = user.role === 'Student';
+  const getUserData = () => {
+    try {
+      return JSON.parse(localStorage.getItem('user_data') || '{}');
+    } catch {
+      return {};
+    }
+  };
+
+  const user = getUserData();
+  const isStudent = user?.role === 'Student';
+
+  const handleViewProfile = (id: any) => {
+    if (!id) {
+       console.error('Invalid Neonate ID localized.');
+       alert('Access failed: Clinical record identifier missing.');
+       return;
+    }
+    navigate(`/neonates/${id}`);
+  };
 
   return (
     <div className="space-y-10 animate-in fade-in duration-700 pb-28 text-[var(--text-main)]">
@@ -319,13 +340,13 @@ const Neonates: React.FC = () => {
             </div>
 
             <div className="pt-8 flex items-center justify-between">
-               <Link 
-                  to={`/neonates/${neonate.id}`}
+               <button 
+                  onClick={() => handleViewProfile(neonate.id)}
                   className="flex items-center space-x-2 text-[11px] font-black uppercase tracking-[0.15em] text-slate-400 group-hover:text-emerald-600 transition-all"
                >
                   <span>View Full Profile</span>
                   <ArrowRight size={14} className="group-hover:translate-x-1 transition-all" />
-               </Link>
+               </button>
                <button className="p-2 text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors">
                   <MoreVertical size={18} />
                </button>

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   GraduationCap, Search, ShieldCheck, Zap, 
   Activity, Clock, ArrowRight,
-  Info, Plus, Edit2, Trash2, X, Save, ChevronDown, CheckCircle2, Flame, Target, BookOpen
+  Info, Plus, Edit2, Trash2, X, Save, ChevronDown, CheckCircle2, Flame, Target, BookOpen, ChevronRight
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';

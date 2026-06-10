@@ -202,6 +202,29 @@ const AcademyAnalytics: React.FC = () => {
             </table>
          </div>
       </div>
+
+      {/* Handover Reviewer Section */}
+      <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] shadow-sm overflow-hidden">
+         <div className="p-8 border-b border-[var(--border-main)] flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+               <h3 className="text-xl font-bold tracking-tight text-emerald-600">Clinical Handover Reviewer</h3>
+               <p className="text-sm text-slate-500 font-medium">Review and evaluate student SBAR transition reports.</p>
+            </div>
+            <Link to="/handovers" className="px-6 py-3 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-2xl text-xs font-bold uppercase tracking-widest hover:bg-slate-100 dark:hover:bg-slate-800 transition-all flex items-center space-x-2">
+               <ClipboardList size={14} />
+               <span>Manage All Handovers</span>
+            </Link>
+         </div>
+         <div className="p-10 text-center space-y-4">
+            <div className="w-16 h-16 bg-emerald-50 rounded-2xl mx-auto flex items-center justify-center text-emerald-600">
+               <CheckCircle2 size={32} />
+            </div>
+            <div className="space-y-1">
+               <p className="text-base font-bold">Review Pipeline Operational</p>
+               <p className="text-sm text-slate-400 max-w-sm mx-auto">Instructors can evaluate student SBAR reports directly within the Handovers module. Evaluation marks are synchronized with the performance directory.</p>
+            </div>
+         </div>
+      </div>
     </div>
   );
 };

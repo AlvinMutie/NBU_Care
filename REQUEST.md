@@ -1,50 +1,23 @@
-You are an expert full-stack developer and UX designer specializing in medical education platforms. Help me build a Student Dashboard and an Instructor/Admin Tracking Portal for a Neonatal Care Learning Management System (LMS) built with Laravel/PHP. 
+Download the React DevTools for a better development experience: https://react.dev/link/react-devtools
+2recharts.js?v=36f72ef7:7342 The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width.
+warn @ recharts.js?v=36f72ef7:7342
+Academy.tsx:223 Uncaught ReferenceError: ChevronRight is not defined
+    at Academy.tsx:223:24
+    at Array.map (<anonymous>)
+    at Academy (Academy.tsx:203:22)
+    at Object.react_stack_bottom_frame (react-dom_client.js?v=36f72ef7:12868:12)
+    at renderWithHooks (react-dom_client.js?v=36f72ef7:4213:19)
+    at updateFunctionComponent (react-dom_client.js?v=36f72ef7:5569:16)
+    at beginWork (react-dom_client.js?v=36f72ef7:6140:20)
+    at runWithFiberInDEV (react-dom_client.js?v=36f72ef7:851:66)
+    at performUnitOfWork (react-dom_client.js?v=36f72ef7:8429:92)
+    at workLoopSync (react-dom_client.js?v=36f72ef7:8325:37)
+react-dom_client.js?v=36f72ef7:5258 An error occurred in the <Academy> component.
 
-Adhere strictly to the following architectural and feature requirements:
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries.
 
-### 1. USER ROLES & ACCESS CONTROL
-- **Students:** Can only access their personalized Overview, the 30-Day Quiz, the Patient Simulation (Virtual Ward), the Guided Handover Page, and a Profile-only Settings Page. They must NEVER see the global system activity logs or the master list of real-world neonates in the system.
-- **Nurse in Charge & System Admin:** Have full administrative access, including system activity logs on their overview page, and access to a dedicated "Academy Analytics" page to monitor student performance.
-
----
-
-### 2. STUDENT DASHBOARD ARCHITECTURE
-
-#### A. Overview Page (Student View)
-- **Remove:** Completely remove the global system activity log.
-- **Metrics Display:** Show actual personalized student data: Active 30-Day Quiz Streak, Overall Calculation Accuracy (%), Active Case Load (number of simulated patients added), and Handover Reports Completed.
-- **Action Center:** A prominent call-to-action displaying "Today's Challenge" (linking to the active day of the 30-day quiz).
-
-#### B. The 30-Day Simulation & Quiz Section
-- **Concept:** Students do not view existing neonates. Instead, they are prompted to add their own simulated neonates based on specific clinical scenarios.
-- **The 5 Case Scenarios:** Over the 30 days, students must build a "Virtual Ward" containing exactly 5 neonates, each with a different clinical condition (e.g., Extreme Prematurity, Neonatal Jaundice, Sepsis, Respiratory Distress Syndrome, and Infant of a Diabetic Mother).
-- **Guided Calculations:** When managing these neonates, the system must not just take inputs; it must guide the student through critical calculations (fluid volume, TFI, caloric intake, drug dosing). The UI should show the step-by-step mathematical formulas and guide them on *how* the calculation is done in real time.
-
-#### C. Guided Handover Page
-- **Concept:** Students must be trained to generate professional clinical handover reports using the 5 simulated neonates they created.
-- **Structure:** Frame the page around the SBAR (Situation, Background, Assessment, Recommendation) or I-PASS protocol.
-- **Interactive Guidance:** Instead of a blank form, the system prompts the student with guided questions based on the neonate's current condition (e.g., "What critical lab values or respiratory trends must you highlight for the incoming shift?"). 
-- **Output:** Generates a downloadable, structured Handover PDF.
-
-#### D. Settings Page
-- **Restriction:** Modify the settings page to show the **Profile Settings ONLY** (Name, email, password updates, and clinical rotation year). Strip out all other system configurations.
-
----
-
-### 3. ADMIN & NURSE IN CHARGE PORTAL (NEW)
-
-#### A. Overview Page (Admin/Nurse View)
-- **Retain:** Keep the comprehensive system activity log visible exclusively to these roles.
-
-#### B. Academy Analytics & Performance Tracking Page
-- **Student Directory:** A table listing all enrolled students, their current day in the 30-day quiz, and their overall progress.
-- **Performance Metrics:** 
-  - Individual and cohort average calculation accuracy scores.
-  - Completion status of the 5 distinct neonate case scenarios.
-  - Flags/Alerts for students who are repeatedly failing specific calculation types (e.g., "Student X is struggling with fluid volume calculations").
-- **Handover Reviewer:** A section where the Nurse in Charge can view and review the SBAR handover reports generated by the students for evaluation.
-
----
-
-### OUTPUT EXPECTED
-Carry out and implement evrything mentioned
+the above errors i got them from the clinical academy for the student dahsbaord, fix that because it displays for a second then it becomes blank. I have also added a new image in the project folder, i want you to use it for the logo in all the pages and also as the favicon.
