@@ -372,7 +372,7 @@ const LandingPage: React.FC = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-16 mb-24">
             <div className="lg:col-span-6 space-y-10 text-left">
               <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-2xl shadow-slate-200 dark:shadow-none overflow-hidden p-1">
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-2xl shadow-slate-200 dark:shadow-none overflow-hidden p-1">
                   <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-contain" />
                 </div>
                 <span className="text-3xl font-bold tracking-tighter uppercase">NeoDesk</span>
