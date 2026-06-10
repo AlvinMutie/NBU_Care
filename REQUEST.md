@@ -1,10 +1,1 @@
-[plugin:vite:oxc] Transform failed with 1 error:
-
-[PARSE_ERROR] Expected `)` but found `EOF`
-     ╭─[ src/pages/Academy.tsx:411:29 ]
-     │
- 411 │         {showAddModal && (
-     │                             │ 
-     │                             ╰─ `)` expected
-─────╯
-E:/Projects/NBU_Care-main/nbu-nurse-assistant/src/pages/Academy.tsx
+is there anyway we can implement the lnding page to use a similar structure the same as the following: https://html.kamleshyadav.com/html/healthcare/bootstrap5/one_page.html
