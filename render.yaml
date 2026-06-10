@@ -1,25 +1,23 @@
 services:
   - type: web
-    name: neodesk-front-v130
+    name: neodesk-frontend-final
     env: static
-    rootDir: nbu-nurse-assistant
-    buildCommand: npm install && npm run build
-    staticPublishPath: dist
+    buildCommand: cd nbu-nurse-assistant && npm install && npm run build
+    staticPublishPath: nbu-nurse-assistant/dist
     routes:
       - type: rewrite
         source: /*
         destination: /index.html
     envVars:
       - key: VITE_API_BASE_URL
-        value: https://neodesk-back-v130.onrender.com/api
+        value: https://neodesk-backend-final.onrender.com/api
 
   - type: web
-    name: neodesk-back-v130
+    name: neodesk-backend-final
     env: php
     plan: free
-    rootDir: nbu-laravel-unified
-    buildCommand: composer install --no-dev --no-interaction --prefer-dist && touch database/database.sqlite && php artisan migrate --force
-    startCommand: php artisan serve --host=0.0.0.0 --port=$PORT
+    buildCommand: cd nbu-laravel-unified && composer install --no-dev --no-interaction --prefer-dist && touch database/database.sqlite && php artisan migrate --force
+    startCommand: cd nbu-laravel-unified && php artisan serve --host=0.0.0.0 --port=$PORT
     envVars:
       - key: APP_KEY
         value: "base64:Ym9sdG9uaXNoZXJlYW5kd2VsbG9mY291cnNlaGVsbG8xMg=="
