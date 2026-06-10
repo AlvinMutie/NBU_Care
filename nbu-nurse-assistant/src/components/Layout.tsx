@@ -3,13 +3,16 @@ import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, Users, Calculator, ClipboardList, 
   BookOpen, Settings as SettingsIcon, Menu, LogOut, ShieldAlert, 
-  Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays, Users2
+  Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays, Users2,
+  Moon, Sun
 } from 'lucide-react';
 import AIChatbot from './AIChatbot';
+import { useTheme } from '../services/ThemeContext';
 import logo from '../assets/logo.png';
 
 const Layout: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   
@@ -21,14 +24,16 @@ const Layout: React.FC = () => {
     // Fallback for legacy sessions
     return {
       name: localStorage.getItem('user_name') || 'Clinician',
-      role: localStorage.getItem('user_role') || 'Staff'
+      role: localStorage.getItem('user_role') || 'Staff',
+      email: ''
     };
   };
 
   const user = getUserData();
 
   const isStudent = user.role === 'Student';
-  const isAdmin = user.role === 'Nursing In-Charge' || user.name === 'System Admin';
+  const isSystemAdmin = user.email === 'admin@neodesk.org' || user.name === 'System Admin';
+  const isAdmin = user.role === 'Nursing In-Charge' || isSystemAdmin;
 
   const navItems = [
     { name: 'Command Center', icon: LayoutDashboard, path: '/dashboard' },
@@ -41,13 +46,13 @@ const Layout: React.FC = () => {
 
   const adminItems = [
     { name: 'Staff Management', icon: UserCheck, path: '/staff' },
-    ...(user.role !== 'Nursing In-Charge' ? [{ name: 'System Audit', icon: ShieldAlert, path: '/audit' }] : []),
+    ...(isSystemAdmin ? [{ name: 'System Audit', icon: ShieldAlert, path: '/audit' }] : []),
     { name: 'Institutional Vetting', icon: Users2, path: '/verify' },
     { name: 'Workforce Rota', icon: CalendarDays, path: '/rota' },
     { name: 'Academy Analytics', icon: ShieldCheck, path: '/academy-analytics' },
   ];
 
-  const isManagement = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || user.name === 'System Admin';
+  const isManagement = user.role === 'Nursing In-Charge' || user.role === 'Consultant Pediatrician' || isSystemAdmin;
 
   const handleLogout = () => {
     localStorage.removeItem('auth_token');
@@ -150,6 +155,16 @@ const Layout: React.FC = () => {
                 <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Institutional Node</p>
                 <p className="text-xs font-bold text-emerald-600 mt-1">ND-HQ-MAIN-01</p>
              </div>
+             
+             {/* Theme Toggle */}
+             <button 
+               onClick={toggleTheme}
+               className="p-2.5 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-xl text-slate-400 hover:text-emerald-500 transition-all group"
+               title={theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode'}
+             >
+                {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+             </button>
+
              <button className="relative p-2.5 bg-[var(--bg-main)] border border-[var(--border-main)] rounded-xl text-slate-400 hover:text-[var(--text-main)] transition-all group">
                 <Bell size={18} />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-[var(--bg-header)] group-hover:scale-110 transition-transform" />
