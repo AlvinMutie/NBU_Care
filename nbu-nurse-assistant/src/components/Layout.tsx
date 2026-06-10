@@ -150,7 +150,7 @@ const Layout: React.FC = () => {
             <Menu size={24} />
           </button>
           
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center space-x-3 sm:space-x-8">
              {/* Theme Toggle */}
              <button 
                onClick={toggleTheme}
@@ -164,11 +164,11 @@ const Layout: React.FC = () => {
                 <Bell size={18} />
                 <span className="absolute top-2 right-2 w-2 h-2 bg-rose-500 rounded-full border-2 border-[var(--bg-header)] group-hover:scale-110 transition-transform" />
              </button>
-             <button className="flex items-center space-x-3 pl-4 border-l border-[var(--border-main)] group">
+             <button className="flex items-center space-x-3 pl-3 sm:pl-4 border-l border-[var(--border-main)] group">
                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-[var(--border-main)] flex items-center justify-center text-xs font-black text-slate-500 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                    {user?.name?.split(' ').map((n:any) => n[0]).join('') || 'CU'}
                 </div>
-                <div className="flex flex-col text-right bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-1.5 rounded-xl border border-emerald-100/50 dark:border-emerald-800/30">
+                <div className="hidden sm:flex flex-col text-right bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-1.5 rounded-xl border border-emerald-100/50 dark:border-emerald-800/30">
                    <p className="text-base font-black text-[var(--text-main)] tracking-tight leading-none">{user?.name || 'Clinician'}</p>
                    <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mt-1">{user?.role || 'Staff'}</p>
                 </div>

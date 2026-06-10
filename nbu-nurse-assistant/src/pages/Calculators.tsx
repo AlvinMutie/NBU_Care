@@ -219,27 +219,27 @@ const Calculators: React.FC = () => {
                        <p className="text-slate-500 font-medium italic">Target rate for {selectedDrug?.name}</p>
                     </div>
 
-                    <div className="flex flex-col items-center justify-center space-y-8 py-10">
-                       <div className="flex items-baseline space-x-6">
+                    <div className="flex flex-col items-center justify-center space-y-4 sm:space-y-8 py-6 sm:py-10">
+                       <div className="flex items-baseline space-x-3 sm:space-x-6">
                           <input 
                             type="number" 
-                            className="bg-transparent border-b-2 border-[var(--border-main)] text-[100px] font-black text-center w-64 outline-none text-[var(--text-main)] focus:border-emerald-600 transition-all"
+                            className="bg-transparent border-b-2 border-[var(--border-main)] text-[60px] sm:text-[100px] font-black text-center w-40 sm:w-64 outline-none text-[var(--text-main)] focus:border-emerald-600 transition-all"
                             placeholder="0.0"
                             value={dose}
                             onChange={(e) => setDose(e.target.value)}
                             autoFocus
                           />
-                          <span className="text-2xl font-black text-slate-300 uppercase tracking-tighter">{selectedDrug?.unit}</span>
+                          <span className="text-lg sm:text-2xl font-black text-slate-300 uppercase tracking-tighter">{selectedDrug?.unit}</span>
                        </div>
                        <div className="flex items-center space-x-3 text-[11px] font-black uppercase tracking-[0.3em] text-slate-400">
-                          <span className="bg-[var(--bg-main)] px-3 py-1 rounded-md border border-[var(--border-main)]">Rec: {selectedDrug?.defaultDose} {selectedDrug?.unit}</span>
+                          <span className="bg-[var(--bg-main)] px-3 py-1 rounded-md border border-[var(--border-main)] text-[9px] sm:text-[11px]">Rec: {selectedDrug?.defaultDose} {selectedDrug?.unit}</span>
                        </div>
                     </div>
 
                     <div className="flex justify-center">
                        <button 
                         onClick={nextStep}
-                        className="bg-slate-900 dark:bg-emerald-600 text-white px-16 py-5 rounded-2xl font-bold text-lg shadow-2xl shadow-slate-200 dark:shadow-none active:scale-95 transition-all"
+                        className="bg-slate-900 dark:bg-emerald-600 text-white px-8 sm:px-16 py-4 sm:py-5 rounded-2xl font-bold text-base sm:text-lg shadow-2xl shadow-slate-200 dark:shadow-none active:scale-95 transition-all"
                         disabled={!dose}
                        >
                          Validate Therapeutic Rate

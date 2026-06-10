@@ -291,23 +291,28 @@ const Handovers: React.FC = () => {
       <AnimatePresence>
         {isModalOpen && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md">
-             <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 50 }} className="bg-[var(--card-bg)] rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-[var(--border-main)]">
-                <div className="p-8 border-b border-[var(--border-main)] flex items-center justify-between">
+             <motion.div 
+               initial={{ opacity: 0, y: 50 }} 
+               animate={{ opacity: 1, y: 0 }} 
+               exit={{ opacity: 0, y: 50 }} 
+               className="bg-[var(--card-bg)] rounded-3xl sm:rounded-[3rem] w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col border border-[var(--border-main)]"
+             >
+                <div className="p-6 sm:p-8 border-b border-[var(--border-main)] flex items-center justify-between">
                    <div>
-                      <h3 className="text-2xl font-bold tracking-tight">{isStudent ? 'Guided Clinical Handover' : 'Structured SBAR Handover'}</h3>
+                      <h3 className="text-xl sm:text-2xl font-bold tracking-tight">{isStudent ? 'Guided Clinical Handover' : 'Structured SBAR Handover'}</h3>
                       <p className="text-xs text-slate-500 font-medium">Follow the clinical transition protocol.</p>
                    </div>
-                   <button onClick={() => setIsModalOpen(false)} className="p-3 hover:bg-[var(--bg-main)] rounded-2xl"><X size={24} /></button>
+                   <button onClick={() => setIsModalOpen(false)} className="p-2 sm:p-3 hover:bg-[var(--bg-main)] rounded-2xl"><X size={24} /></button>
                 </div>
                 
-                <form onSubmit={handleSaveHandover} className="flex-1 overflow-y-auto p-8 space-y-8 custom-scrollbar">
-                   <div className="grid grid-cols-2 gap-6">
+                <form onSubmit={handleSaveHandover} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Patient</label>
                          <select 
                            value={formData.neonate_id}
                            onChange={(e) => setFormData({...formData, neonate_id: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                            required
                          >
                             <option value="">Choose Patient...</option>
@@ -319,7 +324,7 @@ const Handovers: React.FC = () => {
                          <select 
                            value={formData.shift_type}
                            onChange={(e) => setFormData({...formData, shift_type: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                          >
                             <option>Morning</option>
                             <option>Afternoon</option>
@@ -328,20 +333,20 @@ const Handovers: React.FC = () => {
                       </div>
                    </div>
 
-                   <div className="space-y-6">
+                   <div className="space-y-4 sm:space-y-6">
                       {[
                         { key: 'situation', label: 'S - Situation', guide: 'What is happening right now? State the patient and current acuity.' },
                         { key: 'background', label: 'B - Background', guide: 'Brief history, admission details, and clinical context.' },
                         { key: 'assessment', label: 'A - Assessment', guide: 'What are the current vitals and high-level findings? What do you think is going on?' },
                         { key: 'recommendation', label: 'R - Recommendation', guide: 'What are the immediate next steps? What do you need from the next shift?' },
                       ].map(section => (
-                        <div key={section.key} className="space-y-3 p-6 bg-[var(--bg-main)] rounded-[2rem] border border-[var(--border-main)] relative">
+                        <div key={section.key} className="space-y-3 p-4 sm:p-6 bg-[var(--bg-main)] rounded-2xl sm:rounded-[2rem] border border-[var(--border-main)] relative">
                            <div className="flex items-center justify-between mb-1">
                               <label className="text-xs font-black text-emerald-600 uppercase tracking-widest">{section.label}</label>
                               {isStudent && (
                                 <div className="flex items-center space-x-2 text-[10px] font-bold text-slate-400 italic">
                                    <HelpCircle size={12} />
-                                   <span>Guided Hint</span>
+                                   <span className="hidden sm:inline">Guided Hint</span>
                                 </div>
                               )}
                            </div>
@@ -361,15 +366,15 @@ const Handovers: React.FC = () => {
                       ))}
                    </div>
 
-                   <div className="pt-8 border-t border-[var(--border-main)] flex items-center justify-between">
+                   <div className="pt-6 sm:pt-8 border-t border-[var(--border-main)] flex items-center justify-between">
                       <button type="button" onClick={() => setIsModalOpen(false)} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-rose-600 transition-colors">Discard</button>
                       <button 
                         type="submit" 
                         disabled={isSubmitting}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-12 py-4 rounded-2xl font-black text-sm shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center space-x-2"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-2xl font-black text-sm shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center space-x-2"
                       >
                          {isSubmitting && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
-                         <span>{isStudent ? 'Submit Training Report' : 'Save SBAR Handover'}</span>
+                         <span>{isStudent ? 'Submit Training' : 'Save SBAR'}</span>
                       </button>
                    </div>
                 </form>

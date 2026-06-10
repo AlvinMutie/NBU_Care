@@ -135,32 +135,32 @@ const Neonates: React.FC = () => {
                initial={{ opacity: 0, scale: 0.95 }}
                animate={{ opacity: 1, scale: 1 }}
                exit={{ opacity: 0, scale: 0.95 }}
-               className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[3rem] w-full max-w-2xl p-10 shadow-2xl space-y-8 overflow-y-auto max-h-[90vh] custom-scrollbar"
+               className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-3xl sm:rounded-[3rem] w-full max-w-2xl p-6 sm:p-10 shadow-2xl space-y-6 sm:space-y-8 overflow-y-auto max-h-[90vh] custom-scrollbar"
              >
                 <div className="flex justify-between items-center">
-                   <h3 className="text-2xl font-bold tracking-tight">New Clinical Admission</h3>
+                   <h3 className="text-xl sm:text-2xl font-bold tracking-tight">New Clinical Admission</h3>
                    <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
                 </div>
 
-                <form onSubmit={handleAdmission} className="space-y-6">
+                <form onSubmit={handleAdmission} className="space-y-4 sm:space-y-6">
                    <div className="space-y-2">
                       <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Patient Full Name</label>
                       <input 
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                         placeholder="e.g. Baby Liam"
                         required
                       />
                    </div>
 
-                   <div className="grid grid-cols-2 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Hospital Number</label>
                          <input 
                            value={formData.hospital_number}
                            onChange={(e) => setFormData({...formData, hospital_number: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                            placeholder="HOSP-NBU-XXX"
                            required
                          />
@@ -171,45 +171,45 @@ const Neonates: React.FC = () => {
                            type="date"
                            value={formData.dob}
                            onChange={(e) => setFormData({...formData, dob: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                            required
                          />
                       </div>
                    </div>
 
-                   <div className="grid grid-cols-3 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
                       <div className="space-y-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Gender</label>
                          <select 
                            value={formData.gender}
                            onChange={(e) => setFormData({...formData, gender: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                          >
                             <option>Male</option>
                             <option>Female</option>
                          </select>
                       </div>
-                      <div className="space-y-2 col-span-2">
+                      <div className="space-y-2 sm:col-span-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Gestational Age (Weeks)</label>
                          <input 
                            type="number"
                            value={formData.gestational_age}
                            onChange={(e) => setFormData({...formData, gestational_age: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                            placeholder="e.g. 32"
                            required
                          />
                       </div>
                    </div>
 
-                   <div className="grid grid-cols-2 gap-6">
+                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Birth Weight (kg)</label>
                          <input 
                            type="number" step="0.001"
                            value={formData.birth_weight}
                            onChange={(e) => setFormData({...formData, birth_weight: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                            placeholder="e.g. 1.250"
                            required
                          />
@@ -220,7 +220,7 @@ const Neonates: React.FC = () => {
                            type="number" step="0.001"
                            value={formData.current_weight}
                            onChange={(e) => setFormData({...formData, current_weight: e.target.value})}
-                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                           className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                            placeholder="e.g. 1.250"
                            required
                          />
@@ -232,7 +232,7 @@ const Neonates: React.FC = () => {
                       <select 
                         value={formData.status}
                         onChange={(e) => setFormData({...formData, status: e.target.value})}
-                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-4 rounded-2xl text-sm font-bold outline-none"
+                        className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none"
                       >
                          <option>Stable</option>
                          <option>Serious</option>
@@ -243,7 +243,7 @@ const Neonates: React.FC = () => {
                    <button 
                     type="submit" 
                     disabled={isSubmitting}
-                    className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-5 rounded-2xl font-bold shadow-xl flex items-center justify-center space-x-2 hover:bg-black dark:hover:bg-emerald-700 transition-all disabled:opacity-50"
+                    className="w-full bg-slate-900 dark:bg-emerald-600 text-white py-4 sm:py-5 rounded-2xl font-bold shadow-xl flex items-center justify-center space-x-2 hover:bg-black dark:hover:bg-emerald-700 transition-all disabled:opacity-50"
                    >
                       {isSubmitting ? (
                         <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
