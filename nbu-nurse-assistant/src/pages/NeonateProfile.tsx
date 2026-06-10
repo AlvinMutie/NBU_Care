@@ -185,7 +185,10 @@ const NeonateProfile: React.FC = () => {
             <AlertCircle size={16} className="text-rose-600" />
             <span className="text-xs font-bold text-rose-700 dark:text-rose-300 uppercase tracking-widest">{displayData.bio.status} STATUS</span>
           </div>
-          <button className="bg-slate-900 dark:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 dark:shadow-none active:scale-95 transition-all">
+          <button 
+            onClick={() => alert('Institutional record synchronized. No immediate admission updates required at this checkpoint.')}
+            className="bg-slate-900 dark:bg-emerald-600 text-white px-6 py-2.5 rounded-xl text-sm font-bold shadow-lg shadow-slate-200 dark:shadow-none active:scale-95 transition-all"
+          >
             Update Admission
           </button>
         </div>
@@ -211,6 +214,192 @@ const NeonateProfile: React.FC = () => {
       {/* Content Area */}
       <div className="min-h-[600px]">
         <AnimatePresence mode="wait">
+          {activeTab === 'treatment' && (
+            <motion.div key="treatment" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+               <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                  <div className="flex items-center space-x-3 text-emerald-600 border-b border-[var(--border-main)] pb-6">
+                     <Pill size={20} />
+                     <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Therapeutic Plan</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)] space-y-4">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Medications</p>
+                        <div className="space-y-3">
+                           {[
+                             { name: 'Ampicillin', dose: '150mg', freq: 'BD', route: 'IV' },
+                             { name: 'Gentamicin', dose: '12mg', freq: 'OD', route: 'IV' },
+                             { name: 'Phenobarbitone', dose: '5mg', freq: 'BD', route: 'PO' },
+                           ].map((m, i) => (
+                             <div key={i} className="flex justify-between items-center p-3 bg-white dark:bg-slate-900 rounded-xl border border-[var(--border-main)]">
+                                <div>
+                                   <p className="text-sm font-bold">{m.name}</p>
+                                   <p className="text-[10px] text-slate-400 font-medium">{m.dose} • {m.freq} • {m.route}</p>
+                                </div>
+                                <CheckCircle2 size={16} className="text-emerald-500" />
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                     <div className="p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)] space-y-4">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fluid Plan</p>
+                        <div className="space-y-4">
+                           <div className="flex justify-between">
+                              <span className="text-sm font-medium">Total Fluid Intake (TFI)</span>
+                              <span className="text-sm font-black">80 ml/kg/day</span>
+                           </div>
+                           <div className="flex justify-between">
+                              <span className="text-sm font-medium">10% Dextrose</span>
+                              <span className="text-sm font-black">4.2 ml/hr</span>
+                           </div>
+                           <div className="h-px bg-[var(--border-main)]" />
+                           <p className="text-xs text-slate-500 italic">"Maintain GIR at 6-8 mg/kg/min. Monitor blood glucose 4-hourly."</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'discharge' && (
+            <motion.div key="discharge" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+               <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                  <div className="flex items-center space-x-3 text-slate-900 dark:text-white border-b border-[var(--border-main)] pb-6">
+                     <ShieldCheck size={20} />
+                     <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Discharge Portal</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                     <div className="space-y-6">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discharge Readiness Checklist</p>
+                        <div className="space-y-4">
+                           {[
+                             { t: 'Weight Stability', d: 'Consistent gain for 3 days', c: true },
+                             { t: 'Thermal Regulation', d: 'Maintains temp in open cot', c: true },
+                             { t: 'Feeding Competency', d: 'Full oral feeds tolerated', c: false },
+                             { t: 'Maternal Education', d: 'KMC and warning signs', c: false },
+                           ].map((item, i) => (
+                             <div key={i} className="flex items-start space-x-4">
+                                <div className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center ${item.c ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-300'}`}>
+                                   {item.c ? <CheckCircle2 size={12} /> : <div className="w-1.5 h-1.5 rounded-full bg-current" />}
+                                </div>
+                                <div>
+                                   <p className="text-sm font-bold">{item.t}</p>
+                                   <p className="text-[10px] text-slate-400 font-medium">{item.d}</p>
+                                </div>
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                     <div className="bg-slate-900 rounded-3xl p-8 text-white space-y-6">
+                        <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Final Summary & Referrals</p>
+                        <textarea 
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium focus:outline-none focus:border-emerald-500 h-32"
+                          placeholder="Enter final clinical summary for discharge..."
+                        ></textarea>
+                        <button 
+                          onClick={() => alert('Discharge summary generated. Final institutional approval required.')}
+                          className="w-full py-4 bg-emerald-600 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl"
+                        >
+                          Authenticate Discharge
+                        </button>
+                     </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'treatment' && (
+            <motion.div key="treatment" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+               <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                  <div className="flex items-center space-x-3 text-emerald-600 border-b border-[var(--border-main)] pb-6">
+                     <Pill size={20} />
+                     <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Therapeutic Plan</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     <div className="p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)] space-y-4">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Active Medications</p>
+                        <div className="space-y-3">
+                           {[
+                             { name: 'Ampicillin', dose: '150mg', freq: 'BD', route: 'IV' },
+                             { name: 'Gentamicin', dose: '12mg', freq: 'OD', route: 'IV' },
+                             { name: 'Phenobarbitone', dose: '5mg', freq: 'BD', route: 'PO' },
+                           ].map((m, i) => (
+                             <div key={i} className="flex justify-between items-center p-3 bg-white dark:bg-slate-900 rounded-xl border border-[var(--border-main)]">
+                                <div>
+                                   <p className="text-sm font-bold">{m.name}</p>
+                                   <p className="text-[10px] text-slate-400 font-medium">{m.dose} • {m.freq} • {m.route}</p>
+                                </div>
+                                <CheckCircle2 size={16} className="text-emerald-500" />
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                     <div className="p-6 bg-[var(--bg-main)] rounded-2xl border border-[var(--border-main)] space-y-4">
+                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fluid Plan</p>
+                        <div className="space-y-4">
+                           <div className="flex justify-between">
+                              <span className="text-sm font-medium">Total Fluid Intake (TFI)</span>
+                              <span className="text-sm font-black">80 ml/kg/day</span>
+                           </div>
+                           <div className="flex justify-between">
+                              <span className="text-sm font-medium">10% Dextrose</span>
+                              <span className="text-sm font-black">4.2 ml/hr</span>
+                           </div>
+                           <div className="h-px bg-[var(--border-main)]" />
+                           <p className="text-xs text-slate-500 italic">"Maintain GIR at 6-8 mg/kg/min. Monitor blood glucose 4-hourly."</p>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'discharge' && (
+            <motion.div key="discharge" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+               <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-8">
+                  <div className="flex items-center space-x-3 text-slate-900 dark:text-white border-b border-[var(--border-main)] pb-6">
+                     <ShieldCheck size={20} />
+                     <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Discharge Portal</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                     <div className="space-y-6">
+                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Discharge Readiness Checklist</p>
+                        <div className="space-y-4">
+                           {[
+                             { t: 'Weight Stability', d: 'Consistent gain for 3 days', c: true },
+                             { t: 'Thermal Regulation', d: 'Maintains temp in open cot', c: true },
+                             { t: 'Feeding Competency', d: 'Full oral feeds tolerated', c: false },
+                             { t: 'Maternal Education', d: 'KMC and warning signs', c: false },
+                           ].map((item, i) => (
+                             <div key={i} className="flex items-start space-x-4">
+                                <div className={`mt-0.5 w-5 h-5 rounded-md flex items-center justify-center ${item.c ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 dark:bg-slate-800 text-slate-300'}`}>
+                                   {item.c ? <CheckCircle2 size={12} /> : <div className="w-1.5 h-1.5 rounded-full bg-current" />}
+                                </div>
+                                <div>
+                                   <p className="text-sm font-bold">{item.t}</p>
+                                   <p className="text-[10px] text-slate-400 font-medium">{item.d}</p>
+                                </div>
+                             </div>
+                           ))}
+                        </div>
+                     </div>
+                     <div className="bg-slate-900 rounded-3xl p-8 text-white space-y-6">
+                        <p className="text-[10px] font-bold text-emerald-400 uppercase tracking-widest">Final Summary & Referrals</p>
+                        <textarea 
+                          className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-xs font-medium focus:outline-none focus:border-emerald-500 h-32"
+                          placeholder="Enter final clinical summary for discharge..."
+                        ></textarea>
+                        <button 
+                          onClick={() => alert('Discharge summary generated. Final institutional approval required.')}
+                          className="w-full py-4 bg-emerald-600 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl"
+                        >
+                          Authenticate Discharge
+                        </button>
+                     </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
           {activeTab === 'calculations' && isStudent && (
             <motion.div key="calculations" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 lg:grid-cols-12 gap-8">
                <div className="lg:col-span-8 space-y-8">
@@ -577,25 +766,36 @@ const NeonateProfile: React.FC = () => {
           {activeTab === 'notes' && (
              <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
                <div className="lg:col-span-8 space-y-6">
-                  {neonate.handovers?.map((h: any, idx: number) => (
-                    <div key={idx} className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-4 hover:border-emerald-200 transition-all group">
-                       <div className="flex justify-between items-start">
-                          <div className="flex items-center space-x-4">
-                             <div className="w-10 h-10 rounded-xl bg-[var(--bg-main)] flex items-center justify-center text-slate-400 font-black text-xs border border-[var(--border-main)]">
-                                {h.clinician_name?.split(' ').map((n: any) => n[0]).join('') || '??'}
-                             </div>
-                             <div>
-                                <p className="text-sm font-bold group-hover:text-emerald-600 transition-colors">{h.clinician_name || 'Clinician'}</p>
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Handover Report</p>
-                             </div>
-                          </div>
-                          <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-widest">{new Date(h.created_at).toLocaleTimeString()}</span>
-                       </div>
-                       <p className="text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed font-medium pl-14">
-                          "{h.report_summary || h.clinical_commentary || 'No commentary provided.'}"
-                       </p>
+                  <div className="flex items-center space-x-3 text-slate-900 dark:text-white border-b border-[var(--border-main)] pb-6 mb-4">
+                     <FileText size={20} />
+                     <h3 className="text-lg font-bold tracking-tight uppercase tracking-widest text-[11px]">Clinical Timeline</h3>
+                  </div>
+                  {neonate.handovers?.length > 0 ? (
+                    neonate.handovers.map((h: any, idx: number) => (
+                      <div key={idx} className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2rem] p-8 shadow-sm space-y-4 hover:border-emerald-200 transition-all group">
+                         <div className="flex justify-between items-start">
+                            <div className="flex items-center space-x-4">
+                               <div className="w-10 h-10 rounded-xl bg-[var(--bg-main)] flex items-center justify-center text-slate-400 font-black text-xs border border-[var(--border-main)]">
+                                  {h.clinician_name?.split(' ').map((n: any) => n[0]).join('') || '??'}
+                               </div>
+                               <div>
+                                  <p className="text-sm font-bold group-hover:text-emerald-600 transition-colors">{h.clinician_name || 'Clinician'}</p>
+                                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Handover Report</p>
+                               </div>
+                            </div>
+                            <span className="text-[10px] font-mono text-slate-400 font-bold uppercase tracking-widest">{new Date(h.created_at).toLocaleTimeString()}</span>
+                         </div>
+                         <p className="text-[15px] text-slate-600 dark:text-slate-400 leading-relaxed font-medium pl-14">
+                            "{h.report_summary || h.clinical_commentary || 'No commentary provided.'}"
+                         </p>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="py-20 text-center bg-[var(--card-bg)] border-2 border-dashed border-[var(--border-main)] rounded-[3rem]">
+                       <History className="mx-auto text-slate-300 mb-4" size={40} />
+                       <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No clinical timeline events recorded yet</p>
                     </div>
-                  ))}
+                  )}
                </div>
              </motion.div>
           )}

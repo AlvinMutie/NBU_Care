@@ -67,6 +67,56 @@ class AcademySeeder extends Seeder
                 'category' => 'Critical', 
                 'content' => 'Used for Hypoxic-Ischemic Encephalopathy (HIE) in term/near-term infants. Aim: Cool to 33.5°C for 72 hours starting within 6 hours of birth. It reduces neuronal death by slowing cerebral metabolism.'
             ],
+            [
+                'title' => 'Kernicterus Prevention', 
+                'category' => 'Critical', 
+                'content' => 'Kernicterus is irreversible brain damage from high bilirubin. Early signs: lethargy, poor suck, high-pitched cry. Late signs: opisthotonus, seizures. Monitor TSB levels and ensure timely phototherapy or exchange transfusion.'
+            ],
+            [
+                'title' => 'Neonatal Reflexes', 
+                'category' => 'Routine', 
+                'content' => 'Assessment of the nervous system. Rooting (searching for nipple), Sucking, Moro (startle reflex), Palmar Grasp, and Babinski. Absence or asymmetry can indicate neurological insult or birth injury.'
+            ],
+            [
+                'title' => 'GBS Prophylaxis', 
+                'category' => 'Clinical', 
+                'content' => 'Group B Streptococcus is a leading cause of neonatal sepsis. Intrapartum antibiotic prophylaxis (IAP) given to GBS+ mothers at least 4 hours before delivery significantly reduces early-onset disease.'
+            ],
+            [
+                'title' => 'PDA in Preterms', 
+                'category' => 'Clinical', 
+                'content' => 'Patent Ductus Arteriosus (PDA) often fails to close in preterms. Symptoms: bounding pulses, active precordium, systolic murmur. Management: Fluid restriction, NSAIDs (Indomethacin/Ibuprofen), or surgical ligation if hemodynamically significant.'
+            ],
+            [
+                'title' => 'Meconium Aspiration', 
+                'category' => 'Critical', 
+                'content' => 'MAS occurs when a neonate inhales meconium-stained amniotic fluid. It causes airway obstruction, chemical pneumonitis, and surfactant inactivation. Often leads to PPHN (Persistent Pulmonary Hypertension of the Newborn).'
+            ],
+            [
+                'title' => 'Inborn Errors of Metabolism', 
+                'category' => 'Advanced', 
+                'content' => 'Suspect IEM if a previously healthy infant suddenly deteriorates with metabolic acidosis, hyperammonemia, or hypoglycemia. Common types: Urea cycle disorders, Organic acidemias, Galactosemia.'
+            ],
+            [
+                'title' => 'ROP Screening', 
+                'category' => 'Routine', 
+                'content' => 'Retinopathy of Prematurity affects preterms <32 weeks or <1500g. Caused by abnormal vascular growth in the retina. Risk factors: high oxygen exposure, sepsis, fluctuations in SpO2.'
+            ],
+            [
+                'title' => 'IVH Prevention', 
+                'category' => 'Advanced', 
+                'content' => 'Intraventricular Hemorrhage (IVH) occurs in germinal matrix. Prevention bundle: minimal handling, midline head positioning, avoiding rapid fluid boluses, and maintaining stable blood pressure.'
+            ],
+            [
+                'title' => 'CHD Screening', 
+                'category' => 'Routine', 
+                'content' => 'Critical Congenital Heart Disease (CCHD) screening via pulse oximetry. Done after 24 hours of life. Measures SpO2 in right hand (pre-ductal) and either foot (post-ductal). Difference >3% or SpO2 <95% is a fail.'
+            ],
+            [
+                'title' => 'NICU Breastfeeding', 
+                'category' => 'Essential', 
+                'content' => 'Breast milk reduces the risk of NEC, sepsis, and ROP. It provides immunological protection and improves neurodevelopmental outcomes. Encourage early colostrum expression and skin-to-skin contact.'
+            ],
         ];
 
         foreach ($flashcards as $f) {
@@ -142,6 +192,41 @@ class AcademySeeder extends Seeder
                 'description' => 'Day 1 of life for a 1500g neonate. Standard protocol suggests starting at 60ml/kg/day.', 
                 'problem' => 'What is the total fluid volume for 24 hours and the hourly IV rate?', 
                 'solution' => 'Total: 60 * 1.5 = 90ml. Hourly rate: 90 / 24 = 3.75 ml/hr.', 
+                'difficulty' => 'Intermediate'
+            ],
+            [
+                'title' => 'Hypoglycemic Seizure', 
+                'description' => 'An infant of a diabetic mother is 2 hours old. Suddenly develops generalized twitching. Random blood sugar is 1.1 mmol/L.', 
+                'problem' => 'Immediate pharmacological intervention?', 
+                'solution' => '10% Dextrose bolus (2ml/kg) over 5-10 minutes, followed by an increase in GIR.', 
+                'difficulty' => 'Critical'
+            ],
+            [
+                'title' => 'Septic Shock', 
+                'description' => 'A neonate with suspected sepsis has a blood pressure of 32/18 mmHg. CRT is 5 seconds. Liver is 3cm below costal margin.', 
+                'problem' => 'Priority intervention after starting antibiotics?', 
+                'solution' => 'Fluid resuscitation (Normal Saline 10-20ml/kg) and consider inotropic support (Dopamine/Dobutamine).', 
+                'difficulty' => 'Advanced'
+            ],
+            [
+                'title' => 'MAS Airway', 
+                'description' => 'Thick meconium-stained fluid at birth. The baby is non-vigorous (no breathing, poor tone).', 
+                'problem' => 'Current NRP recommendation for airway management?', 
+                'solution' => 'Start PPV if the baby is not breathing. Routine endotracheal suctioning for meconium is no longer recommended unless there is airway obstruction.', 
+                'difficulty' => 'Critical'
+            ],
+            [
+                'title' => 'PDA Assessment', 
+                'description' => 'A 26-weeker on Day 4. You hear a continuous "machinery" murmur at the left upper sternal border. Pulses are bounding.', 
+                'problem' => 'Likely diagnosis and bedside investigation?', 
+                'solution' => 'Hemodynamically Significant PDA (hsPDA). Investigation: Bedside Echocardiogram.', 
+                'difficulty' => 'Advanced'
+            ],
+            [
+                'title' => 'ROP Screening Criteria', 
+                'description' => 'A neonate was born at 30 weeks with a birth weight of 1300g.', 
+                'problem' => 'When should the first ROP screening be performed?', 
+                'solution' => 'At 4 weeks of chronological age or 31 weeks post-menstrual age (whichever is later).', 
                 'difficulty' => 'Intermediate'
             ],
         ];

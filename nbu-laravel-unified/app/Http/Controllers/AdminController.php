@@ -165,4 +165,21 @@ class AdminController extends Controller
             'message' => 'Settings updated.'
         ]);
     }
+
+    public function destroy(User $user)
+    {
+        // Prevent deleting oneself
+        if (auth()->id() === $user->id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot delete your own account.'
+            ], 403);
+        }
+
+        $user->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully.'
+        ]);
+    }
 }

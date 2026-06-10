@@ -151,11 +151,6 @@ const Layout: React.FC = () => {
           </button>
           
           <div className="flex items-center space-x-8">
-             <div className="hidden md:flex flex-col items-end">
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none">Institutional Node</p>
-                <p className="text-xs font-bold text-emerald-600 mt-1">ND-HQ-MAIN-01</p>
-             </div>
-             
              {/* Theme Toggle */}
              <button 
                onClick={toggleTheme}

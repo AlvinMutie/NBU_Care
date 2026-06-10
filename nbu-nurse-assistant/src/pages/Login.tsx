@@ -61,7 +61,6 @@ const Login: React.FC = () => {
               </div>
             </Link>
             <h1 className="text-4xl font-black tracking-tighter">Welcome back.</h1>
-            <p className="text-slate-500 font-medium tracking-tight">Clinical Intelligence Portal v16.0</p>
           </div>
 
           <form className="space-y-8" onSubmit={handleLogin}>

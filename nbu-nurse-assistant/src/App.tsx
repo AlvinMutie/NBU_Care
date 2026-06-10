@@ -33,6 +33,7 @@ const App: React.FC = () => {
             <Route path="/calculators" element={<Calculators />} />
             <Route path="/handovers" element={<Handovers />} />
             <Route path="/academy" element={<Academy />} />
+            <Route path="/academics" element={<Academy />} />
             <Route path="/academy-analytics" element={<AcademyAnalytics />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/audit" element={<AuditLogs />} />

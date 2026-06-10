@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   Users2, Search, Filter, Mail, Phone, 
   ShieldCheck, MoreVertical, ShieldAlert,
-  ArrowRight, CheckCircle2, UserCheck, Key, X, Save
+  ArrowRight, CheckCircle2, UserCheck, Key, X, Save, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -14,6 +14,7 @@ const ManageStaff: React.FC = () => {
   const [resetModal, setResetModal] = useState<any>(null);
   const [newPassword, setNewPassword] = useState('');
   const [isResetting, setIsResetting] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchStaff = async () => {
     setLoading(true);
@@ -44,6 +45,23 @@ const ManageStaff: React.FC = () => {
       alert('Failed to update credentials. Ensure policy alignment (min 8 chars).');
     } finally {
       setIsResetting(false);
+    }
+  };
+
+  const handleDeleteUser = async (user: any) => {
+    if (!window.confirm(`Are you absolutely sure you want to revoke all access for ${user.name}? This action is irreversible and will be logged in the system audit.`)) {
+      return;
+    }
+
+    setDeletingId(user.id);
+    try {
+      await api.delete(`/admin/users/${user.id}`);
+      setStaff(prev => prev.filter(s => s.id !== user.id));
+    } catch (err: any) {
+      console.error('Deletion failed:', err);
+      alert(err.response?.data?.message || 'Failed to delete user. Ensure you have administrative clearance.');
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -117,8 +135,12 @@ const ManageStaff: React.FC = () => {
                          </div>
                       </div>
                    </div>
-                   <button className="p-2 text-slate-300 hover:text-emerald-600 transition-colors">
-                      <MoreVertical size={20} />
+                   <button 
+                    onClick={() => handleDeleteUser(person)}
+                    disabled={deletingId === person.id}
+                    className="p-2 text-slate-300 hover:text-rose-600 transition-colors disabled:opacity-50"
+                   >
+                      <Trash2 size={20} />
                    </button>
                 </div>
 
@@ -145,7 +167,7 @@ const ManageStaff: React.FC = () => {
              <div className="mt-8 pt-6 border-t border-[var(--border-main)] flex justify-between items-center relative z-10">
                 <button 
                   onClick={() => setResetModal(person)}
-                  className="flex items-center space-x-2 text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-rose-600 transition-colors"
+                  className="flex items-center space-x-2 text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-emerald-600 transition-colors"
                 >
                    <Key size={14} />
                    <span>Reset Password</span>
