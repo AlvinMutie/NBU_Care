@@ -111,7 +111,7 @@ const Dashboard: React.FC = () => {
               {[
                 { label: isStudent ? 'Academy Modules' : 'Live Cases', value: isStudent ? '24' : stats.live_cases, icon: isStudent ? GraduationCap : Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
                 { label: isStudent ? 'Study Hours' : 'Active Staff', value: isStudent ? '12.5' : stats.total_staff, icon: isStudent ? Clock : Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
-                { label: isStudent ? 'Tests Taken' : 'Meds Audit', value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
+                { label: isStudent ? 'Tests Taken' : (user.role === 'Nursing In-Charge' ? 'Doses Given' : 'Meds Audit'), value: isStudent ? '8' : stats.doses_given, icon: isStudent ? ClipboardCheck : Beaker, color: 'text-rose-600', bg: 'bg-rose-50' },
               ].map((stat, idx) => (
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -218,25 +218,27 @@ const Dashboard: React.FC = () => {
               </div>
            </div>
 
-           <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                 <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
-                 <Clock size={16} className="text-slate-300" />
-              </div>
-              <div className="space-y-5">
-                 {recentLogs.slice(0, 4).map((log, i) => (
-                   <div key={i} className="flex items-start space-x-3">
-                      <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
-                         {log.action[0].toUpperCase()}
-                      </div>
-                      <div className="flex-1 space-y-0.5">
-                         <p className="text-xs font-bold capitalize">{log.action.replace('_', ' ')}</p>
-                         <p className="text-[10px] text-slate-400 font-medium">By {log.user?.name || 'System'}</p>
-                      </div>
-                   </div>
-                 ))}
-              </div>
-           </div>
+           {user.role !== 'Nursing In-Charge' && (
+             <div className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-[2.5rem] p-8 shadow-sm">
+                <div className="flex justify-between items-center mb-6">
+                   <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Recent Activity</h4>
+                   <Clock size={16} className="text-slate-300" />
+                </div>
+                <div className="space-y-5">
+                   {recentLogs.slice(0, 4).map((log, i) => (
+                     <div key={i} className="flex items-start space-x-3">
+                        <div className="w-8 h-8 rounded-lg bg-[var(--bg-main)] flex items-center justify-center text-[10px] font-bold text-emerald-600">
+                           {log.action[0].toUpperCase()}
+                        </div>
+                        <div className="flex-1 space-y-0.5">
+                           <p className="text-xs font-bold capitalize">{log.action.replace('_', ' ')}</p>
+                           <p className="text-[10px] text-slate-400 font-medium">By {log.user?.name || 'System'}</p>
+                        </div>
+                     </div>
+                   ))}
+                </div>
+             </div>
+           )}
         </div>
       </div>
     </div>

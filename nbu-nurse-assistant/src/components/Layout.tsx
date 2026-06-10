@@ -37,7 +37,7 @@ const Layout: React.FC = () => {
 
   const adminItems = [
     { name: 'Staff Management', icon: UserCheck, path: '/staff' },
-    { name: 'System Audit', icon: ShieldAlert, path: '/audit' },
+    ...(user.role !== 'Nursing In-Charge' ? [{ name: 'System Audit', icon: ShieldAlert, path: '/audit' }] : []),
     { name: 'Institutional Vetting', icon: Users2, path: '/verify' },
     { name: 'Workforce Rota', icon: CalendarDays, path: '/rota' },
   ];
