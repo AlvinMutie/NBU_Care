@@ -348,12 +348,29 @@ const Academy: React.FC = () => {
                    <div className="space-y-4">
                       <h4 className="text-[11px] font-black text-slate-400 uppercase tracking-widest flex items-center space-x-2">
                          <ShieldCheck size={14} className="text-emerald-500" />
-                         <span>Institutional Directive</span>
+                         <span>Institutional Directive & Clinical Education</span>
                       </h4>
                       <div className="prose prose-slate dark:prose-invert max-w-none">
-                         <p className="text-[15px] leading-relaxed text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[2rem] border border-[var(--border-main)]">
-                            {selectedModule.content || selectedModule.description}
-                         </p>
+                         <div className="text-[15px] leading-relaxed text-slate-600 dark:text-slate-400 font-medium bg-slate-50 dark:bg-slate-900/50 p-6 rounded-[2rem] border border-[var(--border-main)]">
+                            <p className="mb-4">{selectedModule.content || selectedModule.description}</p>
+                            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800">
+                               <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-3">Key Learning Objectives</p>
+                               <ul className="space-y-2 list-none p-0">
+                                  <li className="flex items-start space-x-2">
+                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                                     <span>Master the foundational principles of {selectedModule.title}.</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                                     <span>Identify critical risk factors and institutional safety thresholds.</span>
+                                  </li>
+                                  <li className="flex items-start space-x-2">
+                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
+                                     <span>Execute evidence-based interventions as per NICU protocol.</span>
+                                  </li>
+                               </ul>
+                            </div>
+                         </div>
                       </div>
                    </div>
 

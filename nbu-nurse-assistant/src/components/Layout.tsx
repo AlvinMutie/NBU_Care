@@ -66,8 +66,8 @@ const Layout: React.FC = () => {
         <div className="h-full flex flex-col p-8">
           <div className="flex items-center justify-between mb-12">
             <Link to="/dashboard" className="flex items-center space-x-3 group">
-              <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center shadow-xl group-hover:scale-110 transition-transform duration-500 overflow-hidden border-2 border-emerald-50">
-                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover scale-150" />
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-500 overflow-hidden border border-emerald-50">
+                <img src={logo} alt="NeoDesk Logo" className="w-full h-full object-cover scale-125" />
               </div>
               <span className="text-xl font-black tracking-tighter">NeoDesk<span className="text-emerald-600">.</span></span>
             </Link>
@@ -158,9 +158,9 @@ const Layout: React.FC = () => {
                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 border border-[var(--border-main)] flex items-center justify-center text-xs font-black text-slate-500 shadow-inner group-hover:bg-emerald-600 group-hover:text-white transition-all duration-500">
                    {user?.name?.split(' ').map((n:any) => n[0]).join('') || 'CU'}
                 </div>
-                <div className="flex flex-col text-right">
-                   <p className="text-sm font-black text-[var(--text-main)] tracking-tight">{user?.name || 'Clinician'}</p>
-                   <p className="text-[9px] font-bold text-emerald-600 uppercase tracking-widest">{user?.role || 'Staff'}</p>
+                <div className="flex flex-col text-right bg-emerald-50/50 dark:bg-emerald-900/10 px-4 py-1.5 rounded-xl border border-emerald-100/50 dark:border-emerald-800/30">
+                   <p className="text-base font-black text-[var(--text-main)] tracking-tight leading-none">{user?.name || 'Clinician'}</p>
+                   <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em] mt-1">{user?.role || 'Staff'}</p>
                 </div>
              </button>
           </div>
