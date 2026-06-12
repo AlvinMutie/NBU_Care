@@ -355,21 +355,55 @@ const Neonates: React.FC = () => {
       </div>
 
       {/* Structural Stats Bar */}
-      <div className="bg-slate-900 dark:bg-slate-950 rounded-[2rem] p-10 text-white flex flex-col md:flex-row justify-between items-center gap-8 shadow-2xl dark:shadow-none">
-         <div className="flex items-center space-x-6">
+      <div className="bg-slate-900 dark:bg-slate-950 rounded-[2rem] p-6 sm:p-10 text-white flex flex-col lg:flex-row justify-between items-center gap-8 shadow-2xl dark:shadow-none overflow-hidden relative group">
+         <div className="absolute inset-0 bg-emerald-500/5 group-hover:bg-emerald-500/10 transition-colors pointer-events-none" />
+         
+         <div className="flex items-center space-x-6 relative z-10">
             <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400">
                <Activity size={28} />
             </div>
             <div>
-               <p className="text-2xl font-bold tracking-tight">Active Ward Census</p>
-               <p className="text-sm text-slate-400 font-medium">{neonates.length} Admissions • {30 - neonates.length} Beds Remaining</p>
+               <p className="text-2xl font-bold tracking-tight leading-none mb-2">Ward Census Matrix</p>
+               <p className="text-[10px] text-emerald-500 font-black uppercase tracking-[0.2em]">{neonates.length} Admissions • {30 - neonates.length} Beds Remaining</p>
             </div>
          </div>
-         <div className="flex items-center space-x-3">
-            <div className="flex -space-x-3">
-               {[1, 2, 3, 4].map(i => <div key={i} className="w-10 h-10 rounded-full border-4 border-slate-900 dark:border-slate-950 bg-slate-800 flex items-center justify-center text-[10px] font-bold">RN</div>)}
+
+         {/* Cinema-style Bed Matrix */}
+         <div className="flex flex-col items-center lg:items-end space-y-4 relative z-10">
+            <div className="grid grid-cols-10 gap-2 sm:gap-3 p-4 bg-white/5 rounded-2xl border border-white/10">
+               {Array.from({ length: 30 }).map((_, i) => {
+                  const isOccupied = i < (neonates?.length || 0);
+                  const neonate = isOccupied ? neonates[i] : null;
+                  const isCritical = neonate?.status === 'Critical';
+                  
+                  return (
+                     <div 
+                        key={i} 
+                        title={isOccupied ? `Bed ${i+1}: ${neonate.name}` : `Bed ${i+1}: Available`}
+                        className={`
+                           w-3 h-3 sm:w-4 sm:h-4 rounded-sm transition-all duration-500
+                           ${isOccupied 
+                              ? (isCritical ? 'bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.5)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]') 
+                              : 'bg-white/10 hover:bg-white/20 border border-white/5'}
+                        `} 
+                     />
+                  );
+               })}
             </div>
-            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-4">Staff on Duty</p>
+            <div className="flex items-center space-x-6 text-[9px] font-black uppercase tracking-widest text-slate-400">
+               <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-sm bg-emerald-500" />
+                  <span>Stable</span>
+               </div>
+               <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-sm bg-rose-500" />
+                  <span>Critical</span>
+               </div>
+               <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-sm bg-white/10 border border-white/5" />
+                  <span>Available</span>
+               </div>
+            </div>
          </div>
       </div>
     </div>

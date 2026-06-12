@@ -12,6 +12,7 @@ import {
   BarChart3, BookOpen, ClipboardList, Droplets
 } from 'lucide-react';
 import babyImage from '../assets/baby2.jpg';
+import heroBg from '../assets/hero2.jpg';
 import logo from '../assets/logo.png';
 
 const FlipCard = ({ title, desc, details, icon: Icon, backColor }: any) => {
@@ -137,7 +138,7 @@ const LandingPage: React.FC = () => {
       <section className="relative h-[80vh] min-h-[600px] flex items-center overflow-hidden">
         <div className="absolute inset-0 z-0">
            <img 
-            src={babyImage} 
+            src={heroBg} 
             alt="Clinical Context" 
             className="w-full h-full object-cover object-[70%_center]"
            />

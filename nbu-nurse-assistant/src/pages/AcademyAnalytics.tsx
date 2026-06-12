@@ -58,12 +58,12 @@ const AcademyAnalytics: React.FC = () => {
         <div className="flex items-center gap-4 bg-[var(--card-bg)] border border-[var(--border-main)] p-2 px-4 rounded-2xl">
            <div className="flex flex-col items-end">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Cohort Avg Accuracy</p>
-              <p className="text-lg font-black text-emerald-600">{data.cohort_average_accuracy.toFixed(1)}%</p>
+              <p className="text-lg font-black text-emerald-600">{(data?.cohort_average_accuracy || 0).toFixed(1)}%</p>
            </div>
            <div className="w-px h-8 bg-[var(--border-main)]" />
            <div className="flex flex-col items-end">
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Simulations Completed</p>
-              <p className="text-lg font-black text-blue-600">{data.total_simulations_completed}</p>
+              <p className="text-lg font-black text-blue-600">{data?.total_simulations_completed || 0}</p>
            </div>
         </div>
       </div>

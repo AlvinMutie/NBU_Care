@@ -91,8 +91,8 @@ class AdminController extends Controller
             'success' => true,
             'data' => [
                 'students' => $students,
-                'cohort_average_accuracy' => $students->avg('accuracy'),
-                'total_simulations_completed' => $students->sum('cases_completed'),
+                'cohort_average_accuracy' => $students->avg('accuracy') ?? 0,
+                'total_simulations_completed' => $students->sum('cases_completed') ?? 0,
             ]
         ]);
     }

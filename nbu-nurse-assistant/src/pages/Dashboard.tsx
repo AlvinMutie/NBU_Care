@@ -193,6 +193,86 @@ const Dashboard: React.FC = () => {
               )}
            </div>
 
+           {!isStudent && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 sm:p-10 rounded-[3rem] shadow-sm space-y-8 overflow-hidden relative"
+              >
+                 <div className="flex items-center justify-between relative z-10">
+                    <div>
+                       <h3 className="text-xl font-bold tracking-tight">Daily Workforce Infographic</h3>
+                       <p className="text-xs text-slate-500 font-medium uppercase tracking-widest mt-1">Real-time Personnel Distribution</p>
+                    </div>
+                    <div className="px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+                       Shift: Morning
+                    </div>
+                 </div>
+
+                 <div className="flex flex-wrap gap-6 justify-center sm:justify-start relative z-10">
+                    {/* Simulated personnel data for infographic */}
+                    {[
+                       { r: 'IC', n: 'Sr. Elena G.', c: 'bg-slate-900' },
+                       { r: 'RN', n: 'Nurse Sarah', c: 'bg-emerald-600' },
+                       { r: 'RN', n: 'Nurse John', c: 'bg-emerald-600' },
+                       { r: 'RN', n: 'Nurse Amara', c: 'bg-emerald-600' },
+                       { r: 'RN', n: 'Nurse Kevin', c: 'bg-emerald-500' },
+                       { r: 'ST', n: 'Student Lisa', c: 'bg-blue-600' },
+                       { r: 'ST', n: 'Student Mark', c: 'bg-blue-600' },
+                       { r: 'MD', n: 'Dr. Alvin M.', c: 'bg-rose-600' },
+                    ].map((staff, i) => (
+                       <motion.div 
+                         key={i} 
+                         whileHover={{ scale: 1.05 }}
+                         className="flex flex-col items-center space-y-2 group cursor-help"
+                       >
+                          <div className={`w-14 h-14 rounded-2xl ${staff.c} text-white flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
+                             {staff.r}
+                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-slate-800 rounded-full" />
+                          </div>
+                          <div className="text-center">
+                             <p className="text-[10px] font-bold text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{staff.n.split(' ')[1]}</p>
+                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{staff.r === 'IC' ? 'In-Charge' : staff.r === 'RN' ? 'Registrar' : staff.r === 'ST' ? 'Clinical' : 'Consultant'}</p>
+                          </div>
+                       </motion.div>
+                    ))}
+                    
+                    {/* Empty slots to match census logic */}
+                    {Array.from({ length: 4 }).map((_, i) => (
+                       <div key={i} className="flex flex-col items-center space-y-2 opacity-20 grayscale">
+                          <div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-400 flex items-center justify-center text-slate-400">
+                             <Plus size={16} />
+                          </div>
+                          <div className="text-center">
+                             <p className="text-[10px] font-bold text-slate-400">Available</p>
+                          </div>
+                       </div>
+                    ))}
+                 </div>
+
+                 <div className="pt-6 border-t border-[var(--border-main)] flex items-center justify-between relative z-10">
+                    <div className="flex items-center space-x-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                       <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-slate-900" />
+                          <span>Management</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-emerald-600" />
+                          <span>Nursing</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-blue-600" />
+                          <span>Students</span>
+                       </div>
+                    </div>
+                    <Link to="/rota" className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline flex items-center space-x-2">
+                       <span>Full Unit Rota</span>
+                       <ArrowRight size={12} />
+                    </Link>
+                 </div>
+              </motion.div>
+           )}
+
            {isStudent ? (
              <div className="bg-slate-900 rounded-[3rem] p-10 text-white relative overflow-hidden group shadow-2xl">
                 <div className="absolute top-0 right-0 p-12 opacity-5 pointer-events-none group-hover:scale-110 transition-transform">
