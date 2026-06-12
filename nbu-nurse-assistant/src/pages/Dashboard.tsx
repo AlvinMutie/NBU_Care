@@ -3,7 +3,7 @@ import {
   Users, Activity, Beaker, ShieldCheck, TrendingUp, 
   ArrowRight, ClipboardCheck,
   Clock, Zap, BookOpen, RefreshCcw, AlertCircle,
-  GraduationCap, ChevronRight, Calculator, FileText, Flame
+  GraduationCap, ChevronRight, Calculator, FileText, Flame, Plus
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { 

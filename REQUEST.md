@@ -1,5 +1,17 @@
-I want you to change the background at the hero section with the image labelled her2.jpg
-Also in the dahsboards, the academy analytics is not displaying anything, we need to fix that.
-In the neonate registry page, is there a way we can make this section: Active Ward Census,3 Admissions • 27 Beds Remaining. Look like a booking for cinema seat but instead of seats its beds.
-Also when one is assigned a duty rotar, when the nurse in charge logs in they can see the infographic of all staff working on that day in the command center.
-Implement all of this and push everything to github.
+the following are the issues encountred from deploy logs: 
+==> Downloading cache...
+==> Cloning from https://github.com/AlvinMutie/NBU_Care
+==> Checking out commit 86838dff5565ba7b71eb561b4c6a72d7ccc43c8d in branch main
+==> Downloaded 42MB in 2s. Extraction took 0s.
+==> Running build command 'cd nbu-nurse-assistant && npm install && npm run build'...
+==> Using Node.js version 24.14.1 (default)
+==> Docs on specifying a Node.js version: https://render.com/docs/node-version
+added 244 packages, and audited 245 packages in 9s
+52 packages are looking for funding
+  run `npm fund` for details
+found 0 vulnerabilities
+> nbu-nurse-assistant@0.0.0 build
+> tsc -b && vite build
+src/pages/Dashboard.tsx(244,31): error TS2304: Cannot find name 'Plus'.
+==> Build failed 😞
+==> Common ways to troubleshoot your deploy: https://render.com/docs/troubleshooting-deploys
