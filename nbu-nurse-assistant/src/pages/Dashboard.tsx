@@ -221,24 +221,29 @@ const Dashboard: React.FC = () => {
                  </div>
 
                  <div className="flex flex-wrap gap-6 justify-center sm:justify-start relative z-10">
-                    {shifts.length > 0 ? shifts.map((shift, i) => (
-                       <motion.div 
-                         key={i} 
-                         whileHover={{ scale: 1.05 }}
-                         className="flex flex-col items-center space-y-2 group cursor-help"
-                       >
-                          <div className={`w-14 h-14 rounded-2xl ${shift.shift === 'Morning' ? 'bg-emerald-600' : shift.shift === 'Afternoon' ? 'bg-blue-600' : 'bg-slate-900'} text-white flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
-                             {shift.user.name.split(' ').map((n: any) => n[0]).join('')}
-                             <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-slate-800 rounded-full" />
-                          </div>
-                          <div className="text-center">
-                             <p className="text-[10px] font-bold text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{shift.user.name.split(' ')[0]}</p>
-                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{shift.shift}</p>
-                          </div>
-                       </motion.div>
-                    )) : (
+                    {users.map((person, i) => {
+                       const shift = shifts.find(s => s.user_id === person.id);
+                       return (
+                          <motion.div 
+                            key={i} 
+                            whileHover={{ scale: 1.05 }}
+                            className="flex flex-col items-center space-y-2 group cursor-help"
+                          >
+                             <div className={`w-14 h-14 rounded-2xl ${shift ? (shift.shift === 'Morning' ? 'bg-emerald-600' : shift.shift === 'Afternoon' ? 'bg-blue-600' : 'bg-slate-900') : 'bg-slate-100 dark:bg-slate-800 border-2 border-dashed border-slate-200 dark:border-slate-700'} ${shift ? 'text-white' : 'text-slate-400'} flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
+                                {person.name.split(' ').map((n: any) => n[0]).join('')}
+                                {shift && <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-slate-800 rounded-full" />}
+                             </div>
+                             <div className="text-center">
+                                <p className="text-[10px] font-bold text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{person.name.split(' ')[0]}</p>
+                                <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{shift ? shift.shift : 'Available'}</p>
+                             </div>
+                          </motion.div>
+                       );
+                    })}
+                    
+                    {users.length === 0 && !loading && (
                       <div className="w-full py-10 text-center border-2 border-dashed border-[var(--border-main)] rounded-2xl opacity-40">
-                         <p className="text-[10px] font-black uppercase tracking-widest">No personnel allocated for today</p>
+                         <p className="text-[10px] font-black uppercase tracking-widest">No personnel found in system</p>
                       </div>
                     )}
                  </div>
@@ -293,7 +298,7 @@ const Dashboard: React.FC = () => {
                           </tr>
                        </thead>
                        <tbody>
-                          {users.slice(0, 6).map((u, i) => (
+                          {users.map((u, i) => (
                              <tr key={i} className="border-b border-[var(--border-main)] last:border-0 hover:bg-[var(--bg-main)]/50 transition-colors">
                                 <td className="py-4">
                                    <div className="flex items-center space-x-3">
