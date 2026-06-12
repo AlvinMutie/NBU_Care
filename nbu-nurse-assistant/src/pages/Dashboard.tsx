@@ -25,6 +25,8 @@ const Dashboard: React.FC = () => {
   });
   const [alerts, setAlerts] = useState<any[]>([]);
   const [recentLogs, setLogs] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [shifts, setShifts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [challenge, setChallenge] = useState<any>(null);
   
@@ -61,14 +63,22 @@ const Dashboard: React.FC = () => {
         }));
         setChallenge(challengeRes.data?.data);
       } else {
-        const [statsRes, logsRes, alertsRes] = await Promise.all([
+        const [statsRes, logsRes, alertsRes, usersRes, shiftsRes] = await Promise.all([
           api.get('/admin/stats'),
           api.get('/logs/recent'),
-          api.get('/admin/alerts')
+          api.get('/admin/alerts'),
+          api.get('/admin/users'),
+          api.get('/shifts')
         ]);
         setStats(statsRes.data?.data || {});
         setLogs(logsRes.data?.data || []);
         setAlerts(alertsRes.data?.data || []);
+        setUsers(usersRes.data?.data || []);
+        
+        // Filter shifts for today
+        const today = new Date().toISOString().split('T')[0];
+        const todayShifts = (shiftsRes.data?.data || []).filter((s: any) => s.date === today);
+        setShifts(todayShifts);
       }
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
@@ -201,74 +211,113 @@ const Dashboard: React.FC = () => {
               >
                  <div className="flex items-center justify-between relative z-10">
                     <div>
-                       <h3 className="text-xl font-bold tracking-tight">Daily Workforce Infographic</h3>
-                       <p className="text-xs text-slate-500 font-medium uppercase tracking-widest mt-1">Real-time Personnel Distribution</p>
+                       <h3 className="text-xl font-bold tracking-tight">Duty Rota</h3>
+                       <p className="text-xs text-slate-500 font-medium uppercase tracking-widest mt-1">Personnel on Duty Today</p>
                     </div>
                     <div className="px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
-                       Shift: Morning
+                       {shifts.length > 0 ? `Active: ${shifts.length}` : 'No Active Shifts'}
                     </div>
                  </div>
 
                  <div className="flex flex-wrap gap-6 justify-center sm:justify-start relative z-10">
-                    {/* Simulated personnel data for infographic */}
-                    {[
-                       { r: 'IC', n: 'Sr. Elena G.', c: 'bg-slate-900' },
-                       { r: 'RN', n: 'Nurse Sarah', c: 'bg-emerald-600' },
-                       { r: 'RN', n: 'Nurse John', c: 'bg-emerald-600' },
-                       { r: 'RN', n: 'Nurse Amara', c: 'bg-emerald-600' },
-                       { r: 'RN', n: 'Nurse Kevin', c: 'bg-emerald-500' },
-                       { r: 'ST', n: 'Student Lisa', c: 'bg-blue-600' },
-                       { r: 'ST', n: 'Student Mark', c: 'bg-blue-600' },
-                       { r: 'MD', n: 'Dr. Alvin M.', c: 'bg-rose-600' },
-                    ].map((staff, i) => (
+                    {shifts.length > 0 ? shifts.map((shift, i) => (
                        <motion.div 
                          key={i} 
                          whileHover={{ scale: 1.05 }}
                          className="flex flex-col items-center space-y-2 group cursor-help"
                        >
-                          <div className={`w-14 h-14 rounded-2xl ${staff.c} text-white flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
-                             {staff.r}
+                          <div className={`w-14 h-14 rounded-2xl ${shift.shift_type === 'Morning' ? 'bg-emerald-600' : shift.shift_type === 'Afternoon' ? 'bg-blue-600' : 'bg-slate-900'} text-white flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
+                             {shift.user.name.split(' ').map((n: any) => n[0]).join('')}
                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-slate-800 rounded-full" />
                           </div>
                           <div className="text-center">
-                             <p className="text-[10px] font-bold text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{staff.n.split(' ')[1]}</p>
-                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{staff.r === 'IC' ? 'In-Charge' : staff.r === 'RN' ? 'Registrar' : staff.r === 'ST' ? 'Clinical' : 'Consultant'}</p>
+                             <p className="text-[10px] font-bold text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{shift.user.name.split(' ')[0]}</p>
+                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{shift.shift_type}</p>
                           </div>
                        </motion.div>
-                    ))}
-                    
-                    {/* Empty slots to match census logic */}
-                    {Array.from({ length: 4 }).map((_, i) => (
-                       <div key={i} className="flex flex-col items-center space-y-2 opacity-20 grayscale">
-                          <div className="w-14 h-14 rounded-2xl border-2 border-dashed border-slate-400 flex items-center justify-center text-slate-400">
-                             <Plus size={16} />
-                          </div>
-                          <div className="text-center">
-                             <p className="text-[10px] font-bold text-slate-400">Available</p>
-                          </div>
-                       </div>
-                    ))}
+                    )) : (
+                      <div className="w-full py-10 text-center border-2 border-dashed border-[var(--border-main)] rounded-2xl opacity-40">
+                         <p className="text-[10px] font-black uppercase tracking-widest">No personnel allocated for today</p>
+                      </div>
+                    )}
                  </div>
 
                  <div className="pt-6 border-t border-[var(--border-main)] flex items-center justify-between relative z-10">
                     <div className="flex items-center space-x-6 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full bg-slate-900" />
-                          <span>Management</span>
-                       </div>
-                       <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 rounded-full bg-emerald-600" />
-                          <span>Nursing</span>
+                          <span>Morning</span>
                        </div>
                        <div className="flex items-center space-x-2">
                           <div className="w-2 h-2 rounded-full bg-blue-600" />
-                          <span>Students</span>
+                          <span>Afternoon</span>
+                       </div>
+                       <div className="flex items-center space-x-2">
+                          <div className="w-2 h-2 rounded-full bg-slate-900" />
+                          <span>Night</span>
                        </div>
                     </div>
                     <Link to="/rota" className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline flex items-center space-x-2">
-                       <span>Full Unit Rota</span>
+                       <span>Manage Rota</span>
                        <ArrowRight size={12} />
                     </Link>
+                 </div>
+              </motion.div>
+           )}
+
+           {isAdminOrNurse && (
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-[var(--card-bg)] border border-[var(--border-main)] p-8 sm:p-10 rounded-[3rem] shadow-sm space-y-6"
+              >
+                 <div className="flex items-center justify-between">
+                    <div>
+                       <h3 className="text-xl font-bold tracking-tight">Staff Directory</h3>
+                       <p className="text-xs text-slate-500 font-medium uppercase tracking-widest mt-1">Global Personnel Overview</p>
+                    </div>
+                    <Link to="/staff" className="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:underline">
+                       Manage All
+                    </Link>
+                 </div>
+
+                 <div className="overflow-x-auto custom-scrollbar">
+                    <table className="w-full text-left border-collapse">
+                       <thead>
+                          <tr className="border-b border-[var(--border-main)]">
+                             <th className="py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Personnel</th>
+                             <th className="py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Institutional ID</th>
+                             <th className="py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Role</th>
+                             <th className="py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Status</th>
+                          </tr>
+                       </thead>
+                       <tbody>
+                          {users.slice(0, 6).map((u, i) => (
+                             <tr key={i} className="border-b border-[var(--border-main)] last:border-0 hover:bg-[var(--bg-main)]/50 transition-colors">
+                                <td className="py-4">
+                                   <div className="flex items-center space-x-3">
+                                      <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 flex items-center justify-center font-bold text-xs">
+                                         {u.name[0]}
+                                      </div>
+                                      <span className="text-xs font-bold">{u.name}</span>
+                                   </div>
+                                </td>
+                                <td className="py-4 text-xs font-medium text-slate-500">{u.staff_id}</td>
+                                <td className="py-4">
+                                   <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${u.role === 'Nursing In-Charge' ? 'bg-slate-900 text-white' : 'bg-emerald-50 text-emerald-600 border border-emerald-100'}`}>
+                                      {u.role}
+                                   </span>
+                                </td>
+                                <td className="py-4">
+                                   <div className="flex items-center space-x-1.5">
+                                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                      <span className="text-[10px] font-bold text-emerald-600 uppercase">Active</span>
+                                   </div>
+                                </td>
+                             </tr>
+                          ))}
+                       </tbody>
+                    </table>
                  </div>
               </motion.div>
            )}

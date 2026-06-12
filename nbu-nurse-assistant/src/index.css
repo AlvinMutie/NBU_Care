@@ -19,10 +19,11 @@
   
   /* System-wide light/dark variables */
   :root {
-    --bg-main: #F8FAFC;
-    --text-main: #0F172A;
+    --bg-main: #F1F5F9;
+    --text-main: #020617;
+    --text-muted: #475569;
     --card-bg: #FFFFFF;
-    --border-main: #E2E8F0;
+    --border-main: #CBD5E1;
     --bg-sidebar: #FFFFFF;
     --bg-header: #FFFFFF;
   }
@@ -30,6 +31,7 @@
   .dark {
     --bg-main: #0f172a;
     --text-main: #f8fafc;
+    --text-muted: #94a3b8;
     --card-bg: #1e293b;
     --border-main: #334155;
     --bg-sidebar: #1e293b;
@@ -39,7 +41,21 @@
   body {
     background-color: var(--bg-main);
     color: var(--text-main);
+    font-weight: 500;
     @apply antialiased selection:bg-emerald-500/10;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold;
+  }
+
+  p {
+    color: var(--text-muted);
+  }
+
+  .text-slate-500 {
+    color: var(--text-muted);
+    @apply font-semibold;
   }
 }
 
