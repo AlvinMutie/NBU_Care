@@ -76,8 +76,9 @@ const Dashboard: React.FC = () => {
         setUsers(usersRes.data?.data || []);
         
         // Filter shifts for today
-        const today = new Date().toISOString().split('T')[0];
-        const todayShifts = (shiftsRes.data?.data || []).filter((s: any) => s.date === today);
+        const todayStr = new Date().toLocaleDateString('en-CA'); // Get YYYY-MM-DD in local time
+        const allShifts = shiftsRes.data?.data || [];
+        const todayShifts = allShifts.filter((s: any) => s.date === todayStr);
         setShifts(todayShifts);
       }
     } catch (err) {
@@ -226,13 +227,13 @@ const Dashboard: React.FC = () => {
                          whileHover={{ scale: 1.05 }}
                          className="flex flex-col items-center space-y-2 group cursor-help"
                        >
-                          <div className={`w-14 h-14 rounded-2xl ${shift.shift_type === 'Morning' ? 'bg-emerald-600' : shift.shift_type === 'Afternoon' ? 'bg-blue-600' : 'bg-slate-900'} text-white flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
+                          <div className={`w-14 h-14 rounded-2xl ${shift.shift === 'Morning' ? 'bg-emerald-600' : shift.shift === 'Afternoon' ? 'bg-blue-600' : 'bg-slate-900'} text-white flex items-center justify-center text-xs font-black shadow-lg shadow-slate-200 dark:shadow-none relative`}>
                              {shift.user.name.split(' ').map((n: any) => n[0]).join('')}
                              <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 border-2 border-white dark:border-slate-800 rounded-full" />
                           </div>
                           <div className="text-center">
                              <p className="text-[10px] font-bold text-[var(--text-main)] group-hover:text-emerald-600 transition-colors">{shift.user.name.split(' ')[0]}</p>
-                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{shift.shift_type}</p>
+                             <p className="text-[8px] font-black text-slate-400 uppercase tracking-tighter">{shift.shift}</p>
                           </div>
                        </motion.div>
                     )) : (
