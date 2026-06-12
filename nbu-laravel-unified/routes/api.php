@@ -46,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/admin/analytics', [AdminController::class, 'analytics']);
     Route::get('/admin/academy-analytics', [AdminController::class, 'academyAnalytics']);
     Route::post('/admin/users/{user}/reset-password', [AdminController::class, 'resetPassword']);
+    Route::patch('/admin/users/{user}', [AdminController::class, 'update']);
     Route::get('/admin/users', [AdminController::class, 'users']);
     Route::delete('/admin/users/{user}', [AdminController::class, 'destroy']);
     Route::get('/auth/pending', [AdminController::class, 'pendingUsers']);

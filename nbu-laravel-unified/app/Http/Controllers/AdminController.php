@@ -113,6 +113,24 @@ class AdminController extends Controller
         ]);
     }
 
+    public function update(Request $request, User $user)
+    {
+        $data = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'role' => 'sometimes|required|string',
+            'staff_id' => 'sometimes|required|string',
+            'status' => 'sometimes|required|string',
+        ]);
+
+        $user->update($data);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'User profile updated successfully.',
+            'data' => $user
+        ]);
+    }
+
     public function users()
     {
         $users = User::all();
