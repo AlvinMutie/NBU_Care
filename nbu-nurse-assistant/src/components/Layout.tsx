@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Calculator, ClipboardList, 
   BookOpen, Settings as SettingsIcon, Menu, LogOut, ShieldAlert, 
   Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays, Users2,
-  Moon, Sun
+  Moon, Sun, MessageSquare, LifeBuoy
 } from 'lucide-react';
 import { useTheme } from '../services/ThemeContext';
 import logo from '../assets/logo.png';
@@ -14,6 +14,12 @@ const Layout: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const toggleChat = () => {
+    if ((window as any).Tawk_API) {
+      (window as any).Tawk_API.maximize();
+    }
+  };
   
   // Robust user data retrieval
   const getUserData = () => {
@@ -125,7 +131,14 @@ const Layout: React.FC = () => {
             )}
           </nav>
 
-          <div className="mt-auto pt-8 border-t border-[var(--border-main)]">
+          <div className="mt-auto space-y-2 pt-8 border-t border-[var(--border-main)]">
+            <button 
+              onClick={toggleChat}
+              className="w-full flex items-center space-x-4 px-4 py-4 rounded-2xl text-slate-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/10 hover:text-emerald-600 transition-all font-bold text-sm"
+            >
+              <LifeBuoy size={18} />
+              <span>Clinical Support</span>
+            </button>
             <button 
               onClick={handleLogout}
               className="w-full flex items-center space-x-4 px-4 py-4 rounded-2xl text-slate-400 hover:bg-rose-50 dark:hover:bg-rose-900/10 hover:text-rose-600 transition-all font-bold text-sm"
@@ -202,6 +215,16 @@ const Layout: React.FC = () => {
           </Link>
         </nav>
       </main>
+
+      {/* Floating Support Button */}
+      <button 
+        onClick={toggleChat}
+        className="fixed bottom-24 lg:bottom-10 right-6 w-16 h-16 bg-slate-900 dark:bg-emerald-600 rounded-[1.5rem] shadow-2xl flex items-center justify-center text-white hover:scale-110 active:scale-95 transition-all z-50 group border border-white/10"
+        title="Open Clinical Support"
+      >
+        <div className="absolute inset-0 bg-emerald-500 rounded-[1.5rem] animate-ping opacity-10 group-hover:hidden" />
+        <MessageSquare size={28} className="text-emerald-400 dark:text-white" strokeWidth={2.5} />
+      </button>
     </div>
   );
 };
