@@ -19,7 +19,7 @@ class HandoverController extends Controller
 
     public function index($neonateId = null)
     {
-        $query = Handover::with('nurse');
+        $query = Handover::with(['nurse', 'neonate']);
         if ($neonateId) {
             $query->where('neonate_id', $neonateId);
         }
@@ -45,6 +45,7 @@ class HandoverController extends Controller
             'recommendation' => 'nullable|string',
             'is_guided' => 'nullable|boolean',
             'guided_responses' => 'nullable|array',
+            'status' => 'nullable|string|in:completed,draft',
         ]);
 
         $handover = Handover::create([
@@ -61,6 +62,7 @@ class HandoverController extends Controller
             'recommendation' => $request->recommendation,
             'is_guided' => $request->is_guided ?? false,
             'guided_responses' => $request->guided_responses,
+            'status' => $request->status ?? 'completed',
         ]);
 
         return response()->json([
@@ -68,5 +70,37 @@ class HandoverController extends Controller
             'message' => 'Handover recorded successfully.',
             'data' => $handover
         ], 201);
+    }
+
+    public function update(Request $request, Handover $handover)
+    {
+        $request->validate([
+            'clinical_status' => 'nullable|string',
+            'vitals_snapshot' => 'nullable|array',
+            'treatment_plan' => 'nullable|string',
+            'shift_type' => 'sometimes|required|string',
+            'situation' => 'nullable|string',
+            'background' => 'nullable|string',
+            'assessment' => 'nullable|string',
+            'recommendation' => 'nullable|string',
+            'status' => 'nullable|string|in:completed,draft',
+        ]);
+
+        $handover->update($request->all());
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Handover updated successfully.',
+            'data' => $handover
+        ]);
+    }
+
+    public function destroy(Handover $handover)
+    {
+        $handover->delete();
+        return response()->json([
+            'success' => true,
+            'message' => 'Handover deleted successfully.'
+        ]);
     }
 }

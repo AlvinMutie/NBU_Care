@@ -21,6 +21,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::get('/handovers/{neonateId?}', [HandoverController::class, 'index']);
     Route::post('/handovers', [HandoverController::class, 'store']);
+    Route::patch('/handovers/{handover}', [HandoverController::class, 'update']);
+    Route::delete('/handovers/{handover}', [HandoverController::class, 'destroy']);
     Route::get('/handovers/{handover}/download', [HandoverController::class, 'downloadPDF']);
     
     Route::post('/vitals', [VitalController::class, 'store']);

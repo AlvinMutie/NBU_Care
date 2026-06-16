@@ -67,6 +67,17 @@ class NeonateController extends Controller
 
     public function update(Request $request, Neonate $neonate)
     {
+        $request->validate([
+            'hospital_number' => 'sometimes|required|string|unique:neonates,hospital_number,' . $neonate->id,
+            'name' => 'sometimes|required|string|max:255',
+            'dob' => 'sometimes|required|date',
+            'gender' => 'sometimes|required|string',
+            'birth_weight' => 'sometimes|required|numeric',
+            'current_weight' => 'sometimes|required|numeric',
+            'gestational_age' => 'sometimes|required|integer',
+            'status' => 'sometimes|required|string',
+        ]);
+
         $neonate->update($request->all());
 
         return response()->json([

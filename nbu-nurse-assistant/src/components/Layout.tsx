@@ -6,7 +6,6 @@ import {
   Bell, ShieldCheck, X, ChevronRight, UserCheck, CalendarDays, Users2,
   Moon, Sun
 } from 'lucide-react';
-import AIChatbot from './AIChatbot';
 import { useTheme } from '../services/ThemeContext';
 import logo from '../assets/logo.png';
 
@@ -203,9 +202,6 @@ const Layout: React.FC = () => {
           </Link>
         </nav>
       </main>
-      
-      {/* Floating Support Assistant */}
-      <AIChatbot />
     </div>
   );
 };

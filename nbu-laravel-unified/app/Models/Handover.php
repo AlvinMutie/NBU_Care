@@ -10,7 +10,7 @@ class Handover extends Model
     protected $fillable = [
         'neonate_id', 'nurse_id', 'clinical_status', 'vitals_snapshot', 
         'investigations', 'treatment_plan', 'shift_type',
-        'situation', 'background', 'assessment', 'recommendation', 'is_guided', 'guided_responses'
+        'situation', 'background', 'assessment', 'recommendation', 'is_guided', 'guided_responses', 'status'
     ];
 
     protected $casts = [

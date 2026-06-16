@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Clock, Plus, ShieldCheck, 
-  ChevronRight, X, Download, FileText, Info, HelpCircle
+  ChevronRight, X, Download, FileText, Info, HelpCircle, Edit2, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -9,6 +9,7 @@ import api from '../services/api';
 const Handovers: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [detailHandover, setDetailHandover] = useState<any>(null);
+  const [editingHandover, setEditingHandover] = useState<any>(null);
   const [activeShiftFilter, setActiveShiftFilter] = useState('All');
   const [handovers, setHandovers] = useState<any[]>([]);
   const [neonates, setNeonates] = useState<any[]>([]);
@@ -62,15 +63,24 @@ const Handovers: React.FC = () => {
     fetchData();
   }, []);
 
-  const handleSaveHandover = async (e: React.FormEvent) => {
+  const handleSaveHandover = async (e: React.FormEvent, status: 'completed' | 'draft' = 'completed') => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await api.post('/handovers', {
+      const payload = {
         ...formData,
-        is_guided: isStudent
-      });
+        is_guided: isStudent,
+        status: status
+      };
+
+      if (editingHandover) {
+        await api.patch(`/handovers/${editingHandover.id}`, payload);
+      } else {
+        await api.post('/handovers', payload);
+      }
+      
       setIsModalOpen(false);
+      setEditingHandover(null);
       fetchData();
       resetForm();
     } catch (err) {
@@ -94,6 +104,36 @@ const Handovers: React.FC = () => {
       treatment_plan: '',
       clinical_status: ''
     });
+  };
+
+  const openEditModal = (handover: any) => {
+    setEditingHandover(handover);
+    setFormData({
+      neonate_id: handover.neonate_id.toString(),
+      shift_type: handover.shift_type,
+      situation: handover.situation || '',
+      background: handover.background || '',
+      assessment: handover.assessment || '',
+      recommendation: handover.recommendation || '',
+      is_guided: handover.is_guided,
+      vitals_snapshot: handover.vitals_snapshot || { hr: '', spo2: '', temp: '' },
+      treatment_plan: handover.treatment_plan || '',
+      clinical_status: handover.clinical_status || ''
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleDelete = async (e: React.MouseEvent, id: any) => {
+    e.stopPropagation();
+    if (window.confirm('Are you sure you want to delete this handover report?')) {
+      try {
+        await api.delete(`/handovers/${id}`);
+        fetchData();
+      } catch (err) {
+        console.error('Delete failed:', err);
+        alert('Failed to delete handover.');
+      }
+    }
   };
 
   const downloadPDF = async (id: number) => {
@@ -130,7 +170,7 @@ const Handovers: React.FC = () => {
           <p className="text-slate-500 font-medium max-w-lg">Professional transition of care using SBAR protocol.</p>
         </div>
         <button 
-          onClick={() => { resetForm(); setIsModalOpen(true); }}
+          onClick={() => { setEditingHandover(null); resetForm(); setIsModalOpen(true); }}
           className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3 rounded-2xl font-bold text-sm shadow-xl hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
         >
           <Plus size={18} strokeWidth={3} />
@@ -185,15 +225,20 @@ const Handovers: React.FC = () => {
                    <p className="text-sm font-bold text-slate-400 uppercase tracking-widest">No reports archived</p>
                 </div>
              ) : handovers.filter(i => activeShiftFilter === 'All' || i.shift_type === activeShiftFilter).map(item => (
-               <div key={item.id} onClick={() => setDetailHandover(item)} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] flex items-center justify-between group hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer">
+               <div key={item.id} onClick={() => item.status === 'draft' ? openEditModal(item) : setDetailHandover(item)} className="bg-[var(--card-bg)] border border-[var(--border-main)] p-6 rounded-[2rem] flex items-center justify-between group hover:border-emerald-200 hover:shadow-md transition-all cursor-pointer">
                   <div className="flex items-center space-x-6">
                     <div className="w-14 h-14 rounded-2xl bg-[var(--bg-main)] border border-[var(--border-main)] flex flex-col items-center justify-center">
                        <span className="text-[8px] font-black text-slate-400 uppercase">{item.shift_type}</span>
                        <FileText size={18} className="text-emerald-600 mt-1" />
                     </div>
                     <div>
-                      <div className="text-base font-bold text-[var(--text-main)]">
-                        Handover for {item.neonate?.name || 'Patient'}
+                      <div className="text-base font-bold text-[var(--text-main)] flex items-center space-x-2">
+                        <span>Handover for {item.neonate?.name || 'Patient'}</span>
+                        {item.status === 'draft' && (
+                          <span className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 text-[8px] font-black uppercase tracking-[0.2em] px-2 py-0.5 rounded-md border border-amber-200 dark:border-amber-800">
+                             Draft
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center space-x-3 mt-1">
                          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">By {item.nurse?.name}</span>
@@ -206,7 +251,19 @@ const Handovers: React.FC = () => {
                       </div>
                     </div>
                   </div>
-                  <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-600 transition-colors" />
+                  <div className="flex items-center space-x-2">
+                    {item.status === 'draft' && (
+                      <button onClick={(e) => { e.stopPropagation(); openEditModal(item); }} className="p-2 text-slate-400 hover:text-emerald-600 transition-colors">
+                        <Edit2 size={16} />
+                      </button>
+                    )}
+                    {(isAdminOrInCharge || item.nurse_id === user.id) && (
+                      <button onClick={(e) => handleDelete(e, item.id)} className="p-2 text-slate-400 hover:text-rose-600 transition-colors">
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                    <ChevronRight size={20} className="text-slate-300 group-hover:text-emerald-600 transition-colors" />
+                  </div>
                </div>
              ))}
           </div>
@@ -299,13 +356,13 @@ const Handovers: React.FC = () => {
              >
                 <div className="p-6 sm:p-8 border-b border-[var(--border-main)] flex items-center justify-between">
                    <div>
-                      <h3 className="text-xl sm:text-2xl font-bold tracking-tight">{isStudent ? 'Guided Clinical Handover' : 'Structured SBAR Handover'}</h3>
+                      <h3 className="text-xl sm:text-2xl font-bold tracking-tight">{editingHandover ? 'Continue Handover' : (isStudent ? 'Guided Clinical Handover' : 'Structured SBAR Handover')}</h3>
                       <p className="text-xs text-slate-500 font-medium">Follow the clinical transition protocol.</p>
                    </div>
-                   <button onClick={() => setIsModalOpen(false)} className="p-2 sm:p-3 hover:bg-[var(--bg-main)] rounded-2xl"><X size={24} /></button>
+                   <button onClick={() => { setIsModalOpen(false); setEditingHandover(null); resetForm(); }} className="p-2 sm:p-3 hover:bg-[var(--bg-main)] rounded-2xl"><X size={24} /></button>
                 </div>
                 
-                <form onSubmit={handleSaveHandover} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
+                <form onSubmit={(e) => handleSaveHandover(e, 'completed')} className="flex-1 overflow-y-auto p-6 sm:p-8 space-y-6 sm:space-y-8 custom-scrollbar">
                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                       <div className="space-y-2">
                          <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Select Patient</label>
@@ -314,6 +371,7 @@ const Handovers: React.FC = () => {
                            onChange={(e) => setFormData({...formData, neonate_id: e.target.value})}
                            className="w-full bg-[var(--bg-main)] border border-[var(--border-main)] p-3 sm:p-4 rounded-2xl text-sm font-bold outline-none focus:border-emerald-500 transition-all"
                            required
+                           disabled={!!editingHandover}
                          >
                             <option value="">Choose Patient...</option>
                             {neonates.map(n => <option key={n.id} value={n.id}>{n.name} ({n.hospital_number})</option>)}
@@ -367,15 +425,25 @@ const Handovers: React.FC = () => {
                    </div>
 
                    <div className="pt-6 sm:pt-8 border-t border-[var(--border-main)] flex items-center justify-between">
-                      <button type="button" onClick={() => setIsModalOpen(false)} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-rose-600 transition-colors">Discard</button>
-                      <button 
-                        type="submit" 
-                        disabled={isSubmitting}
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-2xl font-black text-sm shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center space-x-2"
-                      >
-                         {isSubmitting && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
-                         <span>{isStudent ? 'Submit Training' : 'Save SBAR'}</span>
-                      </button>
+                      <button type="button" onClick={() => { setIsModalOpen(false); setEditingHandover(null); resetForm(); }} className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-rose-600 transition-colors">Discard</button>
+                      <div className="flex space-x-3">
+                        <button 
+                          type="button" 
+                          onClick={(e) => handleSaveHandover(e, 'draft')}
+                          disabled={isSubmitting}
+                          className="px-6 sm:px-8 py-3 sm:py-4 rounded-2xl font-black text-sm border border-[var(--border-main)] text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all active:scale-95 disabled:opacity-50 flex items-center space-x-2"
+                        >
+                           <span>Save Draft</span>
+                        </button>
+                        <button 
+                          type="submit" 
+                          disabled={isSubmitting}
+                          className="bg-emerald-600 hover:bg-emerald-700 text-white px-8 sm:px-12 py-3 sm:py-4 rounded-2xl font-black text-sm shadow-xl transition-all active:scale-95 disabled:opacity-50 flex items-center space-x-2"
+                        >
+                           {isSubmitting && <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />}
+                           <span>{editingHandover ? 'Finalize Changes' : (isStudent ? 'Submit Training' : 'Finalize SBAR')}</span>
+                        </button>
+                      </div>
                    </div>
                 </form>
              </motion.div>

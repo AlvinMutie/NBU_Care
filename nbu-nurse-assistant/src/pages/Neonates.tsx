@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   Search, UserPlus, Filter, MoreVertical, 
-  Calendar, Weight, Activity, ArrowRight, Heart, Droplets, X, Save, Scale, Baby, Info
+  Calendar, Weight, Activity, ArrowRight, Heart, Droplets, X, Save, Scale, Baby, Info, Edit, Trash2
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../services/api';
@@ -14,6 +14,7 @@ const Neonates: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingNeonate, setEditingNeonate] = useState<any>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const getUserData = () => {
@@ -59,30 +60,69 @@ const Neonates: React.FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await api.post('/neonates', {
+      const payload = {
         ...formData,
         birth_weight: parseFloat(formData.birth_weight),
         current_weight: parseFloat(formData.current_weight),
         gestational_age: parseInt(formData.gestational_age)
-      });
+      };
+
+      if (editingNeonate) {
+        await api.put(`/neonates/${editingNeonate.id}`, payload);
+      } else {
+        await api.post('/neonates', payload);
+      }
+      
       setShowAddModal(false);
+      setEditingNeonate(null);
       fetchNeonates();
-      setFormData({
-        name: '',
-        hospital_number: '',
-        dob: new Date().toISOString().split('T')[0],
-        gender: 'Male',
-        birth_weight: '',
-        current_weight: '',
-        gestational_age: '',
-        status: 'Stable'
-      });
+      resetForm();
     } catch (err) {
       console.error('Admission failed:', err);
-      alert('Failed to admit neonate. Check if Hospital ID is unique.');
+      alert('Failed to save neonate record. Check if Hospital ID is unique.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDelete = async (id: any) => {
+    if (window.confirm('Are you sure you want to discharge and remove this neonate record?')) {
+      try {
+        await api.delete(`/neonates/${id}`);
+        fetchNeonates();
+      } catch (err) {
+        console.error('Delete failed:', err);
+        alert('Failed to delete neonate record.');
+      }
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      name: '',
+      hospital_number: '',
+      dob: new Date().toISOString().split('T')[0],
+      gender: 'Male',
+      birth_weight: '',
+      current_weight: '',
+      gestational_age: '',
+      status: 'Stable'
+    });
+  };
+
+  const openEditModal = (neonate: any) => {
+    setEditingNeonate(neonate);
+    setFormData({
+      name: neonate.name,
+      hospital_number: neonate.hospital_number,
+      dob: neonate.dob,
+      gender: neonate.gender,
+      birth_weight: (neonate.birth_weight || neonate.weight || 0).toString(),
+      current_weight: (neonate.current_weight || neonate.weight || 0).toString(),
+      gestational_age: neonate.gestational_age.toString(),
+      status: neonate.status || 'Stable'
+    });
+    setShowAddModal(true);
   };
 
   const filteredNeonates = (neonates || []).filter(n => {
@@ -120,7 +160,7 @@ const Neonates: React.FC = () => {
           <p className="text-slate-500 font-medium">{isStudent ? 'Your simulated patient environment for clinical training.' : 'Digital census of all active neonatal admissions and clinical status.'}</p>
         </div>
         <button 
-          onClick={() => setShowAddModal(true)}
+          onClick={() => { setEditingNeonate(null); resetForm(); setShowAddModal(true); }}
           className="bg-slate-900 dark:bg-emerald-600 text-white flex items-center space-x-2 px-8 py-3.5 rounded-2xl font-bold text-sm shadow-xl shadow-slate-200 dark:shadow-none hover:bg-black dark:hover:bg-emerald-700 transition-all active:scale-95"
         >
           <UserPlus size={18} strokeWidth={3} />
@@ -138,8 +178,8 @@ const Neonates: React.FC = () => {
                className="bg-[var(--card-bg)] border border-[var(--border-main)] rounded-3xl sm:rounded-[3rem] w-full max-w-2xl p-6 sm:p-10 shadow-2xl space-y-6 sm:space-y-8 overflow-y-auto max-h-[90vh] custom-scrollbar"
              >
                 <div className="flex justify-between items-center">
-                   <h3 className="text-xl sm:text-2xl font-bold tracking-tight">New Clinical Admission</h3>
-                   <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
+                   <h3 className="text-xl sm:text-2xl font-bold tracking-tight">{editingNeonate ? 'Update Clinical Record' : 'New Clinical Admission'}</h3>
+                   <button onClick={() => { setShowAddModal(false); setEditingNeonate(null); resetForm(); }} className="p-2 hover:bg-[var(--bg-main)] rounded-xl"><X size={20} /></button>
                 </div>
 
                 <form onSubmit={handleAdmission} className="space-y-4 sm:space-y-6">
@@ -228,7 +268,7 @@ const Neonates: React.FC = () => {
                    </div>
 
                    <div className="space-y-2">
-                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Initial Status</label>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest px-1">Current Status</label>
                       <select 
                         value={formData.status}
                         onChange={(e) => setFormData({...formData, status: e.target.value})}
@@ -250,7 +290,7 @@ const Neonates: React.FC = () => {
                       ) : (
                         <>
                           <Save size={18} />
-                          <span>Finalize Admission</span>
+                          <span>{editingNeonate ? 'Save Changes' : 'Finalize Admission'}</span>
                         </>
                       )}
                    </button>
@@ -346,9 +386,22 @@ const Neonates: React.FC = () => {
                   <span>View Full Profile</span>
                   <ArrowRight size={14} className="group-hover:translate-x-1 transition-all" />
                </button>
-               <button className="p-2 text-slate-200 hover:text-slate-900 dark:hover:text-white transition-colors">
-                  <MoreVertical size={18} />
-               </button>
+               <div className="flex items-center space-x-2">
+                  <button 
+                    onClick={() => openEditModal(neonate)}
+                    className="p-2 text-slate-400 hover:text-emerald-600 transition-colors"
+                    title="Edit Record"
+                  >
+                    <Edit size={18} />
+                  </button>
+                  <button 
+                    onClick={() => handleDelete(neonate.id)}
+                    className="p-2 text-slate-400 hover:text-rose-600 transition-colors"
+                    title="Delete Record"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+               </div>
             </div>
           </motion.div>
         ))}
