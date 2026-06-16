@@ -17,6 +17,7 @@ const Layout: React.FC = () => {
 
   const toggleChat = () => {
     if ((window as any).Tawk_API) {
+      (window as any).Tawk_API.showWidget();
       (window as any).Tawk_API.maximize();
     }
   };
