@@ -1,4 +1,4 @@
-![Neonatal Care Unified CI](https://github.com/AlvinMutie/NBU_Care/actions/workflows/unified-ci.yml/badge.svg)
+
 # NeoDesk: Neonatal Clinical Intelligence Portal
 
 NeoDesk is a professional-grade clinical operating system designed to standardize neonatal care through precision engineering and editorial design. It transitions neonatal wards from manual, error-prone documentation to a high-integrity, data-driven ecosystem.
