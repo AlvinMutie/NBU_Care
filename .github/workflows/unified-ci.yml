@@ -21,7 +21,7 @@ jobs:
     - name: Setup PHP Environment
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'  # Upgraded to match modern Laravel dependency syntax requirements
+        php-version: '8.3'
         extensions: mbstring, xml, ctype, iconv, mysql, zip
         coverage: none
 
@@ -30,6 +30,9 @@ jobs:
 
     - name: Install Composer Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --ignore-platform-reqs
+
+    - name: Clear Cached Configuration
+      run: php artisan optimize:clear
 
     - name: Generate Application Key
       run: php artisan key:generate
