@@ -21,12 +21,16 @@ jobs:
     - name: Setup PHP Environment
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.4'  # Upgraded to PHP 8.4 to support modern syntax structures (like property hooks)
+        php-version: '8.4'
         extensions: mbstring, xml, ctype, iconv, mysql, zip
         coverage: none
 
     - name: Copy Environment File
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    # This creates the empty SQLite file so Laravel doesn't crash during optimization
+    - name: Create SQLite Database File
+      run: touch database/database.sqlite
 
     - name: Install Composer Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --ignore-platform-reqs
