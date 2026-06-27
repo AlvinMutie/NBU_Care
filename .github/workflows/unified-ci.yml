@@ -1,0 +1,66 @@
+name: Neonatal Care Unified CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  # --- JOB 1: BACKEND VERIFICATION ---
+  laravel-backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./nbu-laravel-unified
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup PHP Environment
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.2' # Adjust to match your local PHP version if needed
+        extensions: mbstring, xml, ctype, iconv, mysql, zip
+        coverage: none
+
+    - name: Copy Environment File
+      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
+
+    - name: Install Composer Dependencies
+      run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Generate Application Key
+      run: php artisan key:generate
+
+    - name: Run PHP Syntax Check (Linting)
+      run: find app/ -type f -name "*.php" -exec php -l {} \;
+
+    # If you ever add PHPUnit tests later, uncomment the line below:
+    # - name: Run Backend Tests
+    #   run: php artisan test
+
+  # --- JOB 2: FRONTEND VERIFICATION ---
+  react-frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./nbu-nurse-assistant
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js Environment
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20' # Matches standard LTS environments
+        cache: 'npm'
+        cache-dependency-path: ./nbu-nurse-assistant/package-lock.json
+
+    - name: Install Node Dependencies
+      run: npm ci
+
+    - name: Verify Production Compilation
+      run: npm run build
