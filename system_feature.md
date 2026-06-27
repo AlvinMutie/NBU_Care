@@ -56,3 +56,4 @@ A secure management suite for hospital administrators and ICT support.
 - **Adaptive UI:** Supports both Dark and Light modes for different clinical environments (e.g., night shifts).
 - **Mobile Responsive:** Fully optimized for use on both desktop workstations and mobile tablets.
 - **Real-time Search:** Lightning-fast search across patient records and clinical manuals.
+-Addition of other features later on
