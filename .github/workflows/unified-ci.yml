@@ -21,7 +21,7 @@ jobs:
     - name: Setup PHP Environment
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.2' # Adjust to match your local PHP version if needed
+        php-version: '8.3'  # Upgraded to match modern Laravel dependency syntax requirements
         extensions: mbstring, xml, ctype, iconv, mysql, zip
         coverage: none
 
@@ -55,7 +55,7 @@ jobs:
     - name: Setup Node.js Environment
       uses: actions/setup-node@v4
       with:
-        node-version: '20' # Matches standard LTS environments
+        node-version: '20' 
         cache: 'npm'
         cache-dependency-path: ./nbu-nurse-assistant/package-lock.json
 
