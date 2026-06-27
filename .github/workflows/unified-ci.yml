@@ -28,18 +28,22 @@ jobs:
     - name: Copy Environment File
       run: php -r "file_exists('.env') || copy('.env.example', '.env');"
 
-    # This creates the empty SQLite file so Laravel doesn't crash during optimization
-    - name: Create SQLite Database File
-      run: touch database/database.sqlite
-
     - name: Install Composer Dependencies
       run: composer install --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist --ignore-platform-reqs
 
+    # We inject standard environment overrides directly into the execution run
     - name: Clear Cached Configuration
       run: php artisan optimize:clear
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: ":memory:"
+        CACHE_STORE: array
 
     - name: Generate Application Key
       run: php artisan key:generate
+      env:
+        DB_CONNECTION: sqlite
+        DB_DATABASE: ":memory:"
 
     - name: Run PHP Syntax Check (Linting)
       run: find app/ -type f -name "*.php" -exec php -l {} \;
