@@ -21,7 +21,7 @@ jobs:
     - name: Setup PHP Environment
       uses: shivammathur/setup-php@v2
       with:
-        php-version: '8.3'
+        php-version: '8.4'  # Upgraded to PHP 8.4 to support modern syntax structures (like property hooks)
         extensions: mbstring, xml, ctype, iconv, mysql, zip
         coverage: none
 
@@ -39,10 +39,6 @@ jobs:
 
     - name: Run PHP Syntax Check (Linting)
       run: find app/ -type f -name "*.php" -exec php -l {} \;
-
-    # If you ever add PHPUnit tests later, uncomment the line below:
-    # - name: Run Backend Tests
-    #   run: php artisan test
 
   # --- JOB 2: FRONTEND VERIFICATION ---
   react-frontend:
