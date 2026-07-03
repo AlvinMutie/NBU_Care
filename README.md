@@ -93,7 +93,7 @@ This project is pre-configured for deployment on [Render](https://render.com).
 4. **Configuration:**
    - Copy the live URL of your backend (e.g., `https://neodesk-back-v301.onrender.com`).
    - In the Render dashboard for the `neodesk-front-v301` service, ensure the `VITE_API_BASE_URL` environment variable is set to `YOUR_BACKEND_URL/api`.
-   - Re-deploy the frontend to apply the change. (Incase of any problem contact the admin)
+   - Re-deploy the frontend to apply the change. (Incase of any problem contact the admin, which is me)
 
 ## Clinical Safety Disclaimer
 
