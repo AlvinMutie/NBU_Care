@@ -71,7 +71,7 @@ docker run -p 8000:10000 neodesk-backend
 
 ## Testing & Login Credentials
 
-Use the following pre-seeded credentials to access the platform during review. The default password for all accounts is **`password`**.
+Use the following pre-seeded credentials to access the platform during review. The default password for all accounts is **`password`**. (They are all test accounts and dont have real user data, only test data)
 
 | Role | Email Address | Access Level |
 | :--- | :--- | :--- |
@@ -99,6 +99,6 @@ This project is pre-configured for deployment on [Render](https://render.com).
 
 NeoDesk is a decision-support tool designed to enhance clinical precision. It is not a substitute for professional clinical judgment. All software-generated calculations must be verified by a secondary clinician in accordance with standard neonatal ward protocols and institutional guidelines.
 
-## License and Attribution
+## License
 
 Copyright 2026 NeoDesk Clinical Systems. All rights reserved.
