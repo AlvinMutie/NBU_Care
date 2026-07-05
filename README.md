@@ -16,7 +16,7 @@ NeoDesk is a professional-grade clinical operating system designed to standardiz
 A robust PHP/Laravel backend providing a secure API, institutional governance, and clinical ledger.
 - **Location:** `/nbu-laravel-unified`
 - **Framework:** Laravel 11+ ( this is what was stable)
-- **Database:** SQLite (default) / PostgreSQL (production)
+- **Database:** SQLite (default) / PostgreSQL (production) (Mongo Db could be a good db to use, dont limit yourself to this)
 - **Features:** Eloquent Models, API Authentication, Migrations, Seeders.
 
 ### Frontend: Nurse Assistant Portal
